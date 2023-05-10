@@ -75,8 +75,7 @@ Organization에서 BackEnd 별도의 레파지토리에서 관리합니다.
 ### **⚙️** 브랜치 관리 전략
 
 ### **⚙️ Git-flow**
-<img width="700" alt="148559145-64a8029e-d220-4b80-b02f-eb45a0e07c05" src="https://user-images.githubusercontent.com/39437170/235847085-de95565f-6b35-4c16-b079-ad6503e95afc.png">
-
+![trunked_base_development](https://www.optimizely.com/contentassets/569ac3ee0b124da19a5ac9ea2e8b2b4d/trunk-based-development.png)
 
 **⚙️ 브랜치 구성**
 - `feat` 브랜치는 하나의 기능을 개발하기 위한 브랜치입니다. 부모는`develop`이며, 개발이 완료되면`develop`에 merge합니다. 브랜치 이름은 보통`feature/*`이 됩니다.
