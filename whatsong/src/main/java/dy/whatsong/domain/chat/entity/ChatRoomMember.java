@@ -13,11 +13,11 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RoomMember {
+public class ChatRoomMember {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long roomMemberSeq;
+	private Long chatRoomMemberSeq;
 
 	@ManyToOne
 	@JoinColumn(name = "memberSeq")
