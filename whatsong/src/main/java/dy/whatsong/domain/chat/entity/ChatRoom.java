@@ -14,14 +14,10 @@ public class ChatRoom {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long roomSeq;
+	private Long chatRoomSeq;
 
 	private String title;
 
-	private int limit;
-
-	private String roomCode;
-
 	@OneToMany(mappedBy = "chatRoom")
-	private List<RoomMember> chatMemberList;
+	private List<ChatRoomMember> chatMemberList;
 }
