@@ -5,7 +5,12 @@ What's Song(왓송) 서비스 백엔드 레포지토리
 
 ## 프로젝트 아키텍쳐
 
-- 추후 이미지 업로드(CloudCraft PNG)
+![image](https://github.com/DY-WhatSong/BE-What_Song/assets/39437170/7b4ba815-c0b7-4ecd-92e3-8dfc8401af1b)
+
+## ERD
+
+![image](https://github.com/DY-WhatSong/BE-What_Song/assets/39437170/79e35ee2-6c24-449b-b007-02b979209e05)
+
 
 # 0. 개발 환경, 언어, 도구
 
@@ -126,9 +131,9 @@ Organization에서 BackEnd 별도의 레파지토리에서 관리합니다.
 - Swagger
 - Oauth2.0
 - Spring Rest docs
-- Crawling
 - RestAPI
 - Redis
+- Youtube API
 
 # 개발기간
 
