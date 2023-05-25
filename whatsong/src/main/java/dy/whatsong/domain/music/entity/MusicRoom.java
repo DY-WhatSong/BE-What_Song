@@ -22,8 +22,6 @@ public class MusicRoom {
 
 	private String category;
 
-	private Integer count;
-
 	@Enumerated(EnumType.STRING)
 	private AccessAuth accessAuth;
 
