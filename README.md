@@ -88,6 +88,12 @@ Organization에서 BackEnd 별도의 레파지토리에서 관리합니다.
 - `main`브랜치는 실제 운영 중인 서비스의 브랜치입니다.
 - `hotfix`브랜치는 서비스에 문제가 발생했을 때 핫픽스에 해당하는 브랜치입니다. 기능 개발(`feature`) 등과 달리 빠르게 대처해야 할 필요가 있기 때문에,`master`브랜치에 직접 merge하는 전략을 취합니다.`dev`과의 차이가 발생하기 때문에, 나중에 차이를 merge할 필요가 있습니다.
 
+## 🛠 Git Branch workflow
+![image](https://github.com/DY-WhatSong/BE-What_Song/assets/39437170/70a022bc-ff52-48cd-b8a5-994d6b2b15f6)
+
+- `Squash and Merge` 방법을 차용하여 `Issue`,`Feature` 단위 커밋을 통해 Merge시 진행 사항 구조 손쉽게 파악하는 것을 목적으로한다.
+- 각 branch PR시 `이슈화`하여 코드에 대한 피드백 및 토론 후 상대방이 `Merge`
+
 ### 브랜치 네이밍
 
 **⚙️ 네이밍 패턴**
