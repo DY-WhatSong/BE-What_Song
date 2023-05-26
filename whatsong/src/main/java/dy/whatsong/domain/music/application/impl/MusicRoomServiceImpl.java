@@ -30,11 +30,13 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 
 	private final MusicMemberCheckService musicMemberCheckService;
 
+	//TODO : 회원데이터 추후 진짜 회원 도메인에서 받아오기
+	Member member=new Member();
+
 
 	@Override
+	@Transactional
 	public ResponseEntity<?> createMusicRoom(MusicRequestDTO.Create createDTO) {
-		//TODO : 회원데이터 추후 진짜 회원 도메인에서 받아오기
-		Member member=new Member();
 		List<MusicRoomMember> mrmList = musicMemberCheckService.getInfoMRMListByMember(member);
 		if(getInfoCreatedRoomLimit(mrmList)) return new ResponseEntity<>("limit", HttpStatus.OK);
 
@@ -52,6 +54,24 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 
 		return new ResponseEntity<>(createdRoom,HttpStatus.OK);
 	}
+
+	@Override
+	public ResponseEntity<?> getOwnerRoomList(MusicRequestDTO.OwnerInfo ownerInfoDTO) {
+		List<MusicRoomMember> mrmList = musicMemberCheckService.getInfoMRMListByMember(member);
+
+	}
+
+	@Override
+	public ResponseEntity<?> changeRoomInfo(MusicRequestDTO.ChangeInfo changeInfoDTO) {
+		return null;
+	}
+
+	@Override
+	public ResponseEntity<?> deleteMusicRoom(MusicRequestDTO.Delete deleteDTO) {
+		return null;
+	}
+
+	private
 
 
 	private boolean getInfoCreatedRoomLimit(List<MusicRoomMember> mrmList){

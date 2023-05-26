@@ -6,4 +6,10 @@ import org.springframework.http.ResponseEntity;
 
 public interface MusicRoomService {
 	ResponseEntity<?> createMusicRoom(MusicRequestDTO.Create createDTO);
+
+	ResponseEntity<?> getOwnerRoomList(MusicRequestDTO.OwnerInfo ownerInfoDTO);
+
+	ResponseEntity<?> changeRoomInfo(MusicRequestDTO.ChangeInfo changeInfoDTO);
+
+	ResponseEntity<?> deleteMusicRoom(MusicRequestDTO.Delete deleteDTO);
 }
