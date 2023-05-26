@@ -1,7 +1,7 @@
 package dy.whatsong.domain.music.application.impl;
 
 import dy.whatsong.domain.member.entity.Member;
-import dy.whatsong.domain.music.application.service.check.MusicMemberService;
+import dy.whatsong.domain.music.application.service.MusicMemberService;
 import dy.whatsong.domain.music.entity.MusicRoom;
 import dy.whatsong.domain.music.entity.MusicRoomMember;
 import dy.whatsong.domain.music.repo.MusicMemberRepository;

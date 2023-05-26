@@ -1,5 +1,6 @@
 package dy.whatsong.domain.music.entity;
 
+import dy.whatsong.domain.music.dto.request.MusicRequestDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,4 +28,11 @@ public class MusicRoom {
 
 	@OneToMany(mappedBy = "musicRoom")
 	private List<MusicRoomMember> musicRoomMembers;
+
+	public MusicRoom changeElements(MusicRequestDTO.ChangeInfo changeInfoDTO){
+		this.accessAuth=changeInfoDTO.getAccessAuth();
+		this.category=changeInfoDTO.getCategory();
+		this.roomName=changeInfoDTO.getName();
+		return this;
+	}
 }
