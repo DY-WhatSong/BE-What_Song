@@ -27,15 +27,8 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 	@Override
 	@Transactional
 	public ResponseEntity<?> memberFriendRequest(MemberRequestDTO.FriendsApply friendsApplyDTO) {
-		QFriendsState qfs=QFriendsState.friendsState;
-		BooleanExpression friendConditon = qfs.ownerSeq.eq(friendsApplyDTO.getOwnerSeq())
-				.and(qfs.targetSeq.eq(friendsApplyDTO.getTargetSeq()));
 
-		boolean alreadyFriends = jpaQueryFactory.selectOne()
-				.from(qfs)
-				.where(friendConditon)
-				.fetchFirst() != null;
-
+		boolean alreadyFriends = isAlreadyFriends(friendsApplyDTO.getOwnerSeq(),friendsApplyDTO.getTargetSeq());
 		if (alreadyFriends){
 			return new ResponseEntity<>("Already Friends", HttpStatus.OK);
 		}
@@ -45,5 +38,18 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 				.build();
 		friendsStateRepository.save(friendsNew);
 		return new ResponseEntity<>(friendsNew,HttpStatus.OK);
+	}
+
+	@Override
+	public boolean isAlreadyFriends(Long ownerSeq,Long requestMemberSeq){
+		QFriendsState qfs=QFriendsState.friendsState;
+
+		BooleanExpression friendConditon = qfs.ownerSeq.eq(ownerSeq)
+				.and(qfs.targetSeq.eq(requestMemberSeq));
+
+		return jpaQueryFactory.selectOne()
+				.from(qfs)
+				.where(friendConditon)
+				.fetchFirst() != null;
 	}
 }

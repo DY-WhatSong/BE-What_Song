@@ -12,4 +12,6 @@ public interface MusicRoomService {
 	ResponseEntity<?> changeRoomInfo(MusicRequestDTO.ChangeInfo changeInfoDTO);
 
 	ResponseEntity<?> deleteMusicRoom(MusicRequestDTO.Delete deleteDTO);
+
+	ResponseEntity<?> ableAccessRoom(MusicRequestDTO.AccessRoom accessRoomDTO);
 }

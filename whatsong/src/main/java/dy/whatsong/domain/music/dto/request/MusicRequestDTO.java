@@ -32,4 +32,10 @@ public class MusicRequestDTO {
 	public static class Delete{
 		private Long roomSeq;
 	}
+
+	@Getter
+	public static class AccessRoom{
+		private String oauthId;
+		private Long roomSeq;
+	}
 }

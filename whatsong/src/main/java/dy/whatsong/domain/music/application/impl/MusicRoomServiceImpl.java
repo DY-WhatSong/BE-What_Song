@@ -1,16 +1,15 @@
 package dy.whatsong.domain.music.application.impl;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.music.application.service.MusicRoomService;
 import dy.whatsong.domain.music.application.service.check.MusicCheckService;
 import dy.whatsong.domain.music.application.service.check.MusicMemberCheckService;
 import dy.whatsong.domain.music.application.service.MusicMemberService;
 import dy.whatsong.domain.music.dto.request.MusicRequestDTO;
-import dy.whatsong.domain.music.entity.MusicRoom;
-import dy.whatsong.domain.music.entity.MusicRoomMember;
-import dy.whatsong.domain.music.entity.QMusicRoom;
-import dy.whatsong.domain.music.entity.QMusicRoomMember;
+import dy.whatsong.domain.music.entity.*;
 import dy.whatsong.domain.music.repo.MusicRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -39,7 +38,14 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
+	private final MemberDetailService memberDetailService;
+
 	public static final String BAD_REQUEST="Bad Request";
+
+	public static final String ACCESS_ALLOW="Access Allow";
+
+	public static final String ACCESS_DENIED="Access Denied";
+
 
 	//TODO : 회원데이터 추후 진짜 회원 도메인에서 받아오기
 	Member dummyMember =new Member();
@@ -103,9 +109,64 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 		return new ResponseEntity<>(BAD_REQUEST,HttpStatus.BAD_REQUEST);
 	}
 
+	@Override
+	public ResponseEntity<?> ableAccessRoom(MusicRequestDTO.AccessRoom accessRoomDTO) {
+		QMusicRoom qmr=QMusicRoom.musicRoom;
+		if (isRequestUserRoomOwner(accessRoomDTO)){
+			return new ResponseEntity<>(ACCESS_ALLOW,HttpStatus.OK);
+		}
+
+		MusicRoom musicRoom = jpaQueryFactory.selectFrom(qmr)
+				.where(qmr.musicRoomSeq.eq(accessRoomDTO.getRoomSeq()))
+				.fetchOne();
+
+		AccessAuth roomAccess = musicRoom.getAccessAuth();
+		switch (roomAccess){
+			case NON:
+				return new ResponseEntity<>(ACCESS_DENIED,HttpStatus.OK);
+			case PUBLIC:
+				return new ResponseEntity<>(ACCESS_ALLOW,HttpStatus.OK);
+			case PRIVATE:
+				return requestPrivateRoomIsCorrect(accessRoomDTO);
+		}
+
+		System.out.println("BADREQUEST");
+		return new ResponseEntity<>("ERR",HttpStatus.BAD_REQUEST);
+	}
+
 
 	private boolean getInfoCreatedRoomLimit(List<MusicRoomMember> mrmList){
 		return mrmList.size()==3;
 	}
 
+
+	private boolean isRequestUserRoomOwner(MusicRequestDTO.AccessRoom accessRoomDTO){
+		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
+		QMusicRoom qmr=QMusicRoom.musicRoom;
+		BooleanExpression validRoom = qmrm.musicRoom.musicRoomSeq.eq(accessRoomDTO.getRoomSeq())
+				.and(qmrm.ownerSeq.eq(dummyMember.getMemberSeq()));
+
+		return jpaQueryFactory.selectOne()
+				.from(qmrm)
+				.join(qmrm.musicRoom,qmr)
+				.where(validRoom)
+				.fetchFirst()!=null;
+	}
+
+	private ResponseEntity<?> requestPrivateRoomIsCorrect(MusicRequestDTO.AccessRoom accessRoomDTO){
+		QMusicRoom qmr=QMusicRoom.musicRoom;
+		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
+		MusicRoom eqMR = jpaQueryFactory.selectFrom(qmr)
+				.where(qmr.musicRoomSeq.eq(accessRoomDTO.getRoomSeq()))
+				.fetchOne();
+
+		Long ownerSeq = jpaQueryFactory.selectFrom(qmrm)
+				.where(qmrm.musicRoom.eq(eqMR))
+				.fetchOne().getOwnerSeq();
+		if(memberDetailService.isAlreadyFriends(ownerSeq,dummyMember.getMemberSeq())){
+			return new ResponseEntity<>(ACCESS_ALLOW,HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(ACCESS_DENIED,HttpStatus.OK);
+	}
 }
