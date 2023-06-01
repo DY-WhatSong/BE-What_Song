@@ -48,7 +48,6 @@ public class YoutubeServiceImpl implements YoutubeService {
 
 		RestTemplate restTemplate=new RestTemplate();
 		String response = restTemplate.getForObject(target_url, String.class);
-		System.out.println(response);
 		List<VideoDTO.SearchResponse> infoToSearchDTO = getInfoToSearchDTO(response);
 		return new ResponseEntity<>(infoToSearchDTO, HttpStatus.OK);
 	}
@@ -65,11 +64,13 @@ public class YoutubeServiceImpl implements YoutubeService {
 			JsonObject snippet = targetObject.get("snippet").getAsJsonObject();
 			String title = snippet.get("title").getAsString();
 			String channelTitle = snippet.get("channelTitle").getAsString();
+			String thumbnailUrl = snippet.get("thumbnails").getAsJsonObject().get("high").getAsJsonObject().get("url").getAsString();
 			searchList.add(
 					VideoDTO.SearchResponse.builder()
 							.videoId(videoId)
 							.title(title)
 							.channelName(channelTitle)
+							.thumbnailUrl(thumbnailUrl)
 							.build()
 			);
 		}

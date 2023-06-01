@@ -12,6 +12,7 @@ public class VideoDTO {
 		private String videoId;
 		private String title;
 		private String channelName;
+		private String thumbnailUrl;
 	}
 
 	@Getter
