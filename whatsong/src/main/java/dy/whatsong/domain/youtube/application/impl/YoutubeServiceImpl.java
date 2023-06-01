@@ -41,7 +41,7 @@ public class YoutubeServiceImpl implements YoutubeService {
 		log.info("searchQuery="+searchQuery);
 		String target_url= API_URL_SNIPPET +
 				"?part="+YOUTUBE_PART +
-				"&maxResult="+MAX_QUERY +
+				"&maxResults="+MAX_QUERY +
 				"&q=" + searchQuery +
 				"&key=" + API_KEY +
 				"&type="+YOUTUBE_TYPE;
