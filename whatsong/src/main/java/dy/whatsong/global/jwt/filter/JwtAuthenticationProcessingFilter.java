@@ -18,6 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Jwt 인증 필터
@@ -36,7 +38,8 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-    private static final String NO_CHECK_URL = "/login"; // "/login"으로 들어오는 요청은 Filter 작동 X
+    // "/login"으로 들어오는 요청은 Filter 작동 X
+    private static final List<String> NO_CHECK_URLS = Arrays.asList("/oauth2", "/login");
 
     private final JwtService jwtService;
     private final MemberRepository memberRepository;
@@ -45,7 +48,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().equals(NO_CHECK_URL)) {
+        log.info("request.getRequestURI() : {}", request.getRequestURI());
+        if(NO_CHECK_URLS.contains(request.getRequestURI())) {
             filterChain.doFilter(request, response); // "/login" 요청이 들어오면, 다음 필터 호출
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
         }
@@ -58,6 +62,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 .filter(jwtService::isTokenValid)
                 .orElse(null);
 
+        log.info("refreshToken : {}", refreshToken);
         // 리프레시 토큰이 요청 헤더에 존재했다면, 사용자가 AccessToken이 만료되어서
         // RefreshToken까지 보낸 것이므로 리프레시 토큰이 DB의 리프레시 토큰과 일치하는지 판단 후,
         // 일치한다면 AccessToken을 재발급해준다.
@@ -118,7 +123,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 .ifPresent(accessToken -> jwtService.extractEmail(accessToken)
                         .ifPresent(email -> memberRepository.findByEmail(email)
                                 .ifPresent(this::saveAuthentication)));
-
+        log.info("checkAccessTokenAndAuthentication() 호출2");
         filterChain.doFilter(request, response);
     }
 
@@ -138,6 +143,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      * setAuthentication()을 이용하여 위에서 만든 Authentication 객체에 대한 인증 허가 처리
      */
     public void saveAuthentication(Member myMember) {
+        log.info("saveAuthentication() 호출");
         String password = "";
 
         UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()

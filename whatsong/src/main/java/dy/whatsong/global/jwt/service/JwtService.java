@@ -87,6 +87,7 @@ public class JwtService {
      * 헤더를 가져온 후 "Bearer"를 삭제(""로 replace)
      */
     public Optional<String> extractRefreshToken(HttpServletRequest request) {
+        log.info("extractRefreshToken() 메서드 호출");
         return Optional.ofNullable(request.getHeader(jwtProperties.getREFRESH_TOKEN_HEADER()))
                 .filter(refreshToken -> refreshToken.startsWith(BEARER))
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
@@ -98,6 +99,7 @@ public class JwtService {
      * 헤더를 가져온 후 "Bearer"를 삭제(""로 replace)
      */
     public Optional<String> extractAccessToken(HttpServletRequest request) {
+        log.info("extractAccessToken() 메서드 호출");
         return Optional.ofNullable(request.getHeader(jwtProperties.getACCESS_TOKEN_HEADER()))
                 .filter(refreshToken -> refreshToken.startsWith(BEARER))
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
@@ -112,6 +114,7 @@ public class JwtService {
      */
     public Optional<String> extractEmail(String accessToken) {
         try {
+            log.info("extractEmail() 메서드");
             // 토큰 유효성 검사하는 데에 사용할 알고리즘이 있는 JWT verifier builder 반환
             return Optional.ofNullable(JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()))
                     .build() // 반환된 빌더로 JWT verifier 생성
@@ -151,7 +154,9 @@ public class JwtService {
 
     public boolean isTokenValid(String token) {
         try {
+            log.info("isTokenValid() 메서드");
             JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY())).build().verify(token);
+
             return true;
         } catch (Exception e) {
             log.error("유효하지 않은 토큰입니다. {}", e.getMessage());
