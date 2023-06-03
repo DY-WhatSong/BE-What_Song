@@ -1,4 +1,4 @@
-package dy.whatsong.domain.oauth.domain;
+package dy.whatsong.domain.member.domain;
 
 import lombok.*;
 

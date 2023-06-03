@@ -1,7 +1,8 @@
-package dy.whatsong.domain.oauth.service;
+package dy.whatsong.domain.member.service;
 
-import dy.whatsong.domain.oauth.domain.KakaoProfile;
-import dy.whatsong.domain.oauth.util.KakaoOAuth2;
+import dy.whatsong.domain.member.entity.Member;
+import dy.whatsong.domain.member.repository.MemberRepository;
+import dy.whatsong.domain.member.domain.KakaoProfile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,21 +11,23 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserService {
+public class MemberService {
 
 //    private final PasswordEncoder passwordEncoder;
-//    private final UserRepository userRepository;
-    private final KakaoOAuth2 kakaoOAuth2;
+    private final MemberRepository memberRepository;
+    private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
     private static final String ADMIN_TOKEN = "376d3362b0307ab01c9ef0642be92155";
 
     public void kakaoLogin(String authorizedCode) {
         // 카카오 OAuth2 를 통해 카카오 사용자 정보 조회
         log.info("authorizedCode : {}", authorizedCode);
-        KakaoProfile userInfo = kakaoOAuth2.getUserInfo(authorizedCode);
+        KakaoProfile userInfo = tokenService.getUserInfo(authorizedCode);
         Long kakaoId = userInfo.getId();
         String nickname = userInfo.getNickname();
         String email = userInfo.getEmail();
@@ -57,5 +60,13 @@ public class UserService {
         Authentication authentication = authenticationManager.authenticate(kakaoUsernamePassword);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         log.info("Finished");
+    }
+
+    public Member checkUserExistence(Long id) {
+        // 카카오 회원 정보 > 회원 번호(고유값)로 DB에 정보 존재 하는 지 판별
+        Optional<Member> byId = memberRepository.findById(id);
+        Member member = byId.orElse(null);
+
+        return member;
     }
 }
