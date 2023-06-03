@@ -32,13 +32,12 @@ spring:
       client:
         registration:
           kakao:
-            client-id: 7ae1ad5950661b2aefe29ac0874cc44d
-#            client-id: f51146cf3f9524ee8e1e4c32a3e9a5d2
-            redirect-uri: "localhost:3000/login/oauth"
+            client-id: 73ab336ae29a4c56ef25afe3c13ac54b
+            redirect-uri: "http://localhost:8080/login/oauth2/code/{registrationId}"
             client-authentication-method: POST
             authorization-grant-type: authorization_code
-            scope: profile_nickname, profile_image, account_email #?? ??
             client-name: Kakao
+            scope: profile_nickname, profile_image, account_email #?? ??
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
@@ -51,5 +50,9 @@ spring:
 jwt:
   secret:
     key: IamSecretKey
-  expired:
-    time: 1800000
+  access:
+    expired: 1800000
+    header: authorization
+  refresh:
+    expired: 1800000
+    header: refresh

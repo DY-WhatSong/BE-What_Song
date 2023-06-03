@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.domain.member.service;
 
 import com.auth0.jwt.JWT;
@@ -11,8 +12,6 @@ import dy.whatsong.common.domain.response.ResponseService;
 import dy.whatsong.common.domain.response.SingleResponse;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
-import dy.whatsong.domain.member.domain.KakaoProfile;
-import dy.whatsong.domain.member.domain.OAuthToken;
 import dy.whatsong.global.constant.Properties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -57,11 +56,13 @@ public class TokenService {
         return userInfo;
     }
 
-    /**
+    */
+/**
      * 인가 코드를 통해서 access_token 발급받는 메서드
      * @param authorizedCode
      * @return OAuthToken
-     */
+     *//*
+
     public OAuthToken getAccessToken(String authorizedCode) {
         // HttpHeader 오브젝트 생성
         HttpHeaders headers = new HttpHeaders();
@@ -96,11 +97,13 @@ public class TokenService {
 //        return accessToken;
     }
 
-    /**
+    */
+/**
      * 카카오 서버에 접근해서 사용자의 정보를 받아오는 메서드
      * @param accessToken
      * @return KakaoProfile
-     */
+     *//*
+
     public KakaoProfile getUserInfoByToken(String accessToken) {
         // HttpHeader 오브젝트 생성
         HttpHeaders headers = new HttpHeaders();
@@ -128,9 +131,11 @@ public class TokenService {
 //        return new KakaoProfile(id, email, nickname);
     }
 
-    /**
+    */
+/**
      * 토큰을 포함한 응답값 리턴 함수
-     */
+     *//*
+
     public ResponseEntity getTokensResponse(Member member) {
 
         List<String> tokenList = new ArrayList<>();
@@ -149,9 +154,11 @@ public class TokenService {
                 .body(singleResponse);
     }
 
-    /**
+    */
+/**
      * 토큰을 포함한 응답값 리턴 함수
-     */
+     *//*
+
     public ResponseEntity getKakaoProfileResponse(KakaoProfile kakaoProfile) {
 
         SingleResponse<KakaoProfile> singleResponse = responseService.getSingleResponse(kakaoProfile);
@@ -161,16 +168,18 @@ public class TokenService {
                 .body(singleResponse);
     }
 
-    /**
+    */
+/**
      * JWT토큰 생성하는 함수
      * @param member 사용자
      * @return 발급한 JWT 토큰
-     */
+     *//*
+
     private String createToken(Member member) {
 
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getEXPIRED_TIME()))
+                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getACCESS_TOKEN_EXPIRED_TIME()))
 
                 .withClaim("id", member.getMemberSeq())
                 .withClaim("email", member.getEmail())
@@ -180,16 +189,18 @@ public class TokenService {
         return jwtToken;
     }
 
-    /**
+    */
+/**
      * refresh 토큰을 생성하는 함수
      * @param member 사용자
      * @return 발급한 refresh token
-     */
+     *//*
+
     private String createRefreshToken(Member member) {
 
         String refreshToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getEXPIRED_TIME()))
+                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
 
                 .withClaim("id", member.getMemberSeq())
 
@@ -197,11 +208,13 @@ public class TokenService {
         return refreshToken;
     }
 
-    /**
+    */
+/**
      * refresh token을 받아 access token과 refresh toekn 재발급
      * @param refreshToken
      * @return access token과 refresh token List
-     */
+     *//*
+
     public List<String> reissueRefreshToken(String refreshToken){
 
         List<String> tokenList = new ArrayList<>();
@@ -222,11 +235,13 @@ public class TokenService {
         return tokenList;
     }
 
-    /**
+    */
+/**
      * 토큰 정보를 검증하는 메서드
      * @param token 토큰
      * @return 토큰 검증 여부
-     */
+     *//*
+
     public boolean validateToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY());
@@ -255,3 +270,4 @@ public class TokenService {
                 .asLong();
     }
 }
+*/

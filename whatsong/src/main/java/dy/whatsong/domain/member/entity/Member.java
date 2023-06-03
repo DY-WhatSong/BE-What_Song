@@ -46,4 +46,8 @@ public class Member {
 
 	@OneToMany(mappedBy = "member")
 	private List<MusicRoomMember> musicRoomMembers;
+
+	public void updateRefreshToken(String updateRefreshToken) {
+		this.refreshToken = updateRefreshToken;
+	}
 }

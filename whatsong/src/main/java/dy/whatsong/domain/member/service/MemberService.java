@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.domain.member.service;
 
 import dy.whatsong.domain.member.entity.Member;
@@ -37,6 +38,7 @@ public class MemberService {
         String username = nickname;
         // 패스워드 = 카카오 Id + ADMIN TOKEN
         String password = kakaoId + ADMIN_TOKEN;
+*/
 /*
         // DB 에 중복된 Kakao Id 가 있는지 확인
         Member kakaoUser = userRepository.findByKakaoId(kakaoId).orElse(null);
@@ -52,7 +54,8 @@ public class MemberService {
             kakaoUser = new Member();
 //            kakaoUser = new Member(nickname, encodedPassword, email, role, kakaoId);
             userRepository.save(kakaoUser);
-        }*/
+        }*//*
+
 
         log.info("Started");
         // 로그인 처리
@@ -70,3 +73,4 @@ public class MemberService {
         return member;
     }
 }
+*/
