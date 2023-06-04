@@ -79,6 +79,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
      * 만약 찾은 회원이 있다면, 그대로 반환하고 없다면 saveUser()를 호출하여 회원을 저장한다.
      */
     private Member getMember(OAuthAttributes attributes, SocialType socialType) {
+        log.info("getMember() 메서드");
         Member findMember = memberRepository.findByOauthId(
                 attributes.getOauth2UserInfo().getId()).orElse(null);
 
@@ -93,6 +94,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
      * 생성된 User 객체를 DB에 저장 : socialType, socialId, email, role 값만 있는 상태
      */
     private Member saveMember(OAuthAttributes attributes, SocialType socialType) {
+        log.info("saveMember() 메서드");
         Member createdMember = attributes.toEntity(socialType, attributes.getOauth2UserInfo());
         return memberRepository.save(createdMember);
     }
