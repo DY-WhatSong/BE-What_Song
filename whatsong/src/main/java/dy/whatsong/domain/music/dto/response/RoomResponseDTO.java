@@ -1,0 +1,27 @@
+package dy.whatsong.domain.music.dto.response;
+
+import dy.whatsong.domain.music.entity.AccessAuth;
+import lombok.Builder;
+import lombok.Getter;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
+@Getter
+public class RoomResponseDTO {
+
+	@Getter
+	@Builder
+	public static class Have{
+		private Long musicRoomSeq;
+
+		private String roomName;
+
+		private String roomCode;
+
+		private String category;
+
+		@Enumerated(EnumType.STRING)
+		private AccessAuth accessAuth;
+	}
+}

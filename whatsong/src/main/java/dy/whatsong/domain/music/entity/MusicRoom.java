@@ -1,6 +1,7 @@
 package dy.whatsong.domain.music.entity;
 
 import dy.whatsong.domain.music.dto.request.MusicRequestDTO;
+import dy.whatsong.domain.music.dto.response.RoomResponseDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,5 +35,15 @@ public class MusicRoom {
 		this.category=changeInfoDTO.getCategory();
 		this.roomName=changeInfoDTO.getName();
 		return this;
+	}
+
+	public RoomResponseDTO.Have toHaveRoomDTO(){
+		return RoomResponseDTO.Have.builder()
+				.musicRoomSeq(musicRoomSeq)
+				.roomCode(roomCode)
+				.roomName(roomName)
+				.accessAuth(accessAuth)
+				.category(category)
+				.build();
 	}
 }
