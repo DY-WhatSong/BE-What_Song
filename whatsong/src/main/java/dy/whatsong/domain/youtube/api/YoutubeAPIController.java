@@ -18,6 +18,6 @@ public class YoutubeAPIController {
 
 	@PostMapping("/youtube/search")
 	public ResponseEntity<?> searchByKeywordOnYoutube(@RequestBody VideoDTO.Keyword keywordDTO) throws JsonProcessingException {
-		return youtubeService.searchOnYoutube(keywordDTO.getKeyword());
+		return youtubeService.searchOnYoutube(keywordDTO);
 	}
 }

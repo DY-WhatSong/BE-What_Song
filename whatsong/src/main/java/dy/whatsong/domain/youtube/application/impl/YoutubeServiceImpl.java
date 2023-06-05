@@ -35,14 +35,13 @@ public class YoutubeServiceImpl implements YoutubeService {
 	private static final String API_URL_SNIPPET = "https://www.googleapis.com/youtube/v3/search";
 
 	@Override
-	public ResponseEntity<?> searchOnYoutube(String searchQuery) {
+	public ResponseEntity<?> searchOnYoutube(VideoDTO.Keyword keyword) {
 		log.info("KEY="+API_KEY);
 		log.info("KEY="+MAX_QUERY);
-		log.info("searchQuery="+searchQuery);
 		String target_url= API_URL_SNIPPET +
 				"?part="+YOUTUBE_PART +
 				"&maxResults="+MAX_QUERY +
-				"&q=" + searchQuery +
+				"&q=" + keyword.getKeyword() +
 				"&key=" + API_KEY +
 				"&type="+YOUTUBE_TYPE;
 
