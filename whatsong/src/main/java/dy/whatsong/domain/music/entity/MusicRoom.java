@@ -46,4 +46,14 @@ public class MusicRoom {
 				.category(category)
 				.build();
 	}
+
+	public RoomResponseDTO.Change toChangeInfoDTO(){
+		return RoomResponseDTO.Change.builder()
+				.musicRoomSeq(musicRoomSeq)
+				.roomCode(roomCode)
+				.accessAuth(accessAuth)
+				.category(category)
+				.roomName(roomName)
+				.build();
+	}
 }

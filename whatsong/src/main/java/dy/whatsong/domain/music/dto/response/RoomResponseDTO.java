@@ -24,4 +24,20 @@ public class RoomResponseDTO {
 		@Enumerated(EnumType.STRING)
 		private AccessAuth accessAuth;
 	}
+
+	@Getter
+	@Builder
+	public static class Change{
+		private Long musicRoomSeq;
+
+		private String roomName;
+
+		private String roomCode;
+
+		private String category;
+
+		@Enumerated(EnumType.STRING)
+		private AccessAuth accessAuth;
+	}
+
 }

@@ -5,6 +5,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.dto.MemberRequestDTO;
 import dy.whatsong.domain.member.entity.FriendsState;
+import dy.whatsong.domain.member.entity.Member;
+import dy.whatsong.domain.member.entity.MemberRole;
 import dy.whatsong.domain.member.entity.QFriendsState;
 import dy.whatsong.domain.member.repo.FriendsStateRepository;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
@@ -51,5 +53,16 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 				.from(qfs)
 				.where(friendConditon)
 				.fetchFirst() != null;
+	}
+
+	public Member testDummy(){
+		return Member.builder()
+				.memberSeq(1L)
+				.nickname("dummy")
+				.innerNickname("bomin")
+				.memberRole(MemberRole.USER)
+				.email("dummy@dummy.com")
+				.imgURL("https://avatars.githubusercontent.com/u/65716445?v=4")
+				.build();
 	}
 }

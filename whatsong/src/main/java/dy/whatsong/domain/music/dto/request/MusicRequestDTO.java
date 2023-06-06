@@ -15,10 +15,10 @@ public class MusicRequestDTO {
 		private AccessAuth accessAuth;
 	}
 
-	@Getter
+	/*@Getter
 	public static class OwnerInfo{
-		private String oauthId;
-	}
+		private Long memberSeq;
+	}*/
 
 	@Getter
 	public static class ChangeInfo{

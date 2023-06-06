@@ -2,13 +2,16 @@ package dy.whatsong.domain.music.application.impl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import dy.whatsong.domain.member.application.impl.MemberDetailServiceImpl;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.entity.Member;
+import dy.whatsong.domain.member.entity.MemberRole;
 import dy.whatsong.domain.music.application.service.MusicRoomService;
 import dy.whatsong.domain.music.application.service.check.MusicCheckService;
 import dy.whatsong.domain.music.application.service.check.MusicMemberCheckService;
 import dy.whatsong.domain.music.application.service.MusicMemberService;
 import dy.whatsong.domain.music.dto.request.MusicRequestDTO;
+import dy.whatsong.domain.music.dto.response.RoomResponseDTO;
 import dy.whatsong.domain.music.entity.*;
 import dy.whatsong.domain.music.repo.MusicRoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +21,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,9 +50,15 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 
 	public static final String ACCESS_DENIED="Access Denied";
 
-
 	//TODO : 회원데이터 추후 진짜 회원 도메인에서 받아오기
-	Member dummyMember =new Member();
+	Member dummyMember= Member.builder()
+			.imgURL("https://avatars.githubusercontent.com/u/65716445?v=4")
+			.email("dummy@dummy.com")
+			.memberSeq(1L)
+			.innerNickname("bomin")
+			.nickname("dummy")
+			.memberRole(MemberRole.USER)
+			.build();
 
 
 	@Override
@@ -73,15 +83,23 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	}
 
 	@Override
-	public ResponseEntity<?> getOwnerRoomList(MusicRequestDTO.OwnerInfo ownerInfoDTO) {
-		QMusicRoomMember qmr=QMusicRoomMember.musicRoomMember;
-		QMusicRoom qm=QMusicRoom.musicRoom;
-		List<MusicRoom> musicRoomList = jpaQueryFactory.select(qm)
-				.from(qmr)
-				.join(qmr.musicRoom, qm)
-				.where(qmr.member.eq(dummyMember))
+	public ResponseEntity<?> getOwnerRoomList(Long memberSeq) {
+		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
+		QMusicRoom qmr=QMusicRoom.musicRoom;
+		List<MusicRoom> fetchResult = jpaQueryFactory.select(qmr)
+				.from(qmrm)
+				.join(qmrm.musicRoom,qmr)
+				.where(qmrm.ownerSeq.eq(memberSeq))
 				.fetch();
-		return new ResponseEntity<>(musicRoomList,HttpStatus.OK);
+
+		return new ResponseEntity<>(makeResponseRoomDTO(fetchResult),HttpStatus.OK);
+	}
+
+	private List<RoomResponseDTO.Have> makeResponseRoomDTO(List<MusicRoom> musicRoomList){
+		return musicRoomList
+				.stream()
+				.map(MusicRoom::toHaveRoomDTO)
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -92,16 +110,18 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 
 		if (findMR!=null){
 			MusicRoom updateMR = findMR.changeElements(changeInfoDTO);
-			return new ResponseEntity<>(updateMR,HttpStatus.OK);
+			return new ResponseEntity<>(updateMR.toChangeInfoDTO(),HttpStatus.OK);
 		}
 
 		return new ResponseEntity<>(BAD_REQUEST,HttpStatus.BAD_REQUEST);
 	}
 
 	@Override
+	@Transactional
 	public ResponseEntity<?> deleteMusicRoom(MusicRequestDTO.Delete deleteDTO) {
 		MusicRoom findMR = musicCheckService.getInfoMRBySeq(deleteDTO.getRoomSeq());
 		if (findMR!=null){
+			musicMemberService.deletedRoomDetails(findMR);
 			musicRoomRepository.delete(findMR);
 			return new ResponseEntity<>(findMR.getMusicRoomSeq()+"Deleted",HttpStatus.OK);
 		}

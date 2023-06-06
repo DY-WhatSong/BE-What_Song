@@ -21,7 +21,7 @@ public class MusicRoomMember {
 	private Member member;
 
 	@ManyToOne
-	@JoinColumn(name = "musicRoomSeq")
+	@JoinColumn(name = "music_room_seq")
 	private MusicRoom musicRoom;
 
 	private Long ownerSeq;
