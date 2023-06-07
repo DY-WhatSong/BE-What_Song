@@ -24,6 +24,5 @@ public class MusicRoomMember {
 	@JoinColumn(name = "musicRoomSeq")
 	private MusicRoom musicRoom;
 
-	@Enumerated(EnumType.STRING)
-	private RoomAuth roomAuth;
+	private Long ownerSeq;
 }
