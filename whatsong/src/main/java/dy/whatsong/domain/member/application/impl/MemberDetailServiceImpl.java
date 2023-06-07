@@ -4,10 +4,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.dto.MemberRequestDTO;
-import dy.whatsong.domain.member.entity.FriendsState;
-import dy.whatsong.domain.member.entity.Member;
-import dy.whatsong.domain.member.entity.MemberRole;
-import dy.whatsong.domain.member.entity.QFriendsState;
+import dy.whatsong.domain.member.entity.*;
 import dy.whatsong.domain.member.repo.FriendsStateRepository;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @EssentialServiceLayer
 @RequiredArgsConstructor
@@ -53,6 +52,18 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 				.from(qfs)
 				.where(friendConditon)
 				.fetchFirst() != null;
+	}
+
+	@Override
+	public ResponseEntity<?> memberSearchOnFriendsList(MemberRequestDTO.Search searchDTO) {
+		QMember qMember= QMember.member;
+		BooleanExpression friendsCandidate = qMember.memberSeq.ne(searchDTO.getOwnerSeq())
+				.and(qMember.innerNickname.startsWith(searchDTO.getTargetName()));
+		List<Member> fetchResult = jpaQueryFactory.selectFrom(qMember)
+				.where(friendsCandidate)
+				.fetch();
+
+		return new ResponseEntity<>(fetchResult,HttpStatus.OK);
 	}
 
 	public Member testDummy(){

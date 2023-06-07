@@ -10,4 +10,10 @@ public class MemberRequestDTO {
 		private Long ownerSeq;
 		private Long targetSeq;
 	}
+
+	@Getter
+	public static class Search{
+		private Long ownerSeq;
+		private String targetName;
+	}
 }
