@@ -34,4 +34,9 @@ public class MusicRoomAPIController {
 	public ResponseEntity<?> deletedMusicRoom(@RequestBody MusicRequestDTO.Delete deleteDTO){
 		return musicRoomService.deleteMusicRoom(deleteDTO);
 	}
+
+	@PostMapping("/musicRoom/access")
+	public ResponseEntity<?> accessMusicRoom(@RequestBody MusicRequestDTO.AccessRoom accessRoomDTO){
+		return musicRoomService.ableAccessRoom(accessRoomDTO);
+	}
 }

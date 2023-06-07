@@ -35,7 +35,7 @@ public class MusicRequestDTO {
 
 	@Getter
 	public static class AccessRoom{
-		private String oauthId;
+		private String memberSeq;
 		private Long roomSeq;
 	}
 }
