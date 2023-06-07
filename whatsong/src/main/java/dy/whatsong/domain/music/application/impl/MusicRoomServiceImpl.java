@@ -2,8 +2,8 @@ package dy.whatsong.domain.music.application.impl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import dy.whatsong.domain.member.application.impl.MemberDetailServiceImpl;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
+import dy.whatsong.domain.member.application.service.check.MemberCheckService;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.entity.MemberRole;
 import dy.whatsong.domain.music.application.service.MusicRoomService;
@@ -21,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -43,6 +42,8 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	private final MemberDetailService memberDetailService;
+
+	private final MemberCheckService memberCheckService;
 
 	public static final String BAD_REQUEST="Bad Request";
 
@@ -163,8 +164,9 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	private boolean isRequestUserRoomOwner(MusicRequestDTO.AccessRoom accessRoomDTO){
 		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
 		QMusicRoom qmr=QMusicRoom.musicRoom;
+		Member findM = memberCheckService.getInfoByMemberSeq(accessRoomDTO.getMemberSeq());
 		BooleanExpression validRoom = qmrm.musicRoom.musicRoomSeq.eq(accessRoomDTO.getRoomSeq())
-				.and(qmrm.ownerSeq.eq(dummyMember.getMemberSeq()));
+				.and(qmrm.ownerSeq.eq(findM.getMemberSeq()));
 
 		return jpaQueryFactory.selectOne()
 				.from(qmrm)
@@ -176,6 +178,7 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	private ResponseEntity<?> requestPrivateRoomIsCorrect(MusicRequestDTO.AccessRoom accessRoomDTO){
 		QMusicRoom qmr=QMusicRoom.musicRoom;
 		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
+		Member findM = memberCheckService.getInfoByMemberSeq(accessRoomDTO.getMemberSeq());
 		MusicRoom eqMR = jpaQueryFactory.selectFrom(qmr)
 				.where(qmr.musicRoomSeq.eq(accessRoomDTO.getRoomSeq()))
 				.fetchOne();
@@ -183,7 +186,8 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 		Long ownerSeq = jpaQueryFactory.selectFrom(qmrm)
 				.where(qmrm.musicRoom.eq(eqMR))
 				.fetchOne().getOwnerSeq();
-		if(memberDetailService.isAlreadyFriends(ownerSeq,dummyMember.getMemberSeq())){
+
+		if(memberDetailService.isAlreadyFriends(ownerSeq,findM.getMemberSeq())){
 			return new ResponseEntity<>(ACCESS_ALLOW,HttpStatus.OK);
 		}
 
