@@ -7,4 +7,6 @@ public interface MemberDetailService {
 	ResponseEntity<?> memberFriendRequest(MemberRequestDTO.FriendsApply friendsApplyDTO);
 
 	boolean isAlreadyFriends(Long ownerSeq,Long requestMemberSeq);
+
+	ResponseEntity<?> memberSearchOnFriendsList(MemberRequestDTO.Search searchDTO);
 }

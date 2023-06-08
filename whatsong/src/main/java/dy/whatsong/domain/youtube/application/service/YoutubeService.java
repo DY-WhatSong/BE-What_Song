@@ -1,8 +1,9 @@
 package dy.whatsong.domain.youtube.application.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import dy.whatsong.domain.youtube.dto.VideoDTO;
 import org.springframework.http.ResponseEntity;
 
 public interface YoutubeService {
-	ResponseEntity<?> searchOnYoutube(String searchQuery) throws JsonProcessingException;
+	ResponseEntity<?> searchOnYoutube(VideoDTO.Keyword keywordDTO) throws JsonProcessingException;
 }
