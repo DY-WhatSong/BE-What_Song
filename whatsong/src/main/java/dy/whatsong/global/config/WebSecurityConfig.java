@@ -19,9 +19,8 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final Member member;
-    private final TokenService tokenService;
-    private final CorsFilter corsFilter;
+//    private final TokenService tokenService;
+//    private final CorsFilter corsFilter;
 
     public static final String FRONT_URL = "http://localhost:3000";
 
@@ -44,12 +43,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .httpBasic().disable()
-                .formLogin().disable()
-                .addFilter(corsFilter);
+                .formLogin().disable();
+//                .addFilter(corsFilter);
 
         http.authorizeRequests()
                 .antMatchers("/oauth/**","/test").permitAll()
-                .antMatchers("/user/kakao/*").permitAll()
+                .antMatchers("/user/*").permitAll()
+//                .antMatchers("/user/kakao/*").permitAll()
                 .antMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()
                     .and()

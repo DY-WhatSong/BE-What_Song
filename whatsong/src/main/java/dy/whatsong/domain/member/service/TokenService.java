@@ -14,6 +14,7 @@ import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.domain.member.domain.KakaoProfile;
 import dy.whatsong.domain.member.domain.OAuthToken;
 import dy.whatsong.global.constant.Properties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,6 +32,7 @@ import java.util.Optional;
 import static com.auth0.jwt.JWT.require;
 
 @Component
+@Slf4j
 public class TokenService {
 
     private final Gson gson;
@@ -47,12 +49,12 @@ public class TokenService {
         this.responseService = responseService;
     }
 
-    public KakaoProfile getUserInfo(String authorizedCode) {
+    public KakaoProfile.UsersInfo getUserInfo(String authorizedCode) {
         // 1. 인가코드 -> 액세스 토큰
         OAuthToken accessToken = getAccessToken(authorizedCode);
 
         // 2. 액세스 토큰 -> 카카오 사용자 정보
-        KakaoProfile userInfo = getUserInfoByToken(accessToken.getAccess_token());
+        KakaoProfile.UsersInfo userInfo = getUserInfoByToken(accessToken.getAccess_token());
 
         return userInfo;
     }
@@ -71,7 +73,7 @@ public class TokenService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", kakaoProperties.getCLIENT_ID());
-        params.add("redirect_uri", "http://localhost:8080/user/kakao/callback");
+        params.add("redirect_uri", kakaoProperties.getREDIRECT_URI());
         params.add("code", authorizedCode);
 
         // HttpHeader와 HttpBody를 하나의 오브젝트에 담기
@@ -101,7 +103,7 @@ public class TokenService {
      * @param accessToken
      * @return KakaoProfile
      */
-    public KakaoProfile getUserInfoByToken(String accessToken) {
+    public KakaoProfile.UsersInfo getUserInfoByToken(String accessToken) {
         // HttpHeader 오브젝트 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -118,9 +120,9 @@ public class TokenService {
                 kakaoProfileRequest,
                 String.class
         );
-        KakaoProfile kakaoProfile = gson.fromJson(response.getBody(), KakaoProfile.class);
+        KakaoProfile.UsersInfo usersInfo = gson.fromJson(response.getBody(), KakaoProfile.UsersInfo.class);
 
-        return kakaoProfile;
+        return usersInfo;
 
 //        Long id = jsonObject.get("id").getAsLong();
 //        String email = jsonObject.getAsJsonObject("kakao_account").get("email").getAsString();
@@ -142,23 +144,24 @@ public class TokenService {
         headers.add("Authorization", "Bearer " + tokenList.get(0));
         headers.add("Refresh", "Bearer " + tokenList.get(1));
 
-        SingleResponse<Member> singleResponse = responseService.getSingleResponse(member);
+        log.info("Access-Token : {}", tokenList.get(0));
+        log.info("Refresh-Token : {}", tokenList.get(1));
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(singleResponse);
+                .body(member);
     }
 
     /**
      * 토큰을 포함한 응답값 리턴 함수
      */
-    public ResponseEntity getKakaoProfileResponse(KakaoProfile kakaoProfile) {
+    public ResponseEntity getKakaoProfileResponse(KakaoProfile.UsersInfo usersInfo) {
 
-        SingleResponse<KakaoProfile> singleResponse = responseService.getSingleResponse(kakaoProfile);
-
+//        SingleResponse<KakaoProfile.UsersInfo> singleResponse = responseService.getSingleResponse(usersInfo);
+        log.info("getKakaoProfileResponse.KakaoProfile : {}", usersInfo);
         return ResponseEntity.ok()
                 .headers(new HttpHeaders())
-                .body(singleResponse);
+                .body(usersInfo);
     }
 
     /**
@@ -170,7 +173,7 @@ public class TokenService {
 
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getEXPIRED_TIME()))
+                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
 
                 .withClaim("id", member.getMemberSeq())
                 .withClaim("email", member.getEmail())
@@ -189,7 +192,7 @@ public class TokenService {
 
         String refreshToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getEXPIRED_TIME()))
+                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
 
                 .withClaim("id", member.getMemberSeq())
 

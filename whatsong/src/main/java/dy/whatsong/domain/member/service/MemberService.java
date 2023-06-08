@@ -1,6 +1,9 @@
 package dy.whatsong.domain.member.service;
 
+import dy.whatsong.domain.member.dto.MemberDto;
 import dy.whatsong.domain.member.entity.Member;
+import dy.whatsong.domain.member.entity.MemberRole;
+import dy.whatsong.domain.member.entity.SocialType;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.domain.member.domain.KakaoProfile;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +27,27 @@ public class MemberService {
     private final AuthenticationManager authenticationManager;
     private static final String ADMIN_TOKEN = "376d3362b0307ab01c9ef0642be92155";
 
+    public Member saveMember(KakaoProfile.UsersInfo usersInfo) {
+        Member member = convertKakaoProfileToMember(usersInfo);
+        return memberRepository.save(member);
+    }
+
+    public Member saveMember(MemberDto.MemberJoinReqDto memberJoinReqDto) {
+        Member member = convertMemberJoinReqDtoToMember(memberJoinReqDto);
+        return memberRepository.save(member);
+    }
+
+    public boolean isValid(String email, SocialType socialType) {
+        return memberRepository.findByEmailAndSocialType(email, socialType).isPresent();
+    }
+
     public void kakaoLogin(String authorizedCode) {
         // 카카오 OAuth2 를 통해 카카오 사용자 정보 조회
         log.info("authorizedCode : {}", authorizedCode);
-        KakaoProfile userInfo = tokenService.getUserInfo(authorizedCode);
-        Long kakaoId = userInfo.getId();
-        String nickname = userInfo.getNickname();
-        String email = userInfo.getEmail();
+        KakaoProfile.UsersInfo usersInfo = tokenService.getUserInfo(authorizedCode);
+        String kakaoId = usersInfo.getId();
+        String nickname = usersInfo.getKakao_account().getProfile().getNickname();
+        String email = usersInfo.getKakao_account().getEmail();
 
         // 우리 DB 에서 회원 Id 와 패스워드
         // 회원 Id = 카카오 nickname
@@ -62,11 +79,48 @@ public class MemberService {
         log.info("Finished");
     }
 
-    public Member checkUserExistence(Long id) {
+    public Member existsByOauthId(String oauthId) {
         // 카카오 회원 정보 > 회원 번호(고유값)로 DB에 정보 존재 하는 지 판별
-        Optional<Member> byId = memberRepository.findById(id);
-        Member member = byId.orElse(null);
+        log.info("oauthId : {}", oauthId);
+        Optional<Member> byId = memberRepository.findByOauthId(oauthId);
 
-        return member;
+        return byId.orElse(null);
+    }
+
+    public Member existsByEmail(String email) {
+        // 카카오 회원 정보 > 회원 번호(고유값)로 DB에 정보 존재 하는 지 판별
+        log.info("email : {}", email);
+        Optional<Member> byId = memberRepository.findByEmail(email);
+
+        return byId.orElse(null);
+    }
+
+    private static Member convertKakaoProfileToMember(KakaoProfile.UsersInfo usersInfo) {
+        return Member.builder()
+                .email(usersInfo.getKakao_account().getEmail())
+                .nickname(usersInfo.getKakao_account().getProfile().getNickname())
+                .innerNickname("")
+                .imgURL("")
+                .oauthId(usersInfo.getId())
+                .refreshToken("")
+                .profileMusic("")
+                .memberRole(MemberRole.USER)
+                .socialType(SocialType.KAKAO)
+                .build();
+    }
+
+    private static Member convertMemberJoinReqDtoToMember(MemberDto.MemberJoinReqDto memberDto) {
+        return Member.builder()
+                .memberSeq(memberDto.getMemberSeq())
+                .email(memberDto.getEmail())
+                .nickname(memberDto.getNickname())
+                .innerNickname(memberDto.getInnerNickname())
+                .imgURL(memberDto.getImgURL())
+                .oauthId(memberDto.getOauthId())
+                .refreshToken(memberDto.getRefreshToken())
+                .profileMusic(memberDto.getProfileMusic())
+                .memberRole(memberDto.getMemberRole())
+                .socialType(memberDto.getSocialType())
+                .build();
     }
 }
