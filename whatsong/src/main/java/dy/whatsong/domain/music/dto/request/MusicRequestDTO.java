@@ -9,7 +9,7 @@ public class MusicRequestDTO {
 
 	@Getter
 	public static class Create{
-		private String oauthId;
+		private Long memberSeq;
 		private String roomName;
 		private String category;
 		private AccessAuth accessAuth;

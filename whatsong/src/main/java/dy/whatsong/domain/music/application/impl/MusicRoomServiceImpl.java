@@ -21,9 +21,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static dy.whatsong.domain.music.entity.QMusicRoom.musicRoom;
+import static dy.whatsong.domain.music.entity.QMusicRoomMember.musicRoomMember;
 
 @Service
 @RequiredArgsConstructor
@@ -65,7 +69,8 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	@Override
 	@Transactional
 	public ResponseEntity<?> createMusicRoom(MusicRequestDTO.Create createDTO) {
-		List<MusicRoomMember> mrmList = musicMemberCheckService.getInfoMRMListByMember(dummyMember);
+		Member findM = memberCheckService.getInfoByMemberSeq(createDTO.getMemberSeq());
+		List<MusicRoomMember> mrmList = musicMemberCheckService.getInfoMRMListByMember(findM);
 		if(getInfoCreatedRoomLimit(mrmList)) return new ResponseEntity<>("limit", HttpStatus.OK);
 
 
@@ -85,8 +90,8 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 
 	@Override
 	public ResponseEntity<?> getOwnerRoomList(Long memberSeq) {
-		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
-		QMusicRoom qmr=QMusicRoom.musicRoom;
+		QMusicRoom qmr= musicRoom;
+		QMusicRoomMember qmrm=musicRoomMember;
 		List<MusicRoom> fetchResult = jpaQueryFactory.select(qmr)
 				.from(qmrm)
 				.join(qmrm.musicRoom,qmr)
@@ -132,7 +137,7 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 
 	@Override
 	public ResponseEntity<?> ableAccessRoom(MusicRequestDTO.AccessRoom accessRoomDTO) {
-		QMusicRoom qmr=QMusicRoom.musicRoom;
+		QMusicRoom qmr= musicRoom;
 		if (isRequestUserRoomOwner(accessRoomDTO)){
 			return new ResponseEntity<>(ACCESS_ALLOW,HttpStatus.OK);
 		}
@@ -157,13 +162,14 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 
 
 	private boolean getInfoCreatedRoomLimit(List<MusicRoomMember> mrmList){
+		System.out.println("mrmSize="+mrmList);
 		return mrmList.size()==3;
 	}
 
 
 	private boolean isRequestUserRoomOwner(MusicRequestDTO.AccessRoom accessRoomDTO){
-		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
-		QMusicRoom qmr=QMusicRoom.musicRoom;
+		QMusicRoomMember qmrm= musicRoomMember;
+		QMusicRoom qmr= musicRoom;
 		Member findM = memberCheckService.getInfoByMemberSeq(accessRoomDTO.getMemberSeq());
 		BooleanExpression validRoom = qmrm.musicRoom.musicRoomSeq.eq(accessRoomDTO.getRoomSeq())
 				.and(qmrm.ownerSeq.eq(findM.getMemberSeq()));
@@ -176,8 +182,8 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	}
 
 	private ResponseEntity<?> requestPrivateRoomIsCorrect(MusicRequestDTO.AccessRoom accessRoomDTO){
-		QMusicRoom qmr=QMusicRoom.musicRoom;
-		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
+		QMusicRoom qmr= musicRoom;
+		QMusicRoomMember qmrm= musicRoomMember;
 		Member findM = memberCheckService.getInfoByMemberSeq(accessRoomDTO.getMemberSeq());
 		MusicRoom eqMR = jpaQueryFactory.selectFrom(qmr)
 				.where(qmr.musicRoomSeq.eq(accessRoomDTO.getRoomSeq()))
