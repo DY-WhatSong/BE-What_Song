@@ -2,7 +2,6 @@ package dy.whatsong.domain.music.application.impl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import dy.whatsong.domain.member.application.impl.MemberDetailServiceImpl;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.entity.MemberRole;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -183,7 +181,7 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 		Long ownerSeq = jpaQueryFactory.selectFrom(qmrm)
 				.where(qmrm.musicRoom.eq(eqMR))
 				.fetchOne().getOwnerSeq();
-		if(memberDetailService.isAlreadyFriends(ownerSeq,dummyMember.getMemberSeq())){
+		if(memberDetailService.isOwnerAlreadyFriendsRequest(ownerSeq,dummyMember.getMemberSeq())){
 			return new ResponseEntity<>(ACCESS_ALLOW,HttpStatus.OK);
 		}
 

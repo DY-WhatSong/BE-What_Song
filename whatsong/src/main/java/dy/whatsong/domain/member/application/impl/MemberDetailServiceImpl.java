@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -28,10 +27,14 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 	@Override
 	@Transactional
 	public ResponseEntity<?> memberFriendRequest(MemberRequestDTO.FriendsApply friendsApplyDTO) {
+		Long ownerSeq = friendsApplyDTO.getOwnerSeq();
+		Long targetSeq = friendsApplyDTO.getTargetSeq();
 
-		boolean alreadyFriends = isAlreadyFriends(friendsApplyDTO.getOwnerSeq(),friendsApplyDTO.getTargetSeq());
-		if (alreadyFriends){
-			return new ResponseEntity<>("Already Friends", HttpStatus.OK);
+		if (isOwnerAlreadyFriendsRequest(ownerSeq, targetSeq)){
+			if (isAlreadyBothFriends(friendsApplyDTO.getOwnerSeq(),friendsApplyDTO.getTargetSeq())){
+				return new ResponseEntity<>("Both Follow",HttpStatus.OK);
+			}
+			return new ResponseEntity<>("Already Follow", HttpStatus.OK);
 		}
 		FriendsState friendsNew = FriendsState.builder()
 				.ownerSeq(friendsApplyDTO.getOwnerSeq())
@@ -41,8 +44,17 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 		return new ResponseEntity<>(friendsNew,HttpStatus.OK);
 	}
 
+	public boolean isAlreadyBothFriends(Long ownerSeq,Long targetSeq){
+		QFriendsState qFriendsState=QFriendsState.friendsState;
+		return jpaQueryFactory.selectFrom(qFriendsState)
+				.where(qFriendsState.ownerSeq.eq(ownerSeq).and(qFriendsState.targetSeq.eq(targetSeq)
+						.and(qFriendsState.targetSeq.eq(ownerSeq).and(qFriendsState.ownerSeq.eq(targetSeq))
+						)))
+				.fetchFirst()!=null;
+	}
+
 	@Override
-	public boolean isAlreadyFriends(Long ownerSeq,Long requestMemberSeq){
+	public boolean isOwnerAlreadyFriendsRequest(Long ownerSeq, Long requestMemberSeq){
 		QFriendsState qfs=QFriendsState.friendsState;
 
 		BooleanExpression friendConditon = qfs.ownerSeq.eq(ownerSeq)
@@ -64,6 +76,11 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 				.fetch();
 
 		return new ResponseEntity<>(fetchResult,HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<?> memberUnfollowRequest(MemberRequestDTO.FriendsApply friendsApplyDTO) {
+		return null;
 	}
 
 	public Member testDummy(){
