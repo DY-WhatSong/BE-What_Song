@@ -1,5 +1,7 @@
 package dy.whatsong.domain.music.entity;
 
+import dy.whatsong.domain.music.dto.request.MusicRequestDTO;
+import dy.whatsong.domain.music.dto.response.RoomResponseDTO;
 import lombok.*;
 
 import javax.persistence.*;
@@ -22,11 +24,36 @@ public class MusicRoom {
 
 	private String category;
 
-	private Integer count;
-
 	@Enumerated(EnumType.STRING)
 	private AccessAuth accessAuth;
 
 	@OneToMany(mappedBy = "musicRoom")
 	private List<MusicRoomMember> musicRoomMembers;
+
+	public MusicRoom changeElements(MusicRequestDTO.ChangeInfo changeInfoDTO){
+		this.accessAuth=changeInfoDTO.getAccessAuth();
+		this.category=changeInfoDTO.getCategory();
+		this.roomName=changeInfoDTO.getName();
+		return this;
+	}
+
+	public RoomResponseDTO.Have toHaveRoomDTO(){
+		return RoomResponseDTO.Have.builder()
+				.musicRoomSeq(musicRoomSeq)
+				.roomCode(roomCode)
+				.roomName(roomName)
+				.accessAuth(accessAuth)
+				.category(category)
+				.build();
+	}
+
+	public RoomResponseDTO.Change toChangeInfoDTO(){
+		return RoomResponseDTO.Change.builder()
+				.musicRoomSeq(musicRoomSeq)
+				.roomCode(roomCode)
+				.accessAuth(accessAuth)
+				.category(category)
+				.roomName(roomName)
+				.build();
+	}
 }
