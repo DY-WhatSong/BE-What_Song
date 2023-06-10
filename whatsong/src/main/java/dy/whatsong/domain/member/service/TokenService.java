@@ -8,11 +8,10 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dy.whatsong.common.domain.response.ResponseService;
-import dy.whatsong.common.domain.response.SingleResponse;
-import dy.whatsong.domain.member.entity.Member;
-import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.domain.member.domain.KakaoProfile;
 import dy.whatsong.domain.member.domain.OAuthToken;
+import dy.whatsong.domain.member.entity.Member;
+import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.global.constant.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -135,10 +134,7 @@ public class TokenService {
      */
     public ResponseEntity getTokensResponse(Member member) {
 
-        List<String> tokenList = new ArrayList<>();
-
-        tokenList.add(createToken(member));
-        tokenList.add(createRefreshToken(member));
+        List<String> tokenList = getTokenList(member);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + tokenList.get(0));
@@ -152,6 +148,24 @@ public class TokenService {
                 .body(member);
     }
 
+    /**
+     * 토큰을 포함한 응답값 리턴 함수
+     */
+    public ResponseEntity getReissusedTokensResponse(String refreshToken) {
+
+        List<String> tokenList = reissueRefreshToken(refreshToken);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + tokenList.get(0));
+        headers.add("Refresh", "Bearer " + tokenList.get(1));
+
+        log.info("Access-Token : {}", tokenList.get(0));
+        log.info("Refresh-Token : {}", tokenList.get(1));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .build();
+    }
     /**
      * 토큰을 포함한 응답값 리턴 함수
      */
@@ -256,5 +270,13 @@ public class TokenService {
                 .verify(token)
                 .getClaim("id")
                 .asLong();
+    }
+    private List<String> getTokenList(Member member) {
+        List<String> tokenList = new ArrayList<>();
+
+        tokenList.add(createToken(member));
+        tokenList.add(createRefreshToken(member));
+
+        return tokenList;
     }
 }

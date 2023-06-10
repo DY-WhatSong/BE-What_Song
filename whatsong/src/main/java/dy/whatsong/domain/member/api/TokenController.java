@@ -43,7 +43,7 @@ public class TokenController {
 
         // 3. 해당 카카오 사용자 정보를 통해 DB에 존재하는지 판별
         // Res 수정해야함. Json 리턴에 맞게!
-        Member member = memberService.existsByOauthId(usersInfo.getId().toString());
+        Member member = memberService.existsByOauthId(usersInfo.getId());
 //        Member member = memberService.existsByEmail(usersInfo.getKakao_account().getEmail());
         log.info("Member : {}", member);
 
@@ -54,6 +54,12 @@ public class TokenController {
             // 3.2. 회원 정보 DB 에 존재하지 않으면? 성공 유무 flag + 사용자 정보
             return tokenService.getKakaoProfileResponse(usersInfo);
         }
+    }
+
+    @GetMapping(value = "/user/token/reissue")
+    public ResponseEntity reissue(@RequestHeader("refresh") String refreshToken) {
+        log.info("refreshToken : {}", refreshToken);
+        return tokenService.getReissusedTokensResponse(refreshToken);
     }
 
 }
