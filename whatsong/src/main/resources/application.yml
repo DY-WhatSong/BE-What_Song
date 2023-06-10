@@ -31,7 +31,49 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-      show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    format_sql: true
+    use_sql_comments: true
+  ######################################################################
+# MVC Settings
+######################################################################
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+######################################################################
+# security Settings
+######################################################################
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+#            client-id: f51146cf3f9524ee8e1e4c32a3e9a5d2
+#            redirect-uri: http://localhost:8080/user/kakao/callback
+            client-id: 7ae1ad5950661b2aefe29ac0874cc44d
+            redirect-uri: http://localhost:3000/login/oauth2
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+            scope: profile_nickname, account_email #?? ??
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+######################################################################
+# JWT Settings
+######################################################################
+jwt:
+  secret:
+    key: IamSecretKey
+  access:
+    expired: 1800000
+    header: authorization
+  refresh:
+    expired: 1800000
+    header: refresh
