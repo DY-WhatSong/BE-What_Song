@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 public class MusicRequestDTO {
 
 	@Getter
-	@Builder
 	public static class Create{
 		private Long memberSeq;
 		private String roomName;
@@ -36,7 +35,6 @@ public class MusicRequestDTO {
 	}
 
 	@Getter
-	@Builder
 	public static class AccessRoom{
 		private Long memberSeq;
 		private Long roomSeq;

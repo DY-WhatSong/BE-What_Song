@@ -39,31 +39,33 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .httpBasic().disable()
-                .formLogin().disable()
-//                .addFilter(corsFilter);
-                .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            http
+                    .csrf().disable()
+                    .httpBasic().disable()
+                    .formLogin().disable()
+    //                .addFilter(corsFilter);
+                    .sessionManagement()
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http
-                .authorizeRequests()
-                    .antMatchers("/oauth/**",
-                                            "/test",
-                                            "/user/**",
-                                            "/user/*",
-                                            "/user/kakao/*")
-                    .permitAll()
-                    .antMatchers("/api/**").authenticated()
-                    .anyRequest().authenticated()
-                .and()
-                    .exceptionHandling()
-                .and()
-                    .addFilterBefore(
-                            new JwtAuthenticationFilter(),
-                            UsernamePasswordAuthenticationFilter.class
-                    );
+            http
+                    .authorizeRequests()
+                        .antMatchers("/oauth/**",
+                                                "/**",
+                                                "/test",
+                                                "/user/**",
+                                                "/user/*",
+                                                "/user/kakao/*",
+                                                "/api/v1/healthcheck")
+                        .permitAll()
+                        .antMatchers("/api/**").authenticated()
+                        .anyRequest().authenticated()
+                    .and()
+                        .exceptionHandling()
+                    .and()
+                        .addFilterBefore(
+                                new JwtAuthenticationFilter(),
+                                UsernamePasswordAuthenticationFilter.class
+                        );
 
     }
 }
