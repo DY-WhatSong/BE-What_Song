@@ -114,7 +114,6 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 							.accessAuth(fetchMusicRoom.getAccessAuth())
 							.extraInfo(RoomResponseDTO.ExtraInfo.builder()
 									.hostName(musicRoomMember.getMember().getNickname())
-									.isOwner(true)
 									.view(1)
 									.build())
 							.build();

@@ -32,7 +32,6 @@ public class RoomResponseDTO {
 	public static class ExtraInfo{
 		private String hostName;
 		private long view;
-		private boolean isOwner;
 	}
 
 	@Getter
