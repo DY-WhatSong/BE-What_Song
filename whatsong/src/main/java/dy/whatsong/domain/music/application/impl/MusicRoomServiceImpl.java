@@ -65,7 +65,8 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	@Override
 	@Transactional
 	public ResponseEntity<?> createMusicRoom(MusicRequestDTO.Create createDTO) {
-		List<MusicRoomMember> mrmList = musicMemberCheckService.getInfoMRMListByMember(dummyMember);
+		Member findM = memberCheckService.getInfoByMemberSeq(createDTO.getMemberSeq());
+		List<MusicRoomMember> mrmList = musicMemberCheckService.getInfoMRMListByMember(findM);
 		if(getInfoCreatedRoomLimit(mrmList)) return new ResponseEntity<>("limit", HttpStatus.OK);
 
 

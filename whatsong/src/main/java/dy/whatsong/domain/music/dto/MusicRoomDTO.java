@@ -2,6 +2,7 @@ package dy.whatsong.domain.music.dto;
 
 import dy.whatsong.domain.music.entity.AccessAuth;
 import dy.whatsong.domain.music.entity.MusicRoomMember;
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.persistence.EnumType;
@@ -10,6 +11,7 @@ import javax.persistence.OneToMany;
 import java.util.List;
 
 @Getter
+@Builder
 public class MusicRoomDTO {
 	private Long musicRoomSeq;
 
