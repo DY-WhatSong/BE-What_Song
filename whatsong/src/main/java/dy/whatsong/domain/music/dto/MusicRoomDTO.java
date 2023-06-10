@@ -7,7 +7,6 @@ import lombok.Getter;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.OneToMany;
 import java.util.List;
 
 @Getter

@@ -88,19 +88,37 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	public ResponseEntity<?> getOwnerRoomList(Long memberSeq) {
 		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
 		QMusicRoom qmr=QMusicRoom.musicRoom;
-		List<MusicRoom> fetchResult = jpaQueryFactory.select(qmr)
+		/*List<MusicRoom> fetchResult = jpaQueryFactory.select(qmr)
 				.from(qmrm)
 				.join(qmrm.musicRoom,qmr)
 				.where(qmrm.ownerSeq.eq(memberSeq))
 				.fetch();
-
+		*/
+		List<MusicRoomMember> fetchResult = jpaQueryFactory
+				.selectFrom(qmrm)
+				.where(qmrm.ownerSeq.eq(memberSeq))
+				.fetch();
 		return new ResponseEntity<>(makeResponseRoomDTO(fetchResult),HttpStatus.OK);
 	}
 
-	private List<RoomResponseDTO.Have> makeResponseRoomDTO(List<MusicRoom> musicRoomList){
-		return musicRoomList
+	private List<RoomResponseDTO.Have> makeResponseRoomDTO(List<MusicRoomMember> musicRoomMembers){
+		return musicRoomMembers
 				.stream()
-				.map(MusicRoom::toHaveRoomDTO)
+				.map(musicRoomMember -> {
+					MusicRoom fetchMusicRoom = musicRoomMember.getMusicRoom();
+					return RoomResponseDTO.Have.builder()
+							.musicRoomSeq(fetchMusicRoom.getMusicRoomSeq())
+							.roomName(fetchMusicRoom.getRoomName())
+							.roomCode(fetchMusicRoom.getRoomCode())
+							.category(fetchMusicRoom.getCategory())
+							.accessAuth(fetchMusicRoom.getAccessAuth())
+							.extraInfo(RoomResponseDTO.ExtraInfo.builder()
+									.hostName(musicRoomMember.getMember().getNickname())
+									.isOwner(true)
+									.view(1)
+									.build())
+							.build();
+				})
 				.collect(Collectors.toList());
 	}
 
