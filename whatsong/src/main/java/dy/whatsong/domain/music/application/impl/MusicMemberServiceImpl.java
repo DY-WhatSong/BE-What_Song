@@ -1,17 +1,10 @@
 package dy.whatsong.domain.music.application.impl;
 
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.music.application.service.MusicMemberService;
-import dy.whatsong.domain.music.dto.MusicRoomDTO;
-import dy.whatsong.domain.music.dto.MusicRoomMemberDTO;
 import dy.whatsong.domain.music.entity.MusicRoom;
 import dy.whatsong.domain.music.entity.MusicRoomMember;
-import dy.whatsong.domain.music.entity.QMusicRoom;
-import dy.whatsong.domain.music.entity.QMusicRoomMember;
 import dy.whatsong.domain.music.repo.MusicMemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
