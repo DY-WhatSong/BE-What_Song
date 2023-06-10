@@ -1,6 +1,7 @@
 package dy.whatsong.domain.music.dto.request;
 
 import dy.whatsong.domain.music.entity.AccessAuth;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 public class MusicRequestDTO {
 
 	@Getter
+	@Builder
 	public static class Create{
 		private Long memberSeq;
 		private String roomName;
@@ -34,6 +36,7 @@ public class MusicRequestDTO {
 	}
 
 	@Getter
+	@Builder
 	public static class AccessRoom{
 		private Long memberSeq;
 		private Long roomSeq;
