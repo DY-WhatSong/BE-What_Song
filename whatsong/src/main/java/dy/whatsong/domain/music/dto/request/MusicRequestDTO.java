@@ -1,6 +1,7 @@
 package dy.whatsong.domain.music.dto.request;
 
 import dy.whatsong.domain.music.entity.AccessAuth;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
