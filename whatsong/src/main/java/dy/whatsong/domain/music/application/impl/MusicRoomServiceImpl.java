@@ -66,6 +66,7 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	@Transactional
 	public ResponseEntity<?> createMusicRoom(MusicRequestDTO.Create createDTO) {
 		Member findM = memberCheckService.getInfoByMemberSeq(createDTO.getMemberSeq());
+		System.out.println("nick="+findM.getNickname());
 		List<MusicRoomMember> mrmList = musicMemberCheckService.getInfoMRMListByMember(findM);
 		if(getInfoCreatedRoomLimit(mrmList)) return new ResponseEntity<>("limit", HttpStatus.OK);
 
@@ -79,7 +80,7 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 						.build()
 		);
 
-		musicMemberService.createdRoomDetails(createdRoom, dummyMember);
+		musicMemberService.createdRoomDetails(createdRoom, findM);
 
 		return new ResponseEntity<>(createdRoom,HttpStatus.OK);
 	}
