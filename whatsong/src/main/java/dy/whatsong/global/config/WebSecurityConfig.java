@@ -4,7 +4,6 @@ package dy.whatsong.global.config;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.service.TokenService;
 import dy.whatsong.global.filter.jwt.JwtAuthenticationFilter;
-import dy.whatsong.global.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +23,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 //    private final TokenService tokenService;
 //    private final CorsFilter corsFilter;
-    private final JwtUtil jwtUtil;
 
     public static final String FRONT_URL = "http://localhost:3000";
 
