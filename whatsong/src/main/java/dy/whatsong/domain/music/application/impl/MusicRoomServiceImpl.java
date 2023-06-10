@@ -56,17 +56,6 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 
 	public static final String ACCESS_DENIED="Access Denied";
 
-	//TODO : 회원데이터 추후 진짜 회원 도메인에서 받아오기
-	Member dummyMember= Member.builder()
-			.imgURL("https://avatars.githubusercontent.com/u/65716445?v=4")
-			.email("dummy@dummy.com")
-			.memberSeq(1L)
-			.innerNickname("bomin")
-			.nickname("dummy")
-			.memberRole(MemberRole.USER)
-			.build();
-
-
 	@Override
 	@Transactional
 	public ResponseEntity<?> createMusicRoom(MusicRequestDTO.Create createDTO) {
