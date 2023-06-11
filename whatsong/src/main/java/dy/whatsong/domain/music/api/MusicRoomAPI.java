@@ -12,17 +12,12 @@ import javax.websocket.server.PathParam;
 
 @EssentialController
 @RequiredArgsConstructor
-public class MusicRoomAPIController {
+public class MusicRoomAPI {
 	private final MusicRoomService musicRoomService;
 
 	@PostMapping("/musicRoom")
 	public ResponseEntity<?> createMusicRoom(@RequestBody MusicRequestDTO.Create createDTO){
 		return musicRoomService.createMusicRoom(createDTO);
-	}
-
-	@GetMapping("/musicRoom")
-	public ResponseEntity<?> getRoomInfoHave(@RequestParam("memberSeq") Long memberSeq){
-		return musicRoomService.getOwnerRoomList(memberSeq);
 	}
 
 	@PatchMapping("/musicRoom")
@@ -33,5 +28,10 @@ public class MusicRoomAPIController {
 	@DeleteMapping("/musicRoom")
 	public ResponseEntity<?> deletedMusicRoom(@RequestBody MusicRequestDTO.Delete deleteDTO){
 		return musicRoomService.deleteMusicRoom(deleteDTO);
+	}
+
+	@PostMapping("/musicRoom/access")
+	public ResponseEntity<?> accessMusicRoom(@RequestBody MusicRequestDTO.AccessRoom accessRoomDTO){
+		return musicRoomService.ableAccessRoom(accessRoomDTO);
 	}
 }

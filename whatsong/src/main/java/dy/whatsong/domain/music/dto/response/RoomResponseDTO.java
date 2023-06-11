@@ -23,6 +23,15 @@ public class RoomResponseDTO {
 
 		@Enumerated(EnumType.STRING)
 		private AccessAuth accessAuth;
+
+		private ExtraInfo extraInfo;
+	}
+
+	@Getter
+	@Builder
+	public static class ExtraInfo{
+		private String hostName;
+		private long view;
 	}
 
 	@Getter

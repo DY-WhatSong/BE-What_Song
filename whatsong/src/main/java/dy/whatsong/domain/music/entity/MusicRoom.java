@@ -1,5 +1,6 @@
 package dy.whatsong.domain.music.entity;
 
+import dy.whatsong.domain.music.dto.MusicRoomDTO;
 import dy.whatsong.domain.music.dto.request.MusicRequestDTO;
 import dy.whatsong.domain.music.dto.response.RoomResponseDTO;
 import lombok.*;
@@ -56,4 +57,10 @@ public class MusicRoom {
 				.roomName(roomName)
 				.build();
 	}
+
+	/*public MusicRoomDTO toResponseDTO(){
+		return MusicRoomDTO.builder()
+				.
+				.build();
+	}*/
 }

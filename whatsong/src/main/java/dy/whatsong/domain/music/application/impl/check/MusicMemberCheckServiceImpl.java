@@ -3,10 +3,12 @@ package dy.whatsong.domain.music.application.impl.check;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.music.application.service.check.MusicMemberCheckService;
+import dy.whatsong.domain.music.entity.MusicRoom;
 import dy.whatsong.domain.music.entity.MusicRoomMember;
 import dy.whatsong.domain.music.entity.QMusicRoomMember;
 import dy.whatsong.domain.music.repo.MusicMemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,5 +33,10 @@ public class MusicMemberCheckServiceImpl implements MusicMemberCheckService {
 				.where(qmrm.member.eq(member))
 				.fetch();
 		return fetchResult;
+	}
+
+	@Override
+	public MusicRoomMember getInfoMRMByRoom(MusicRoom musicRoom){
+		return musicMemberRepository.findByMusicRoom(musicRoom).get();
 	}
 }
