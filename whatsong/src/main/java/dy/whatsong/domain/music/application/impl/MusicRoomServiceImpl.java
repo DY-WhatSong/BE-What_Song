@@ -5,7 +5,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.application.service.check.MemberCheckService;
 import dy.whatsong.domain.member.entity.Member;
-import dy.whatsong.domain.member.entity.MemberRole;
 import dy.whatsong.domain.music.application.service.MusicRoomService;
 import dy.whatsong.domain.music.application.service.check.MusicCheckService;
 import dy.whatsong.domain.music.application.service.check.MusicMemberCheckService;
@@ -85,27 +84,9 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 				.selectFrom(qmrm)
 				.where(qmrm.ownerSeq.eq(memberSeq))
 				.fetch();
-		return new ResponseEntity<>(makeResponseRoomDTO(fetchResult),HttpStatus.OK);
-	}
-
-	private List<RoomResponseDTO.Have> makeResponseRoomDTO(List<MusicRoomMember> musicRoomMembers){
-		return musicRoomMembers
-				.stream()
-				.map(musicRoomMember -> {
-					MusicRoom fetchMusicRoom = musicRoomMember.getMusicRoom();
-					return RoomResponseDTO.Have.builder()
-							.musicRoomSeq(fetchMusicRoom.getMusicRoomSeq())
-							.roomName(fetchMusicRoom.getRoomName())
-							.roomCode(fetchMusicRoom.getRoomCode())
-							.category(fetchMusicRoom.getCategory())
-							.accessAuth(fetchMusicRoom.getAccessAuth())
-							.extraInfo(RoomResponseDTO.ExtraInfo.builder()
-									.hostName(musicRoomMember.getMember().getNickname())
-									.view(1)
-									.build())
-							.build();
-				})
-				.collect(Collectors.toList());
+		return new ResponseEntity<>(musicCheckService
+											.makeListResponseRoomDTO(fetchResult)
+													,HttpStatus.OK);
 	}
 
 	@Override

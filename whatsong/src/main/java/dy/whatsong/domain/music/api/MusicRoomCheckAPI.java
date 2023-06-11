@@ -34,6 +34,6 @@ public class MusicRoomCheckAPI {
 
 	@GetMapping("/room")
 	public ResponseEntity<?> getRoomInfo(@RequestParam("roomSeq") Long roomSeq){
-		return new ResponseEntity<>(musicCheckService.getInfoMRBySeq(roomSeq).toEntityDTO(),HttpStatus.OK);
+		return new ResponseEntity<>(musicCheckService.getRoomBasicInfoBySeq(roomSeq),HttpStatus.OK);
 	}
 }

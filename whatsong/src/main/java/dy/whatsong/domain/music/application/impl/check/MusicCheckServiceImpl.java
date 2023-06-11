@@ -36,14 +36,22 @@ public class MusicCheckServiceImpl implements MusicCheckService {
 		return findMR.orElse(null);
 	}
 
+	@Override
+	public RoomResponseDTO.BasicRseponse getRoomBasicInfoBySeq(Long musicRoomSeq){
+		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
+		MusicRoomMember musicRoomMember = jpaQueryFactory.selectFrom(qmrm)
+				.where(qmrm.musicRoom.musicRoomSeq.eq(musicRoomSeq))
+				.fetchFirst();
+		return makeResponseRoomDTO(musicRoomMember);
+	}
 
 	@Override
-	public List<RoomResponseDTO.Have> getInfoListRoom() {
+	public List<RoomResponseDTO.BasicRseponse> getInfoListRoom() {
 		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
 		List<MusicRoomMember> fetchResult = jpaQueryFactory.selectFrom(qmrm)
 				.fetch();
 
-		return makeResponseRoomDTO(fetchResult);
+		return makeListResponseRoomDTO(fetchResult);
 	}
 
 	@Override
@@ -55,23 +63,32 @@ public class MusicCheckServiceImpl implements MusicCheckService {
 				.size()==3;
 	}
 
-	private List<RoomResponseDTO.Have> makeResponseRoomDTO(List<MusicRoomMember> musicRoomMembers){
+	@Override
+	public List<RoomResponseDTO.BasicRseponse> makeListResponseRoomDTO(List<MusicRoomMember> musicRoomMembers){
 		return musicRoomMembers
 				.stream()
 				.map(musicRoomMember -> {
 					MusicRoom fetchMusicRoom = musicRoomMember.getMusicRoom();
-					return RoomResponseDTO.Have.builder()
-							.musicRoomSeq(fetchMusicRoom.getMusicRoomSeq())
-							.roomName(fetchMusicRoom.getRoomName())
-							.roomCode(fetchMusicRoom.getRoomCode())
-							.category(fetchMusicRoom.getCategory())
-							.accessAuth(fetchMusicRoom.getAccessAuth())
+					return RoomResponseDTO.BasicRseponse.builder()
+							.have(fetchMusicRoom.toHaveRoomDTO())
 							.extraInfo(RoomResponseDTO.ExtraInfo.builder()
 									.hostName(musicRoomMember.getMember().getNickname())
 									.view(1)
 									.build())
 							.build();
+
 				})
 				.collect(Collectors.toList());
+	}
+
+	private RoomResponseDTO.BasicRseponse makeResponseRoomDTO(MusicRoomMember musicRoomMember){
+		return RoomResponseDTO.BasicRseponse
+				.builder()
+				.have(musicRoomMember.getMusicRoom().toHaveRoomDTO())
+				.extraInfo(RoomResponseDTO.ExtraInfo.builder()
+						.view(1)
+						.hostName(musicRoomMember.getMember().getNickname())
+						.build())
+				.build();
 	}
 }
