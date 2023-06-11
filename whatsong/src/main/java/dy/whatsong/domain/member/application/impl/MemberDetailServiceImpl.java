@@ -1,6 +1,7 @@
 package dy.whatsong.domain.member.application.impl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.dto.MemberRequestDTO;
@@ -80,17 +81,15 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 
 	@Override
 	public ResponseEntity<?> memberUnfollowRequest(MemberRequestDTO.FriendsApply friendsApplyDTO) {
-		return null;
-	}
+		QFriendsState qf=QFriendsState.friendsState;
+		Long o = friendsApplyDTO.getOwnerSeq();
+		Long t = friendsApplyDTO.getTargetSeq();
+		BooleanExpression findCondition = qf.ownerSeq.eq(o).
+				and(qf.targetSeq.eq(t));
 
-	public Member testDummy(){
-		return Member.builder()
-				.memberSeq(1L)
-				.nickname("dummy")
-				.innerNickname("bomin")
-				.memberRole(MemberRole.USER)
-				.email("dummy@dummy.com")
-				.imgURL("https://avatars.githubusercontent.com/u/65716445?v=4")
-				.build();
+		jpaQueryFactory.delete(qf)
+				.where(findCondition);
+
+		return new ResponseEntity<>(o+"unfollowed"+t,HttpStatus.OK);
 	}
 }
