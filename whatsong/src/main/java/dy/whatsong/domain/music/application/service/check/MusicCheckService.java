@@ -10,4 +10,6 @@ public interface MusicCheckService {
 	MusicRoom getInfoMRBySeq(Long musicRoomSeq);
 
 	List<RoomResponseDTO.Have> getInfoListRoom();
+
+	boolean getInfoRoomLimit(Long memberSeq);
 }

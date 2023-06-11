@@ -26,4 +26,14 @@ public class MusicRoomCheckAPI {
 	public ResponseEntity<?> getRoomInfoHave(@RequestParam("memberSeq") Long memberSeq){
 		return musicRoomService.getOwnerRoomList(memberSeq);
 	}
+
+	@GetMapping("/limit")
+	public ResponseEntity<?> getRoomInfoCreateHave(@RequestParam("memberSeq") Long memberSeq){
+		return new ResponseEntity<>(musicCheckService.getInfoRoomLimit(memberSeq),HttpStatus.OK);
+	}
+
+	@GetMapping("/room")
+	public ResponseEntity<?> getRoomInfo(@RequestParam("roomSeq") Long roomSeq){
+		return new ResponseEntity<>(musicCheckService.getInfoMRBySeq(roomSeq),HttpStatus.OK);
+	}
 }

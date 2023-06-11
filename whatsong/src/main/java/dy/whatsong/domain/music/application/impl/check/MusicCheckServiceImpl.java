@@ -46,6 +46,15 @@ public class MusicCheckServiceImpl implements MusicCheckService {
 		return makeResponseRoomDTO(fetchResult);
 	}
 
+	@Override
+	public boolean getInfoRoomLimit(Long memberSeq) {
+		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
+		return jpaQueryFactory.selectFrom(qmrm)
+				.where(qmrm.ownerSeq.eq(memberSeq))
+				.fetch()
+				.size()==3;
+	}
+
 	private List<RoomResponseDTO.Have> makeResponseRoomDTO(List<MusicRoomMember> musicRoomMembers){
 		return musicRoomMembers
 				.stream()
