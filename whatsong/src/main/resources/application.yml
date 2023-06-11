@@ -69,5 +69,5 @@ jwt:
     expired: 1800000
     header: authorization
   refresh:
-    expired: 1800000
+    expired: 864000000
     header: refresh

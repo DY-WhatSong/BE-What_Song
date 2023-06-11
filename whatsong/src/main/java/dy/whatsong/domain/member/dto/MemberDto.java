@@ -1,12 +1,9 @@
 package dy.whatsong.domain.member.dto;
 
-import dy.whatsong.domain.member.domain.KakaoProfile;
 import dy.whatsong.domain.member.entity.MemberRole;
 import dy.whatsong.domain.member.entity.SocialType;
 import lombok.*;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 
 public class MemberDto {

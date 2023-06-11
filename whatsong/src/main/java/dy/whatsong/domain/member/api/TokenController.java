@@ -1,20 +1,17 @@
 package dy.whatsong.domain.member.api;
 
-import dy.whatsong.common.domain.response.ResponseService;
-import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.domain.KakaoProfile;
 import dy.whatsong.domain.member.domain.OAuthToken;
+import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.service.MemberService;
 import dy.whatsong.domain.member.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor

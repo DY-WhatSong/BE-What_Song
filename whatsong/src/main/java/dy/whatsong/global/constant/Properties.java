@@ -38,6 +38,9 @@ public class Properties {
         @Value("${jwt.refresh.header}")
         private String REFRESH_TOKEN_HEADER;
 
+        private String TOKEN_PREFIX = "Bearer ";
+
+        private String HEADER_STRING = "Authorization";
     }
 }
 
