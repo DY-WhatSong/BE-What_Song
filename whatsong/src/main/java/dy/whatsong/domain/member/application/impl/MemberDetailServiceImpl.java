@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @EssentialServiceLayer
 @RequiredArgsConstructor
@@ -65,6 +66,16 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 				.from(qfs)
 				.where(friendConditon)
 				.fetchFirst() != null;
+	}
+
+	public boolean isOwnerAlreadyFriends(Long ownerSeq,Long targetSeq){
+		Optional<List<FriendsState>> findFS = friendsStateRepository.findByOwnerSeq(ownerSeq);
+		for (FriendsState fs:findFS.get()){
+			if (fs.getTargetSeq().equals(targetSeq)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
