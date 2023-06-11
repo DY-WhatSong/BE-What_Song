@@ -153,7 +153,7 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 			case PUBLIC:
 				return new ResponseEntity<>(ACCESS_ALLOW,HttpStatus.OK);
 			case PRIVATE:
-				return requestPrivateRoomIsCorrect(accessRoomDTO.getMemberSeq(), accessRoomDTO.getRoomSeq());
+				return requestPrivateRoomIsCorrect(accessRoomDTO);
 		}
 
 		System.out.println("BADREQUEST");
@@ -190,14 +190,14 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 		Long ownerSeq = jpaQueryFactory.selectFrom(qmrm)
 				.where(qmrm.musicRoom.eq(eqMR))
 				.fetchOne().getOwnerSeq();
-		if(memberDetailService.isOwnerAlreadyFriendsRequest(ownerSeq,dummyMember.getMemberSeq())){
+		if(memberDetailService.isOwnerAlreadyFriendsRequest(ownerSeq, accessRoomDTO.getMemberSeq())){
 			return new ResponseEntity<>(ACCESS_ALLOW,HttpStatus.OK);
 		}
 
 		return new ResponseEntity<>(ACCESS_DENIED,HttpStatus.OK);
 	}
 
-	public ResponseEntity<?> requestPrivateRoomJPA(Long memberSeq,Long roomSeq){
+	/*public ResponseEntity<?> requestPrivateRoomJPA(Long memberSeq,Long roomSeq){
 		Member findM = memberCheckService.getInfoByMemberSeq(memberSeq);
 		MusicRoom findMR = musicCheckService.getInfoMRBySeq(roomSeq);
 		Long ownerSeq = musicMemberCheckService.getInfoMRMByRoom(findMR).getOwnerSeq();
@@ -205,5 +205,5 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 			return new ResponseEntity<>(ACCESS_ALLOW,HttpStatus.OK);
 		}
 		return new ResponseEntity<>(ACCESS_DENIED,HttpStatus.OK);
-	}
+	}*/
 }

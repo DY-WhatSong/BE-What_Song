@@ -15,5 +15,5 @@ public interface MusicRoomService {
 
 	ResponseEntity<?> ableAccessRoom(MusicRequestDTO.AccessRoom accessRoomDTO);
 
-	ResponseEntity<?> requestPrivateRoomJPA(Long memberSeq,Long roomSeq);
+//	ResponseEntity<?> requestPrivateRoomJPA(Long memberSeq,Long roomSeq);
 }

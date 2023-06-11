@@ -58,6 +58,16 @@ public class MusicRoom {
 				.build();
 	}
 
+	public MusicRoomDTO toEntityDTO(){
+		return MusicRoomDTO.builder()
+				.musicRoomSeq(musicRoomSeq)
+				.roomCode(roomCode)
+				.roomName(roomName)
+				.accessAuth(accessAuth)
+				.category(category)
+				.build();
+	}
+
 	/*public MusicRoomDTO toResponseDTO(){
 		return MusicRoomDTO.builder()
 				.

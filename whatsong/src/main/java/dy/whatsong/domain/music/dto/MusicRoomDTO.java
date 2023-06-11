@@ -23,5 +23,4 @@ public class MusicRoomDTO {
 	@Enumerated(EnumType.STRING)
 	private AccessAuth accessAuth;
 
-	private List<MusicRoomMember> musicRoomMembers;
 }
