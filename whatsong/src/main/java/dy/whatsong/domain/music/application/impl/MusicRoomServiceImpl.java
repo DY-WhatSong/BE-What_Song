@@ -22,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -181,22 +180,17 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 				.where(validRoom)
 				.fetchFirst()!=null;
 	}
+	private ResponseEntity<?> requestPrivateRoomIsCorrect(MusicRequestDTO.AccessRoom accessRoomDTO){
+		QMusicRoom qmr=QMusicRoom.musicRoom;
+		QMusicRoomMember qmrm=QMusicRoomMember.musicRoomMember;
+		MusicRoom eqMR = jpaQueryFactory.selectFrom(qmr)
+				.where(qmr.musicRoomSeq.eq(accessRoomDTO.getRoomSeq()))
+				.fetchOne();
 
-	private ResponseEntity<?> requestPrivateRoomIsCorrect(Long memberSeq,Long roomSeq){
-		Member findM = memberCheckService.getInfoByMemberSeq(memberSeq);
-
-		Long ownerSeq = jpaQueryFactory.select(musicRoomMember)
-				.from(musicRoomMember)
-				.where(musicRoomMember.musicRoom.eq(
-						jpaQueryFactory
-								.selectFrom(musicRoom)
-								.where(musicRoom.musicRoomSeq.eq(roomSeq))
-								.fetchFirst())
-				)
-				.fetchFirst()
-				.getOwnerSeq();
-
-		if(memberDetailService.isAlreadyFriends(ownerSeq,findM.getMemberSeq())){
+		Long ownerSeq = jpaQueryFactory.selectFrom(qmrm)
+				.where(qmrm.musicRoom.eq(eqMR))
+				.fetchOne().getOwnerSeq();
+		if(memberDetailService.isOwnerAlreadyFriendsRequest(ownerSeq,dummyMember.getMemberSeq())){
 			return new ResponseEntity<>(ACCESS_ALLOW,HttpStatus.OK);
 		}
 
