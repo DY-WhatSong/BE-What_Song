@@ -1,0 +1,38 @@
+######################################################################
+# PostgreSQL Settings
+######################################################################
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  profiles:
+    include:
+      - youtube
+      - oauth
+      - jwt
+      - redis
+    active: youtube, oauth, jwt, redis
+
+  config:
+    name: application-dev,application-youtube,application-oauth,application-jwt,application-redis
+    location: classpath:/env/application-dev.yml,classpath:/config/application-youtube.yml,classpath:/config/application-oauth.yml,classpath:/config/application-jwt.yml,classpath:/config/application-redis.yml
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5432/whatsong
+    maximum-pool-size: '4'
+    username: root
+    password: root1234
+
+  ######################################################################
+  # JPA Settings
+  ######################################################################
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    format_sql: true
+    use_sql_comments: true
