@@ -26,38 +26,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-
+        System.out.println("requestURL="+request.getRequestURI());
         // 요청 헤더의 Authorization 항목 값을 가져와 jwtHeader 변수에 담음.
-        String jwtHeader = request.getHeader(jwtProperties.getTOKEN_PREFIX());
-
-        if (jwtHeader == null || !jwtHeader.startsWith(jwtProperties.getTOKEN_PREFIX())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String token = jwtHeader.replace(jwtProperties.getTOKEN_PREFIX(), "");
-
-        Long memberSeq = null;
-
-        try {
-            memberSeq = verifyTokenAndGetMemberSeq(token);
-
-        } catch (TokenExpiredException e) {
-            e.printStackTrace();
-            request.setAttribute(jwtProperties.getHEADER_STRING(), "Token expired");
-
-        } catch (JWTVerificationException e) {
-            e.printStackTrace();
-            request.setAttribute(jwtProperties.getHEADER_STRING(), "Invalid token");
-        }
-
-        request.setAttribute("memberSeq", memberSeq);
+//        String jwtHeader = request.getHeader(jwtProperties.getTOKEN_PREFIX());
+//
+//        if (jwtHeader == null || !jwtHeader.startsWith(jwtProperties.getTOKEN_PREFIX())) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+//
+//        String token = jwtHeader.replace(jwtProperties.getTOKEN_PREFIX(), "");
+//
+//        Long memberSeq = null;
+//
+//        try {
+//            memberSeq = verifyTokenAndGetMemberSeq(token);
+//
+//        } catch (TokenExpiredException e) {
+//            e.printStackTrace();
+//            request.setAttribute(jwtProperties.getHEADER_STRING(), "Token expired");
+//
+//        } catch (JWTVerificationException e) {
+//            e.printStackTrace();
+//            request.setAttribute(jwtProperties.getHEADER_STRING(), "Invalid token");
+//        }
+//
+//        request.setAttribute("memberSeq", memberSeq);
 
         // ngrok 로컬 테스트시 사용하는 코드
-//        response.setHeader("Access-Control-Allow-Origin","*");
-//        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH, PUT");
-//        response.setHeader("Access-Control-Max-Age", "3600");
-//        response.setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization");
+        response.setHeader("Access-Control-Allow-Origin","*");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH, PUT");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization");
         filterChain.doFilter(request, response);
     }
 
