@@ -8,17 +8,6 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-  profiles:
-    include:
-      - youtube
-      - oauth-prod
-      - jwt
-      - redis
-      active: youtube, oauth-prod, jwt, redis
-
-      config:
-        name: application-stage,application-youtube,application-oauth-prod,application-jwt,application-redis
-        location: classpath:/env/application-stage.yml,classpath:/config/application-youtube.yml,classpath:/config/application-oauth-prod.yml,classpath:/config/application-jwt.yml,classpath:/config/application-redis.yml
 
   datasource:
     driver-class-name: org.postgresql.Driver
