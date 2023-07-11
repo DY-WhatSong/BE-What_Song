@@ -29,10 +29,10 @@ public class Properties {
         @Value("${jwt.secret.key}")
         private String JWT_SECRET_KEY;
 
-        @Value("${jwt.access.expired}")
+        @Value("${jwt.access.expiration}")
         private Long ACCESS_TOKEN_EXPIRED_TIME;
 
-        @Value("${jwt.refresh.expired}")
+        @Value("${jwt.refresh.expiration}")
         private Long REFRESH_TOKEN_EXPIRED_TIME;
 
         @Value("${jwt.access.header}")
