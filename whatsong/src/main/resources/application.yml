@@ -9,6 +9,7 @@ spring:
         - oauth
         - redis
         - youtube
+        - qr
       prod:
         - prod
         - oauth-prod

@@ -12,4 +12,6 @@ spring:
       format_sql: true
       use_sql_comments: true
 
-
+music_room:
+  share:
+    prefix: "http://localhost:8080/"
