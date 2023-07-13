@@ -39,4 +39,5 @@ public class MusicRequestDTO {
 		private Long memberSeq;
 		private Long roomSeq;
 	}
+
 }
