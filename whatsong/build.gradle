@@ -88,6 +88,8 @@ dependencies {
     // org.json 라이브러리
     implementation 'org.json:json:20210307'
 
+    //QR Generator
+    implementation 'com.google.zxing:core:3.4.1'
 }
 
 tasks.named('test') {
