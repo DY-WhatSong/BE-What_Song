@@ -14,4 +14,6 @@ public interface MusicRoomService {
 	ResponseEntity<?> deleteMusicRoom(MusicRequestDTO.Delete deleteDTO);
 
 	ResponseEntity<?> ableAccessRoom(MusicRequestDTO.AccessRoom accessRoomDTO);
+
+	ResponseEntity<?> requestPrivateRoomJPA(Long memberSeq,Long roomSeq);
 }

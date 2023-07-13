@@ -31,6 +31,9 @@ public class Member {
 	private String refreshToken;
 
 	private String profileMusic;
+	// 엔티티 추가 내용
+//	private String socialType;
+//	private String socialId;
 
 	@Enumerated(EnumType.STRING)
 	private MemberRole memberRole;
