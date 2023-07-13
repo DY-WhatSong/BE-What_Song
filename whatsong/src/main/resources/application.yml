@@ -1,73 +1,26 @@
-######################################################################
-# PostgreSQL Settings
-######################################################################
 spring:
-  redis:
-    host: localhost
-    port: 6379
-
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
   profiles:
-    include:
-      - youtube
-    active: youtube
+    active:
+      - develop
+    group:
+      develop:
+        - develop
+        - jwt
+        - oauth
+        - redis
+        - youtube
+      prod:
+        - prod
+        - oauth-prod
+        - jwt
+        - redis
+        - youtube
+      stage:
+        - stage
+        - oauth-prod
+        - jwt
+        - redis
+        - youtube
 
-  config:
-    name: application,application-youtube
-    location: classpath:/application.yml,classpath:/application-youtube.yml
-
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/whatsong
-    maximum-pool-size: '4'
-    username: root
-    password: root1234
-    
-######################################################################
-# JPA Settings
-######################################################################
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: true
-    format_sql: true
-    use_sql_comments: true
-######################################################################
-# security Settings
-######################################################################
-  security:
-    oauth2:
-      client:
-        registration:
-          kakao:
-#            client-id: f51146cf3f9524ee8e1e4c32a3e9a5d2
-#            redirect-uri: http://localhost:8080/user/kakao/callback
-            client-id: 7ae1ad5950661b2aefe29ac0874cc44d
-            redirect-uri: http://localhost:3000/login/oauth2
-            client-authentication-method: POST
-            authorization-grant-type: authorization_code
-            scope: profile_nickname, account_email #?? ??
-            client-name: Kakao
-        provider:
-          kakao:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-name-attribute: id
-######################################################################
-# JWT Settings
-######################################################################
-jwt:
-  secret:
-    key: IamSecretKey
-  access:
-    expired: 1800000
-    header: authorization
-  refresh:
-    expired: 1800000
-    header: refresh
+server:
+  port: 8082

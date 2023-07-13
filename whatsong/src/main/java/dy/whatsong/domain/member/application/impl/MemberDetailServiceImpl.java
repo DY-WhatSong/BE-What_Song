@@ -1,6 +1,7 @@
 package dy.whatsong.domain.member.application.impl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.dto.MemberRequestDTO;
@@ -11,10 +12,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @EssentialServiceLayer
 @RequiredArgsConstructor
@@ -28,10 +29,14 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 	@Override
 	@Transactional
 	public ResponseEntity<?> memberFriendRequest(MemberRequestDTO.FriendsApply friendsApplyDTO) {
+		Long ownerSeq = friendsApplyDTO.getOwnerSeq();
+		Long targetSeq = friendsApplyDTO.getTargetSeq();
 
-		boolean alreadyFriends = isAlreadyFriends(friendsApplyDTO.getOwnerSeq(),friendsApplyDTO.getTargetSeq());
-		if (alreadyFriends){
-			return new ResponseEntity<>("Already Friends", HttpStatus.OK);
+		if (isOwnerAlreadyFriendsRequest(ownerSeq, targetSeq)){
+			if (isAlreadyBothFriends(friendsApplyDTO.getOwnerSeq(),friendsApplyDTO.getTargetSeq())){
+				return new ResponseEntity<>("Both Follow",HttpStatus.OK);
+			}
+			return new ResponseEntity<>("Already Follow", HttpStatus.OK);
 		}
 		FriendsState friendsNew = FriendsState.builder()
 				.ownerSeq(friendsApplyDTO.getOwnerSeq())
@@ -41,8 +46,17 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 		return new ResponseEntity<>(friendsNew,HttpStatus.OK);
 	}
 
+	public boolean isAlreadyBothFriends(Long ownerSeq,Long targetSeq){
+		QFriendsState qFriendsState=QFriendsState.friendsState;
+		return jpaQueryFactory.selectFrom(qFriendsState)
+				.where(qFriendsState.ownerSeq.eq(ownerSeq).and(qFriendsState.targetSeq.eq(targetSeq)
+						.and(qFriendsState.targetSeq.eq(ownerSeq).and(qFriendsState.ownerSeq.eq(targetSeq))
+						)))
+				.fetchFirst()!=null;
+	}
+
 	@Override
-	public boolean isAlreadyFriends(Long ownerSeq,Long requestMemberSeq){
+	public boolean isOwnerAlreadyFriendsRequest(Long ownerSeq, Long requestMemberSeq){
 		QFriendsState qfs=QFriendsState.friendsState;
 
 		BooleanExpression friendConditon = qfs.ownerSeq.eq(ownerSeq)
@@ -52,6 +66,16 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 				.from(qfs)
 				.where(friendConditon)
 				.fetchFirst() != null;
+	}
+
+	public boolean isOwnerAlreadyFriends(Long ownerSeq,Long targetSeq){
+		Optional<List<FriendsState>> findFS = friendsStateRepository.findByOwnerSeq(ownerSeq);
+		for (FriendsState fs:findFS.get()){
+			if (fs.getTargetSeq().equals(targetSeq)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -66,14 +90,17 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 		return new ResponseEntity<>(fetchResult,HttpStatus.OK);
 	}
 
-	public Member testDummy(){
-		return Member.builder()
-				.memberSeq(1L)
-				.nickname("dummy")
-				.innerNickname("bomin")
-				.memberRole(MemberRole.USER)
-				.email("dummy@dummy.com")
-				.imgURL("https://avatars.githubusercontent.com/u/65716445?v=4")
-				.build();
+	@Override
+	public ResponseEntity<?> memberUnfollowRequest(MemberRequestDTO.FriendsApply friendsApplyDTO) {
+		QFriendsState qf=QFriendsState.friendsState;
+		Long o = friendsApplyDTO.getOwnerSeq();
+		Long t = friendsApplyDTO.getTargetSeq();
+		BooleanExpression findCondition = qf.ownerSeq.eq(o).
+				and(qf.targetSeq.eq(t));
+
+		jpaQueryFactory.delete(qf)
+				.where(findCondition);
+
+		return new ResponseEntity<>(o+"unfollowed"+t,HttpStatus.OK);
 	}
 }

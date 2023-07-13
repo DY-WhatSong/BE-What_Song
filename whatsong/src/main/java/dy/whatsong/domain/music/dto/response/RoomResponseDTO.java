@@ -23,8 +23,6 @@ public class RoomResponseDTO {
 
 		@Enumerated(EnumType.STRING)
 		private AccessAuth accessAuth;
-
-		private ExtraInfo extraInfo;
 	}
 
 	@Getter
@@ -49,4 +47,10 @@ public class RoomResponseDTO {
 		private AccessAuth accessAuth;
 	}
 
+	@Getter
+	@Builder
+	public static class BasicRseponse{
+		private Have have;
+		private ExtraInfo extraInfo;
+	}
 }

@@ -7,7 +7,6 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dy.whatsong.common.domain.response.ResponseService;
 import dy.whatsong.domain.member.domain.KakaoProfile;
 import dy.whatsong.domain.member.domain.OAuthToken;
 import dy.whatsong.domain.member.entity.Member;
@@ -38,14 +37,12 @@ public class TokenService {
     private final Properties.KakaoProperties kakaoProperties;
     private final Properties.JwtProperties jwtProperties;
     private final MemberRepository memberRepository;
-    private final ResponseService responseService;
 
-    public TokenService(Properties.KakaoProperties kakaoProperties, Properties.JwtProperties jwtProperties, MemberRepository memberRepository, ResponseService responseService) {
+    public TokenService(Properties.KakaoProperties kakaoProperties, Properties.JwtProperties jwtProperties, MemberRepository memberRepository) {
         this.gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         this.kakaoProperties = kakaoProperties;
         this.jwtProperties = jwtProperties;
         this.memberRepository = memberRepository;
-        this.responseService = responseService;
     }
 
     public KakaoProfile.UsersInfo getUserInfo(String authorizedCode) {

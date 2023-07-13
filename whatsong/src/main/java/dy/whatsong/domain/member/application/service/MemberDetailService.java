@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 public interface MemberDetailService {
 	ResponseEntity<?> memberFriendRequest(MemberRequestDTO.FriendsApply friendsApplyDTO);
 
-	boolean isAlreadyFriends(Long ownerSeq,Long requestMemberSeq);
+	boolean isOwnerAlreadyFriendsRequest(Long ownerSeq, Long requestMemberSeq);
 
 	ResponseEntity<?> memberSearchOnFriendsList(MemberRequestDTO.Search searchDTO);
+
+	ResponseEntity<?> memberUnfollowRequest(MemberRequestDTO.FriendsApply friendsApplyDTO);
 }
