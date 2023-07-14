@@ -1,8 +1,11 @@
 package dy.whatsong.domain.music.application.service;
 
+import com.google.zxing.WriterException;
 import dy.whatsong.domain.music.dto.request.MusicRequestDTO;
 import dy.whatsong.domain.music.entity.MusicRoom;
 import org.springframework.http.ResponseEntity;
+
+import java.io.IOException;
 
 public interface MusicRoomService {
 	ResponseEntity<?> createMusicRoom(MusicRequestDTO.Create createDTO);
@@ -15,5 +18,6 @@ public interface MusicRoomService {
 
 	ResponseEntity<?> ableAccessRoom(MusicRequestDTO.AccessRoom accessRoomDTO);
 
+	ResponseEntity<?> shareToQRorLink(Long roomSeq) throws IOException, WriterException;
 //	ResponseEntity<?> requestPrivateRoomJPA(Long memberSeq,Long roomSeq);
 }

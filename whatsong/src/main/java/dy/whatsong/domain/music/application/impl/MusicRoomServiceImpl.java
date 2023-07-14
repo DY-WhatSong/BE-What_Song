@@ -1,11 +1,14 @@
 package dy.whatsong.domain.music.application.impl;
 
+import com.google.zxing.WriterException;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import dy.whatsong.domain.http.Share;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.application.service.check.MemberCheckService;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.music.application.service.MusicRoomService;
+import dy.whatsong.domain.music.application.service.QRService;
 import dy.whatsong.domain.music.application.service.check.MusicCheckService;
 import dy.whatsong.domain.music.application.service.check.MusicMemberCheckService;
 import dy.whatsong.domain.music.application.service.MusicMemberService;
@@ -21,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -47,6 +51,8 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	private final MemberDetailService memberDetailService;
 
 	private final MemberCheckService memberCheckService;
+
+	private final QRService qrService;
 
 	public static final String BAD_REQUEST="Bad Request";
 
@@ -141,6 +147,17 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 		return new ResponseEntity<>("ERR",HttpStatus.BAD_REQUEST);
 	}
 
+	@Override
+	public ResponseEntity<?> shareToQRorLink(Long roomSeq) throws IOException, WriterException {
+
+		String generatedURL = generateShareLink(roomSeq, musicRoomRepository.findById(roomSeq)
+				.get().getRoomCode());
+		return qrService.generateQrCodeToPNG(generatedURL);
+	}
+
+	private String generateShareLink(Long roomSeq,String roomCode){
+		return Share.URL_PREFIX +"?roomId="+roomSeq+"&code="+roomCode;
+	}
 
 	private boolean getInfoCreatedRoomLimit(List<MusicRoomMember> mrmList){
 		System.out.println("mrmSize="+mrmList);
