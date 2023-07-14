@@ -1,4 +1,4 @@
-package dy.whatsong.domain.http;
+package dy.whatsong.domain.http.share;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
