@@ -1,4 +1,4 @@
-package dy.whatsong.domain.http.share;
+package dy.whatsong.domain.http.share.domain;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -20,6 +20,9 @@ public class S3 {
 
 	@Value("${cloud.aws.region.static}")
 	private String region;
+
+	@Value("${s3.dirname}")
+	public String dirName;
 
 	@Bean
 	public AmazonS3 amazonS3Client() {

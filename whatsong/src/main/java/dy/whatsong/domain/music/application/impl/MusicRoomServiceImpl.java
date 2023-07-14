@@ -3,12 +3,12 @@ package dy.whatsong.domain.music.application.impl;
 import com.google.zxing.WriterException;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import dy.whatsong.domain.http.share.Share;
+import dy.whatsong.domain.http.share.domain.Share;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.application.service.check.MemberCheckService;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.music.application.service.MusicRoomService;
-import dy.whatsong.domain.music.application.service.QRService;
+import dy.whatsong.domain.http.share.application.service.QRService;
 import dy.whatsong.domain.music.application.service.check.MusicCheckService;
 import dy.whatsong.domain.music.application.service.check.MusicMemberCheckService;
 import dy.whatsong.domain.music.application.service.MusicMemberService;
@@ -50,6 +50,8 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	private final MemberCheckService memberCheckService;
 
 	private final QRService qrService;
+
+	private final Share share;
 
 	public static final String BAD_REQUEST="Bad Request";
 
@@ -153,7 +155,7 @@ public class MusicRoomServiceImpl implements MusicRoomService {
 	}
 
 	private String generateShareLink(Long roomSeq,String roomCode){
-		return Share.URL_PREFIX +"?roomId="+roomSeq+"&code="+roomCode;
+		return share.URL_PREFIX +"?roomId="+roomSeq+"&code="+roomCode;
 	}
 
 	private boolean getInfoCreatedRoomLimit(List<MusicRoomMember> mrmList){

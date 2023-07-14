@@ -53,4 +53,11 @@ public class RoomResponseDTO {
 		private Have have;
 		private ExtraInfo extraInfo;
 	}
+
+	@Getter
+	@Builder
+	public static class ShareResponse{
+		private String basicUrl;
+		private String qrUrl;
+	}
 }
