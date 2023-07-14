@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dy.whatsong.domain.member.domain.KakaoProfile;
 import dy.whatsong.domain.member.domain.OAuthToken;
+import dy.whatsong.domain.member.dto.MemberDto;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.global.constant.Properties;
@@ -142,7 +143,7 @@ public class TokenService {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(member);
+                .body(convertToMemberDto(member));
     }
 
     /**
@@ -184,7 +185,7 @@ public class TokenService {
 
         String jwtToken = JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
+                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getACCESS_TOKEN_EXPIRED_TIME()))
 
                 .withClaim("id", member.getMemberSeq())
                 .withClaim("email", member.getEmail())
@@ -268,6 +269,7 @@ public class TokenService {
                 .getClaim("id")
                 .asLong();
     }
+
     private List<String> getTokenList(Member member) {
         List<String> tokenList = new ArrayList<>();
 
@@ -275,5 +277,21 @@ public class TokenService {
         tokenList.add(createRefreshToken(member));
 
         return tokenList;
+    }
+
+    private MemberDto.MemberResponseDto convertToMemberDto(Member member) {
+
+        return MemberDto.MemberResponseDto.builder()
+                .memberSeq(member.getMemberSeq())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .innerNickname(member.getInnerNickname())
+                .imgURL(member.getImgURL())
+                .oauthId(member.getOauthId())
+                .refreshToken(member.getRefreshToken())
+                .profileMusic(member.getProfileMusic())
+                .memberRole(member.getMemberRole())
+                .socialType(member.getSocialType())
+                .build();
     }
 }

@@ -7,6 +7,7 @@ import dy.whatsong.domain.member.service.MemberService;
 import dy.whatsong.domain.member.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -54,9 +55,20 @@ public class TokenController {
     }
 
     @GetMapping(value = "/user/token/reissue")
-    public ResponseEntity reissue(@RequestHeader("refresh") String refreshToken) {
+    public ResponseEntity<?> reissue(@RequestHeader("refresh") String refreshToken) {
         log.info("refreshToken : {}", refreshToken);
-        return tokenService.getReissusedTokensResponse(refreshToken);
+        return new ResponseEntity<>(tokenService.getReissusedTokensResponse(refreshToken), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/test/reissue")
+    public ResponseEntity<?> testReissue(@RequestHeader("refresh") String refreshToken) {
+        log.info("refreshToken : {}", refreshToken);
+        return new ResponseEntity<>(tokenService.getReissusedTokensResponse(refreshToken), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/api/test")
+    public String test() {
+        return "";
     }
 
 }
