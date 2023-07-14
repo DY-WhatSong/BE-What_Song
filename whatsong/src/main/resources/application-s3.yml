@@ -1,0 +1,11 @@
+cloud:
+  aws:
+    credentials:
+      accessKey: AKIASNQU3QLLI62USVCD
+      secretKey: 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
+    s3:
+      bucket: whatsong
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false

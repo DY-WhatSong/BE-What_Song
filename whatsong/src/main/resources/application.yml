@@ -10,6 +10,7 @@ spring:
         - redis
         - youtube
         - qr
+        - s3
       prod:
         - prod
         - oauth-prod

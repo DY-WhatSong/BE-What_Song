@@ -10,5 +10,5 @@ import org.springframework.stereotype.Component;
 public class Share {
 
 	@Value("${music_room.share.prefix}")
-	public static String URL_PREFIX;
+	public String URL_PREFIX;
 }
