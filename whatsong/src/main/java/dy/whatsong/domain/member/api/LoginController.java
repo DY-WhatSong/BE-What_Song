@@ -43,7 +43,7 @@ public class LoginController {
         System.out.println("MemberJoinReqDto : " + memberJoinReqDto);
 
 // Res 수정해야함. Json 리턴에 맞게!
-        Member member = memberService.existsByOauthId(memberJoinReqDto.getOauthId());
+        Member member = memberService.getMember(memberJoinReqDto.getOauthId());
 //        Member member = memberService.existsByEmail(usersInfo.getKakao_account().getEmail());
         log.info("Member : {}", member);
 

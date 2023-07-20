@@ -10,9 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,21 +30,17 @@ public class TokenController {
     @GetMapping(value = "/user/kakao/callback")
     public ResponseEntity kakaoLogin(@RequestParam String code) {
         // authorizedCode: 카카오 서버로부터 받은 인가 코드
-        log.info("authorizedCode : {}", code);
 
         // 1. 넘어온 인가 코드를 통해 access_token 발급
         OAuthToken oauthToken = tokenService.getAccessToken(code);
-        log.info("OAuthToken : {}", oauthToken);
 
         // 2. 액세스 토큰 -> 카카오 사용자 정보
         KakaoProfile.UsersInfo usersInfo = tokenService.getUserInfoByToken(oauthToken.getAccess_token());
-        log.info("KakaoProfile : {}", usersInfo);
 
         // 3. 해당 카카오 사용자 정보를 통해 DB에 존재하는지 판별
         // Res 수정해야함. Json 리턴에 맞게!
-        Member member = memberService.existsByOauthId(usersInfo.getId());
+        Member member = memberService.getMember(usersInfo.getId());
 //        Member member = memberService.existsByEmail(usersInfo.getKakao_account().getEmail());
-        log.info("Member : {}", member);
 
         if(member != null) {
             // 3.1. 회원 정보 DB 에 존재하면? 토큰받기
@@ -55,20 +52,23 @@ public class TokenController {
     }
 
     @GetMapping(value = "/user/token/reissue")
-    public ResponseEntity<?> reissue(@RequestHeader("refresh") String refreshToken) {
-        log.info("refreshToken : {}", refreshToken);
-        return new ResponseEntity<>(tokenService.getReissusedTokensResponse(refreshToken), HttpStatus.OK);
+    public ResponseEntity<?> reissue(HttpServletRequest request) {
+        return tokenService.getReissusedTokensResponse(request);
     }
 
-    @GetMapping(value = "/test/reissue")
-    public ResponseEntity<?> testReissue(@RequestHeader("refresh") String refreshToken) {
-        log.info("refreshToken : {}", refreshToken);
-        return new ResponseEntity<>(tokenService.getReissusedTokensResponse(refreshToken), HttpStatus.OK);
-    }
+
+
+
+
+
+
 
     @GetMapping(value = "/api/test")
-    public String test() {
-        return "";
+//    public String test() {
+    public ResponseEntity<?>  test() {
+//        return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>("", HttpStatus.OK);
+//        return "";
     }
 
 }

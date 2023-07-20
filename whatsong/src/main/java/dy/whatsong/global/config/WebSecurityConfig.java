@@ -1,16 +1,15 @@
 package dy.whatsong.global.config;
 
 
-import dy.whatsong.domain.member.entity.Member;
-import dy.whatsong.domain.member.service.TokenService;
+import dy.whatsong.domain.member.service.MemberService;
 import dy.whatsong.global.constant.Properties;
-import dy.whatsong.global.filter.jwt.CustomAccessDeniedHandler;
 import dy.whatsong.global.filter.jwt.CustomAuthenticationEntryPoint;
+import dy.whatsong.global.filter.jwt.JwtExceptionHandlerFilter;
 import dy.whatsong.global.filter.jwt.JwtAuthenticationFilter;
+import dy.whatsong.global.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -18,7 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
@@ -28,16 +26,21 @@ import java.util.List;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 //    private final TokenService tokenService;
-//    private final CorsFilter corsFilter;
+    //    private final CorsFilter corsFilter;
+    private final JwtService jwtService;
     private final Properties.JwtProperties jwtProperties;
+    private final MemberService memberService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtExceptionHandlerFilter jwtExceptionHandlerFilter;
+
 
     public static final String FRONT_URL = "http://localhost:3000";
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+//    @Bean
+//    @Override
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
+//    }
 
     @Bean
     public BCryptPasswordEncoder encodePwd() {
@@ -69,8 +72,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                             "/user/**",
                                             "/user/*",
                                             "/user/kakao/*",
+                                            "/user/kakao/callback",
                                             "/api/v1/healthcheck")
-                    .permitAll()
+                        .permitAll()
                     .antMatchers("/api/**").authenticated()
                     .anyRequest().authenticated()
 //                .and()
@@ -82,11 +86,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .exceptionHandling()
                     .authenticationEntryPoint(new CustomAuthenticationEntryPoint(jwtProperties))
                 .and()
-                    .addFilterBefore(
-                            new JwtAuthenticationFilter(jwtProperties),
-                            UsernamePasswordAuthenticationFilter.class
-                    );
-
+                    .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                    .addFilterBefore(jwtExceptionHandlerFilter, JwtAuthenticationFilter.class);
     }
 }
 

@@ -1,12 +1,9 @@
 jwt:
   secret:
     key: IamSecretKey
-
   access:
-#    expiration: 86400 #3600*24
-    expiration: 50 #3600*24
+    expiration: 50000
     header: Authorization
-
   refresh:
-    expiration: 604800 #3600*24*7
-    header: Authorization_refresh
+    expiration: 600000
+    header: refresh

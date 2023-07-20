@@ -4,17 +4,14 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import dy.whatsong.domain.member.service.MemberService;
 import dy.whatsong.global.constant.Properties;
+import dy.whatsong.global.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -28,6 +25,8 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final Properties.JwtProperties jwtProperties;
+    private final JwtService jwtService;
+    private final MemberService memberService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -38,60 +37,57 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization");
 
-        log.info("requestURL : {}", request.getRequestURI());
-        // 요청 헤더의 Authorization 항목 값을 가져와 jwtHeader 변수에 담음.
-        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        log.info("====================== REQUEST-URL : {} ====================== ", request.getRequestURI());
+        // Refresh 토큰 확인
+        if(request.getRequestURI().equals("/user/kakao/callback")) {
+            response.setStatus(HttpServletResponse.SC_OK);
+//            filterChain.doFilter(request, response);
+//            return;
+        } else if(request.getRequestURI().equals("/user/token/reissue")) {
+            String refreshToken = request.getHeader(jwtProperties.getREFRESH_TOKEN_HEADER());
+            log.info(" Refresh-Token : {}", refreshToken);
+            jwtService.isTokenValid(refreshToken, request, response);
+//            filterChain.doFilter(request, response);
+//            return;
+        } else {
+            // Access Token 확인
+            // 요청 헤더의 Authorization 항목 값을 가져와 jwtHeader 변수에 담음.
+            String authorizationCode = request.getHeader(jwtProperties.getACCESS_TOKEN_HEADER());
 
-        log.info(" Authorization : {}", authorization);
-        if (authorization == null || !authorization.startsWith(jwtProperties.getTOKEN_PREFIX())) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String token = authorization.replace(jwtProperties.getTOKEN_PREFIX(), "");
-
-        Long memberSeq = null;
-
-        try {
-            memberSeq = verifyTokenAndGetMemberSeq(token);
-
-        } catch (TokenExpiredException e) {
-            log.info("TokenExpiredException");
-            e.printStackTrace();
-            request.setAttribute(jwtProperties.getHEADER_STRING(), "Token expired");
-            return;
-        } catch (JWTVerificationException e) {
-            log.info("JWTVerificationException");
-            e.printStackTrace();
-            request.setAttribute(jwtProperties.getHEADER_STRING(), "Invalid token");
-            return;
-        }
-
-        request.setAttribute("memberSeq", memberSeq);
-//        UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(
-//                user.getUsername(), null, user.getAuthorities()
-//        );
-//        SecurityContextHolder.getContext().setAuthentication(userToken);
-//        chain.doFilter(request, response);
-        filterChain.doFilter(request, response);
-    }
-
-    private Long verifyTokenAndGetMemberSeq(String token) throws JWTVerificationException {
-        return JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()))
-                .build()
-                .verify(token)
-                .getClaim("id")
-                .asLong();
-    }
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedMethods("*");
+            log.info("[HEADER-AUTHORIZATION] : {}", authorizationCode);
+            if (!org.springframework.util.StringUtils.hasText(authorizationCode) || !authorizationCode.startsWith(jwtProperties.getTOKEN_PREFIX())) {
+                log.info("TOKEN IS EMPTY OR NO WITH PREFIX");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
-        };
+
+            String accessToken = authorizationCode.replace(jwtProperties.getTOKEN_PREFIX(), "");
+            log.info(" Access-Token : {}", accessToken);
+
+            boolean tokenValid = jwtService.isTokenValid(accessToken, request, response);
+
+//        Long oAuthId = null;
+//        request.setAttribute("oAuthId", oAuthId);
+
+            if(tokenValid) {
+                memberService.getMember(request.getAttribute("oauthId").toString());
+//            UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(
+//                    mem, null, user.getAuthorities()
+//            );
+//            SecurityContextHolder.getContext().setAuthentication(userToken);
+            }
+
+        }
+        filterChain.doFilter(request, response);
+
     }
 
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader(jwtProperties.getHEADER_STRING());
+        if (StringUtils.hasText(bearerToken) && StringUtils.startsWithIgnoreCase(bearerToken,
+                "Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
 }

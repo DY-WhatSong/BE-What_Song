@@ -1,7 +1,7 @@
 package dy.whatsong.member;
 
 import dy.whatsong.domain.member.entity.Member;
-import dy.whatsong.domain.member.repo.MemberRepository;
+import dy.whatsong.domain.member.repository.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -9,8 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class MemberAPITest {
 
-	@Autowired
-	MemberRepository memberRepository;
+	@Autowired MemberRepository memberRepository;
 
 	@Test
 	public void 회원_더미(){

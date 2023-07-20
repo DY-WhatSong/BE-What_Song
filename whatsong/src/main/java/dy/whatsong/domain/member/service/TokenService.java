@@ -14,15 +14,13 @@ import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.global.constant.Properties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -149,20 +147,20 @@ public class TokenService {
     /**
      * 토큰을 포함한 응답값 리턴 함수
      */
-    public ResponseEntity getReissusedTokensResponse(String refreshToken) {
+    public ResponseEntity<?> getReissusedTokensResponse(HttpServletRequest request) {
+
+        String refreshToken = request.getHeader(jwtProperties.getREFRESH_TOKEN_HEADER());
 
         List<String> tokenList = reissueRefreshToken(refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + tokenList.get(0));
-        headers.add("Refresh", "Bearer " + tokenList.get(1));
+        headers.add("authorization", "Bearer " + tokenList.get(0));
+        headers.add("refresh", "Bearer " + tokenList.get(1));
 
-        log.info("Access-Token : {}", tokenList.get(0));
-        log.info("Refresh-Token : {}", tokenList.get(1));
+        log.info("Reissused-Access-Token : {}", headers.get("authorization"));
+        log.info("Reissused-Refresh-Token : {}", headers.get("refresh"));
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .build();
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
     /**
      * 토큰을 포함한 응답값 리턴 함수
@@ -182,17 +180,13 @@ public class TokenService {
      * @return 발급한 JWT 토큰
      */
     private String createToken(Member member) {
-
-        String jwtToken = JWT.create()
+        return JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getACCESS_TOKEN_EXPIRED_TIME()))
-
-                .withClaim("id", member.getMemberSeq())
+                .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getACCESS_TOKEN_EXPIRED_TIME()))
+                .withClaim("oauthId", member.getOauthId())
                 .withClaim("email", member.getEmail())
                 .withClaim("nickname", member.getNickname())
-
                 .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
-        return jwtToken;
     }
 
     /**
@@ -201,19 +195,15 @@ public class TokenService {
      * @return 발급한 refresh token
      */
     private String createRefreshToken(Member member) {
-
-        String refreshToken = JWT.create()
+        return JWT.create()
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
-
-                .withClaim("id", member.getMemberSeq())
-
+                .withClaim("oauthId", member.getOauthId())
                 .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
-        return refreshToken;
     }
 
     /**
-     * refresh token을 받아 access token과 refresh toekn 재발급
+     * refresh token 을 받아 access token 과 refresh token 재발급
      * @param refreshToken
      * @return access token과 refresh token List
      */
@@ -221,14 +211,9 @@ public class TokenService {
 
         List<String> tokenList = new ArrayList<>();
 
-        // 토큰 만료 확인
-        if(!validateToken(refreshToken)){
-            throw new IllegalArgumentException("Token is expired");
-        }
+        String oauthId = getMemberOauthIdFromToken(refreshToken);
 
-        Long memberSeq = getMemberIdFromToken(refreshToken);
-
-        Optional<Member> optionalMember = memberRepository.findById(memberSeq);
+        Optional<Member> optionalMember = memberRepository.findByOauthId(oauthId);
         Member member = optionalMember.orElseThrow(() -> new IllegalArgumentException("Member not found"));
 
         tokenList.add(createToken(member));
@@ -262,12 +247,12 @@ public class TokenService {
         return false;
     }
 
-    private Long getMemberIdFromToken(String token) {
+    private String getMemberOauthIdFromToken(String token) {
         return require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()))
                 .build()
                 .verify(token)
-                .getClaim("id")
-                .asLong();
+                .getClaim("oauthId")
+                .asString();
     }
 
     private List<String> getTokenList(Member member) {
