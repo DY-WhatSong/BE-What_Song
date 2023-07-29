@@ -91,6 +91,8 @@ dependencies {
     //ws
     implementation 'org.webjars:sockjs-client:1.1.2'
 
+    //assertj
+    testImplementation 'org.assertj:assertj-core:3.24.2'
 
 }
 
