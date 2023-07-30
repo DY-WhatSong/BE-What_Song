@@ -55,6 +55,21 @@ public class MemberDto {
     @NoArgsConstructor
     @Builder
     @ToString
+    public static class LogoutRequestDto {
+
+        @NotNull(message = "email field should not be null")
+        private String email;
+        @NotNull(message = "oauthId field should not be null")
+        private String oauthId;
+
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @ToString
     public static class MemberResponseDto {
 
         private Long memberSeq;

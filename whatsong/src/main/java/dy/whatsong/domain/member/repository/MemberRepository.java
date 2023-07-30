@@ -20,5 +20,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmailAndSocialType(String email, SocialType socialType);
 
 
+    @Query("UPDATE Member m SET m.refreshToken = ?3 WHERE m.oauthId = ?1 AND m.email = ?2")
+    int updateRefreshToken(String oauthId, String email, String refreshToken);
+
 
 }

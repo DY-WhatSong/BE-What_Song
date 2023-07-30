@@ -59,10 +59,9 @@ public class LoginController {
             value = "로그아웃"
     )
     @PostMapping("/user/logout")
-    public String logout(@Valid MemberDto.MemberJoinReqDto memberJoinReqDto) {
+    public String logout(@Valid MemberDto.LogoutRequestDto logoutRequestDto) {
         // authorizedCode: 카카오 서버로부터 받은 인가 코드
-        memberService.saveMember(memberJoinReqDto);
-        System.out.println("MemberJoinReqDto : " + memberJoinReqDto);
+        memberService.updateRefreshToken(logoutRequestDto);
 
         return "redirect:/";
     }

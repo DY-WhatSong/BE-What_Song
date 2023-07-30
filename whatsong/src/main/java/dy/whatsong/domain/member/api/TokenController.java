@@ -5,6 +5,7 @@ import dy.whatsong.domain.member.domain.OAuthToken;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.service.MemberService;
 import dy.whatsong.domain.member.service.TokenService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,10 @@ public class TokenController {
 
     // 프론트에서 인가 코드 받는 API
     // 인가 코드로 엑세스 토큰 발급 -> 사용자 정보 조회 -> DB 저장 -> jwt 토큰 발급 -> 프론트에 토큰 전달
-//    @GetMapping("/token")
+    @ApiOperation(
+            value = "회원가입 - 카카오 계정 정보 + 닉네임",
+            notes = "카카오 계정 정보와 고객이 입력한 닉네임 정보로 회원 가입을 합니다."
+    )
     @GetMapping(value = "/user/kakao/callback")
     public ResponseEntity kakaoLogin(@RequestParam String code) {
         // authorizedCode: 카카오 서버로부터 받은 인가 코드
