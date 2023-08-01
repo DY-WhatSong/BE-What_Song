@@ -4,9 +4,12 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import dy.whatsong.domain.member.dto.TokenInfo;
+import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.service.MemberService;
+import dy.whatsong.domain.member.service.TokenService;
 import dy.whatsong.global.constant.Properties;
-import dy.whatsong.global.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,8 +28,8 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final Properties.JwtProperties jwtProperties;
-    private final JwtService jwtService;
     private final MemberService memberService;
+    private final TokenService tokenService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -38,48 +41,54 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization");
 
         log.info("====================== REQUEST-URL : {} ====================== ", request.getRequestURI());
-        // Refresh 토큰 확인
         if(request.getRequestURI().equals("/user/kakao/callback")) {
             response.setStatus(HttpServletResponse.SC_OK);
-//            filterChain.doFilter(request, response);
-//            return;
-        } else if(request.getRequestURI().equals("/user/token/reissue")) {
-            String refreshToken = request.getHeader(jwtProperties.getREFRESH_TOKEN_HEADER());
-            log.info(" Refresh-Token : {}", refreshToken);
-            jwtService.isTokenValid(refreshToken, request, response);
-//            filterChain.doFilter(request, response);
-//            return;
         } else {
-            // Access Token 확인
-            // 요청 헤더의 Authorization 항목 값을 가져와 jwtHeader 변수에 담음.
-            String authorizationCode = request.getHeader(jwtProperties.getACCESS_TOKEN_HEADER());
+            // 해당 회원 DB null 체크
+            String refreshToken = request.getHeader(jwtProperties.getREFRESH_TOKEN_HEADER());
+            TokenInfo tokenInfoFromToken = tokenService.getTokenInfoFromToken(refreshToken);
+            Member member = memberService.getMember(tokenInfoFromToken.getOauthId(), tokenInfoFromToken.getEmail());
 
-            log.info("[HEADER-AUTHORIZATION] : {}", authorizationCode);
-            if (!org.springframework.util.StringUtils.hasText(authorizationCode) || !authorizationCode.startsWith(jwtProperties.getTOKEN_PREFIX())) {
-                log.info("TOKEN IS EMPTY OR NO WITH PREFIX");
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
+            if(!StringUtils.hasText(member.getRefreshToken())) {
+                response.setStatus(440);
+            } else if(request.getRequestURI().equals("/user/token/reissue")) {
+                log.info(" Refresh-Token : {}", refreshToken);
+                isTokenValid(refreshToken, request, response);
+            } else {
+                // Access Token 확인
+                // 요청 헤더의 Authorization 항목 값을 가져와 jwtHeader 변수에 담음.
+                String authorizationCode = request.getHeader(jwtProperties.getACCESS_TOKEN_HEADER());
+
+                log.info("[HEADER-AUTHORIZATION] : {}", authorizationCode);
+                if (!StringUtils.hasText(authorizationCode) || !authorizationCode.startsWith(jwtProperties.getTOKEN_PREFIX())) {
+                    log.info("TOKEN IS EMPTY OR NO WITH PREFIX");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+
+                String accessToken = authorizationCode.replace(jwtProperties.getTOKEN_PREFIX(), "");
+                log.info(" Access-Token : {}", accessToken);
+
+                if(isTokenValid(accessToken, request, response)) {
+                    memberService.getMember(request.getAttribute("oauthId").toString());
+                }
             }
-
-            String accessToken = authorizationCode.replace(jwtProperties.getTOKEN_PREFIX(), "");
-            log.info(" Access-Token : {}", accessToken);
-
-            boolean tokenValid = jwtService.isTokenValid(accessToken, request, response);
-
-//        Long oAuthId = null;
-//        request.setAttribute("oAuthId", oAuthId);
-
-            if(tokenValid) {
-                memberService.getMember(request.getAttribute("oauthId").toString());
-//            UsernamePasswordAuthenticationToken userToken = new UsernamePasswordAuthenticationToken(
-//                    mem, null, user.getAuthorities()
-//            );
-//            SecurityContextHolder.getContext().setAuthentication(userToken);
-            }
-
         }
-        filterChain.doFilter(request, response);
 
+        filterChain.doFilter(request, response);
+    }
+
+    private boolean isTokenValid(String token, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            DecodedJWT verify = JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY())).build().verify(token);
+            String oauthId = verify.getClaim("oauthId").asString();
+            request.setAttribute("oauthId", oauthId);
+            return true;
+        } catch (TokenExpiredException e) {
+            throw new TokenExpiredException("token is expired.");
+        } catch (JWTVerificationException e) {
+            throw new JWTVerificationException("token is invalid.");
+        }
     }
 
     private String resolveToken(HttpServletRequest request) {

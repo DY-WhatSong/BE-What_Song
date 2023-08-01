@@ -2,6 +2,7 @@ package dy.whatsong.domain.member.service;
 
 import dy.whatsong.domain.member.domain.KakaoProfile;
 import dy.whatsong.domain.member.dto.MemberDto;
+import dy.whatsong.domain.member.dto.TokenInfo;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.entity.MemberRole;
 import dy.whatsong.domain.member.entity.SocialType;
@@ -27,16 +28,24 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    public int updateRefreshToken(MemberDto.LogoutRequestDto logoutRequestDto) {
-        return memberRepository.updateRefreshToken(logoutRequestDto.getOauthId(), logoutRequestDto.getEmail(), "");
+    public int updateRefreshToken(TokenInfo decodedTokenInfo) {
+        return memberRepository.updateRefreshToken(decodedTokenInfo.getOauthId(), decodedTokenInfo.getEmail(), "");
     }
 
     public Member getMember(String oauthId) {
         return memberRepository.findByOauthId(oauthId).orElse(new Member());
     }
 
+    public Member getMember(String oauthId, String email) {
+        return memberRepository.findByOauthIdAndEmail(oauthId, email).orElse(new Member());
+    }
+
     public boolean isValid(String email, SocialType socialType) {
         return memberRepository.findByEmailAndSocialType(email, socialType).isPresent();
+    }
+
+    public boolean findRefreshToken(String oauthId, String email) {
+        return memberRepository.findRefreshTokenByOauthIdAndEmail(oauthId, email).isPresent();
     }
 
     private static Member convertKakaoProfileToMember(KakaoProfile.UsersInfo usersInfo) {

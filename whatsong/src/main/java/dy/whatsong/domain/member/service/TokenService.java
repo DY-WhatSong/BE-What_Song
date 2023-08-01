@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import dy.whatsong.domain.member.domain.KakaoProfile;
 import dy.whatsong.domain.member.domain.OAuthToken;
 import dy.whatsong.domain.member.dto.MemberDto;
+import dy.whatsong.domain.member.dto.TokenInfo;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.global.constant.Properties;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import springfox.documentation.service.OAuth;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -132,6 +134,11 @@ public class TokenService {
 
         List<String> tokenList = getTokenList(member);
 
+        log.info("member.getOauthId() : {} ", member.getOauthId());
+        log.info("member.getEmail() : {}", member.getEmail());
+        log.info("tokenList.get(1) : {}", tokenList.get(1));
+        memberRepository.updateRefreshToken(member.getOauthId(), member.getEmail(), tokenList.get(1));
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + tokenList.get(0));
         headers.add("Refresh", "Bearer " + tokenList.get(1));
@@ -199,6 +206,8 @@ public class TokenService {
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
                 .withClaim("oauthId", member.getOauthId())
+                .withClaim("email", member.getEmail())
+                .withClaim("nickname", member.getNickname())
                 .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
     }
 
@@ -253,6 +262,22 @@ public class TokenService {
                 .verify(token)
                 .getClaim("oauthId")
                 .asString();
+    }
+
+    public TokenInfo getTokenInfoFromToken(String token) {
+
+        return TokenInfo.builder()
+                .oauthId(require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()))
+                        .build()
+                        .verify(token)
+                        .getClaim("oauthId")
+                        .asString())
+                .email(require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()))
+                        .build()
+                        .verify(token)
+                        .getClaim("email")
+                        .asString())
+                .build();
     }
 
     private List<String> getTokenList(Member member) {

@@ -8,9 +8,9 @@ import dy.whatsong.domain.member.service.TokenService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,8 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
-//@RequestMapping("/oauth")
-@Slf4j
+@RequestMapping("/user")
 public class TokenController {
 
     private final TokenService tokenService;
@@ -31,7 +30,7 @@ public class TokenController {
             value = "회원가입 - 카카오 계정 정보 + 닉네임",
             notes = "카카오 계정 정보와 고객이 입력한 닉네임 정보로 회원 가입을 합니다."
     )
-    @GetMapping(value = "/user/kakao/callback")
+    @GetMapping(value = "/kakao/callback")
     public ResponseEntity kakaoLogin(@RequestParam String code) {
         // authorizedCode: 카카오 서버로부터 받은 인가 코드
 
@@ -55,24 +54,9 @@ public class TokenController {
         }
     }
 
-    @GetMapping(value = "/user/token/reissue")
+    @GetMapping(value = "/token/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request) {
         return tokenService.getReissusedTokensResponse(request);
-    }
-
-
-
-
-
-
-
-
-    @GetMapping(value = "/api/test")
-//    public String test() {
-    public ResponseEntity<?>  test() {
-//        return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>("", HttpStatus.OK);
-//        return "";
     }
 
 }

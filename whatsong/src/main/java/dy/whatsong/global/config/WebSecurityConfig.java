@@ -25,22 +25,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-//    private final TokenService tokenService;
-    //    private final CorsFilter corsFilter;
-    private final JwtService jwtService;
     private final Properties.JwtProperties jwtProperties;
-    private final MemberService memberService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtExceptionHandlerFilter jwtExceptionHandlerFilter;
-
-
-    public static final String FRONT_URL = "http://localhost:3000";
-
-//    @Bean
-//    @Override
-//    public AuthenticationManager authenticationManagerBean() throws Exception {
-//        return super.authenticationManagerBean();
-//    }
 
     @Bean
     public BCryptPasswordEncoder encodePwd() {
@@ -73,7 +60,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                             "/user/*",
                                             "/user/kakao/*",
                                             "/user/kakao/callback",
-                                            "/api/v1/healthcheck")
+                                            "/api/v1/*",
+                                            "/api/v1/**",
+                                            "/api/v1/healthcheck"
+                    )
                         .permitAll()
                     .antMatchers("/api/**").authenticated()
                     .anyRequest().authenticated()
