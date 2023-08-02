@@ -8,6 +8,7 @@ import dy.whatsong.domain.reservation.entity.Reservation;
 import dy.whatsong.domain.reservation.repo.ReservationRepository;
 import dy.whatsong.domain.youtube.dto.VideoDTO;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
+import dy.whatsong.global.handler.exception.InvalidRequestAPIException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -58,5 +59,30 @@ public class ReservationServiceImpl implements ReservationService {
 				});
 		System.out.println(reservationList.toString());
 		return new ResponseEntity<>(reservationList,HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<?> approveReservation(final ReservationDTO.Approve approveDTO) {
+		Optional<Reservation> findOptionReservation = reservationRepository.findById(approveDTO.getReservationId());
+		if (findOptionReservation.isEmpty()){
+			throw new InvalidRequestAPIException("Invalid Request",400);
+		}
+		return new ResponseEntity<>(
+					reSaveReservationEntity(
+							findOptionReservation.get()
+							,approveDTO.getRecognize())
+					,HttpStatus.OK);
+	}
+
+	private Reservation reSaveReservationEntity(final Reservation reservation,final Recognize changeRecognize){
+		Reservation changeReserEntity = Reservation.builder()
+				.reservationId(reservation.getReservationId())
+				.selectVideo(reservation.getSelectVideo())
+				.recognize(changeRecognize)
+				.roomSeq(reservation.getRoomSeq())
+				.build();
+
+		reservationRepository.delete(reservation);
+		return reservationRepository.save(changeReserEntity);
 	}
 }
