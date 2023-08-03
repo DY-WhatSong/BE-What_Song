@@ -25,4 +25,9 @@ public class ReservationAPI {
 	public ResponseEntity<?> getInfoReservationList(@RequestParam("roomSeq") Long roomSeq){
 		return reservationService.reservationList(roomSeq);
 	}
+
+	@PostMapping("/reservation/approve")
+	public ResponseEntity<?> approveToMusic(@RequestBody ReservationDTO.Approve approveDTO){
+		return reservationService.approveReservation(approveDTO);
+	}
 }
