@@ -36,8 +36,9 @@ public class MemberService {
         return memberRepository.findByOauthId(oauthId).orElse(new Member());
     }
 
-    public Member getMember(String oauthId, String email) {
-        return memberRepository.findByOauthIdAndEmail(oauthId, email).orElse(new Member());
+    public MemberDto.MemberResponseDto getMember(String oauthId, String email) {
+        Member member = memberRepository.findByOauthIdAndEmail(oauthId, email).orElse(new Member());
+        return convertToMemberResponseDto(member);
     }
 
     public boolean isValid(String email, SocialType socialType) {
@@ -59,6 +60,20 @@ public class MemberService {
                 .profileMusic("")
                 .memberRole(MemberRole.USER)
                 .socialType(SocialType.KAKAO)
+                .build();
+    }
+
+    private static MemberDto.MemberResponseDto convertToMemberResponseDto(Member member) {
+        return MemberDto.MemberResponseDto.builder()
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .innerNickname(member.getInnerNickname())
+                .imgURL(member.getImgURL())
+                .oauthId(member.getOauthId())
+                .refreshToken(member.getRefreshToken())
+                .profileMusic(member.getProfileMusic())
+                .memberRole(member.getMemberRole())
+                .socialType(member.getSocialType())
                 .build();
     }
 

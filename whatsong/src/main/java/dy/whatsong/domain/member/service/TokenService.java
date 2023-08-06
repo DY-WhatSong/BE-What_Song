@@ -265,19 +265,23 @@ public class TokenService {
     }
 
     public TokenInfo getTokenInfoFromToken(String token) {
+        log.info("getTokenInfoFromToken");
+        try {
+            DecodedJWT verify = JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY())).build().verify(token);
+            String oauthId = verify.getClaim("oauthId").asString();
+            String email = verify.getClaim("email").asString();
 
-        return TokenInfo.builder()
-                .oauthId(require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()))
-                        .build()
-                        .verify(token)
-                        .getClaim("oauthId")
-                        .asString())
-                .email(require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()))
-                        .build()
-                        .verify(token)
-                        .getClaim("email")
-                        .asString())
-                .build();
+            return TokenInfo.builder()
+                    .oauthId(oauthId)
+                    .email(email)
+                    .build();
+        } catch (TokenExpiredException e) {
+            throw new TokenExpiredException("token is expired.");
+        } catch (JWTVerificationException e) {
+            throw new JWTVerificationException("token is invalid.");
+        } catch (Exception e ) {
+            throw e;
+        }
     }
 
     private List<String> getTokenList(Member member) {

@@ -5,8 +5,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import dy.whatsong.domain.member.dto.MemberDto;
 import dy.whatsong.domain.member.dto.TokenInfo;
-import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.service.MemberService;
 import dy.whatsong.domain.member.service.TokenService;
 import dy.whatsong.global.constant.Properties;
@@ -43,22 +43,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.info("====================== REQUEST-URL : {} ====================== ", request.getRequestURI());
         if(request.getRequestURI().equals("/user/kakao/callback")) {
             response.setStatus(HttpServletResponse.SC_OK);
+        } else if(request.getRequestURI().equals("/user/token/reissue")) {
+            String refreshToken = request.getHeader(jwtProperties.getREFRESH_TOKEN_HEADER());
+            log.info(" Refresh-Token : {}", refreshToken);
+            isTokenValid(refreshToken, request, response);
         } else {
             // 해당 회원 DB null 체크
-            String refreshToken = request.getHeader(jwtProperties.getREFRESH_TOKEN_HEADER());
-            TokenInfo tokenInfoFromToken = tokenService.getTokenInfoFromToken(refreshToken);
-            Member member = memberService.getMember(tokenInfoFromToken.getOauthId(), tokenInfoFromToken.getEmail());
+            String authorizationCode = request.getHeader(jwtProperties.getACCESS_TOKEN_HEADER());
+            String accessToken = authorizationCode.replace(jwtProperties.getTOKEN_PREFIX(), "");;
+            log.info("accessToken : {}", accessToken);
+            isTokenValid(accessToken, request, response);
+            TokenInfo tokenInfoFromToken = TokenInfo.builder()
+                    .oauthId(request.getAttribute("oauthId").toString())
+                    .email(request.getAttribute("email").toString())
+                    .build();
+            log.info("TokenInfo : {}", tokenInfoFromToken);
+            MemberDto.MemberResponseDto member = memberService.getMember(tokenInfoFromToken.getOauthId(), tokenInfoFromToken.getEmail());
 
             if(!StringUtils.hasText(member.getRefreshToken())) {
                 response.setStatus(440);
-            } else if(request.getRequestURI().equals("/user/token/reissue")) {
-                log.info(" Refresh-Token : {}", refreshToken);
-                isTokenValid(refreshToken, request, response);
             } else {
                 // Access Token 확인
                 // 요청 헤더의 Authorization 항목 값을 가져와 jwtHeader 변수에 담음.
-                String authorizationCode = request.getHeader(jwtProperties.getACCESS_TOKEN_HEADER());
-
                 log.info("[HEADER-AUTHORIZATION] : {}", authorizationCode);
                 if (!StringUtils.hasText(authorizationCode) || !authorizationCode.startsWith(jwtProperties.getTOKEN_PREFIX())) {
                     log.info("TOKEN IS EMPTY OR NO WITH PREFIX");
@@ -66,12 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
 
-                String accessToken = authorizationCode.replace(jwtProperties.getTOKEN_PREFIX(), "");
-                log.info(" Access-Token : {}", accessToken);
-
-                if(isTokenValid(accessToken, request, response)) {
-                    memberService.getMember(request.getAttribute("oauthId").toString());
-                }
+//                if(isT₩
             }
         }
 
@@ -82,7 +83,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             DecodedJWT verify = JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY())).build().verify(token);
             String oauthId = verify.getClaim("oauthId").asString();
+            String email = verify.getClaim("email").asString();
+
             request.setAttribute("oauthId", oauthId);
+            request.setAttribute("email", email);
             return true;
         } catch (TokenExpiredException e) {
             throw new TokenExpiredException("token is expired.");

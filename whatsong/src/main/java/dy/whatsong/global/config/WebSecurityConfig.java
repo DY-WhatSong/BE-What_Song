@@ -1,12 +1,10 @@
 package dy.whatsong.global.config;
 
 
-import dy.whatsong.domain.member.service.MemberService;
 import dy.whatsong.global.constant.Properties;
 import dy.whatsong.global.filter.jwt.CustomAuthenticationEntryPoint;
-import dy.whatsong.global.filter.jwt.JwtExceptionHandlerFilter;
 import dy.whatsong.global.filter.jwt.JwtAuthenticationFilter;
-import dy.whatsong.global.service.JwtService;
+import dy.whatsong.global.filter.jwt.JwtExceptionHandlerFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,12 +58,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                             "/user/*",
                                             "/user/kakao/*",
                                             "/user/kakao/callback",
-                                            "/api/v1/*",
-                                            "/api/v1/**",
+//                                            "/api/v1/*",
+//                                            "/api/v1/**",
+//                                            "/api/v1/members/me",
                                             "/api/v1/healthcheck"
                     )
                         .permitAll()
-                    .antMatchers("/api/**").authenticated()
+                    .antMatchers("/api/v1/**").authenticated()
                     .anyRequest().authenticated()
 //                .and()
 //                    // 403 예외처리 핸들링 - 토큰에 대한 권한과 요청 권한이 달라짐
@@ -80,4 +79,3 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .addFilterBefore(jwtExceptionHandlerFilter, JwtAuthenticationFilter.class);
     }
 }
-
