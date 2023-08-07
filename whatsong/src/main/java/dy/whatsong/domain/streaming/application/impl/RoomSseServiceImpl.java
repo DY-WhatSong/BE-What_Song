@@ -18,6 +18,7 @@ import javax.transaction.Transactional;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 @EssentialServiceLayer
@@ -29,13 +30,13 @@ public class RoomSseServiceImpl implements RoomSseService {
     private final MusicCheckService musicCheckService;
 
     @Override
-    public ArrayList<MRSse> getCurrentReservationList(final Reservation reservation) {
+    public LinkedList<MRSse> getCurrentReservationList(final Reservation reservation) {
         saveCurrentRoomState(reservation);
         return changeIterableToArrayList(mrSseRepository.findAll());
     }
 
-    private ArrayList<MRSse> changeIterableToArrayList(Iterable<MRSse> targetIterable){
-        ArrayList<MRSse> currentReservList=new ArrayList<>();
+    private LinkedList<MRSse> changeIterableToArrayList(Iterable<MRSse> targetIterable){
+        LinkedList<MRSse> currentReservList=new LinkedList<>();
         for (MRSse mrSse : targetIterable) {
             currentReservList.add(mrSse);
         }
