@@ -6,6 +6,7 @@ import dy.whatsong.domain.reservation.dto.ReservationDTO;
 import dy.whatsong.domain.reservation.entity.Recognize;
 import dy.whatsong.domain.reservation.entity.Reservation;
 import dy.whatsong.domain.reservation.repo.ReservationRepository;
+import dy.whatsong.domain.streaming.application.service.RoomSseService;
 import dy.whatsong.domain.youtube.dto.VideoDTO;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
 import dy.whatsong.global.handler.exception.InvalidRequestAPIException;
@@ -27,6 +28,8 @@ public class ReservationServiceImpl implements ReservationService {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	private final ReservationRepository reservationRepository;
+
+	private final RoomSseService roomSseService;
 
 	@Override
 	public ResponseEntity<?> reservationMusic(ReservationDTO.Select selectDTO) {
@@ -53,7 +56,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 		reservationRepository.findAll()
 				.forEach(reservation -> {
-					if(reservation.getRoomSeq()!=null&&reservation.getRoomSeq().equals(roomSeq)){
+					if(Optional.ofNullable(reservation).isPresent()&&reservation.getRoomSeq().equals(roomSeq)){
 						reservationList.add(reservation);
 					}
 				});
@@ -67,10 +70,11 @@ public class ReservationServiceImpl implements ReservationService {
 		if (findOptionReservation.isEmpty()){
 			throw new InvalidRequestAPIException("Invalid Request",400);
 		}
+		Reservation reSaveReserv = reSaveReservationEntity(
+				findOptionReservation.get()
+				, approveDTO.getRecognize());
 		return new ResponseEntity<>(
-					reSaveReservationEntity(
-							findOptionReservation.get()
-							,approveDTO.getRecognize())
+					roomSseService.getCurrentReservationList(reSaveReserv)
 					,HttpStatus.OK);
 	}
 
