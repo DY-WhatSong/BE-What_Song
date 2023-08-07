@@ -50,7 +50,7 @@ public class RoomSseServiceImpl implements RoomSseService {
                 MRSse.builder()
                         .videoId(reservation.getSelectVideo().getVideoId())
                         .roomCode(infoMRBySeq.getRoomCode())
-                        .status(Status.PLAYING)
+                        .status(Status.PAUSE)
                         .timestamp("0")
                         .build()
         );
