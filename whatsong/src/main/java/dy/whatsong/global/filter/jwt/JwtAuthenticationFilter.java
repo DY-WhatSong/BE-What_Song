@@ -54,10 +54,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //        request.setAttribute("memberSeq", memberSeq);
 
         // ngrok 로컬 테스트시 사용하는 코드
+        if (request.getRequestURI().contains("channels")) {
+            response.setHeader("Content-Type", "text/event-stream");
+        }
         response.setHeader("Access-Control-Allow-Origin","*");
         response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH, PUT");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization");
+
+        System.out.println("response ContentType="+response.getContentType());
         filterChain.doFilter(request, response);
     }
 
