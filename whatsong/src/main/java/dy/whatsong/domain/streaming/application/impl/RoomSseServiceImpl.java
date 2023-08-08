@@ -10,16 +10,14 @@ import dy.whatsong.domain.streaming.entity.room.MRSse;
 import dy.whatsong.domain.streaming.entity.room.Status;
 import dy.whatsong.domain.streaming.repo.MRSseRepository;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
+import dy.whatsong.global.handler.exception.InvalidRequestAPIException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.transaction.Transactional;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @EssentialServiceLayer
 @RequiredArgsConstructor
@@ -33,6 +31,14 @@ public class RoomSseServiceImpl implements RoomSseService {
     public LinkedList<MRSse> getCurrentReservationList(final Reservation reservation) {
         saveCurrentRoomState(reservation);
         return changeIterableToArrayList(mrSseRepository.findAll());
+    }
+
+    @Override
+    public MRSse getMRSseByRoomCode(String roomCode) {
+        System.out.println("RC="+roomCode);
+        Optional<MRSse> byId = mrSseRepository.findById(roomCode);
+        if (byId.isEmpty()) System.out.println("!!!!");
+        return mrSseRepository.findById(roomCode).orElseThrow(()->new InvalidRequestAPIException("Invalid Request",400));
     }
 
     private LinkedList<MRSse> changeIterableToArrayList(Iterable<MRSse> targetIterable){

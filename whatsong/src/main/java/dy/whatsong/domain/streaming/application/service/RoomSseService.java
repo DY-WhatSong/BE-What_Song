@@ -7,4 +7,6 @@ import java.util.LinkedList;
 
 public interface RoomSseService{
     LinkedList<MRSse> getCurrentReservationList(final Reservation reservation);
+
+    MRSse getMRSseByRoomCode(String roomCode);
 }
