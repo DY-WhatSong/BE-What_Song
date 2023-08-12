@@ -2,10 +2,7 @@ package dy.whatsong.global.constant;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 @Component
 public class Properties {
@@ -44,6 +41,19 @@ public class Properties {
         private String TOKEN_PREFIX = "Bearer ";
 
         private String HEADER_STRING = "Authorization";
+
+    }
+
+    @Getter
+    @Component
+    public static class RedisProperties {
+
+        @Value("${spring.redis.host}")
+        private String host;
+
+        @Value("${spring.redis.port}")
+        private int port;
+
     }
 }
 

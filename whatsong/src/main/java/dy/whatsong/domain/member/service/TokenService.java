@@ -14,6 +14,7 @@ import dy.whatsong.domain.member.dto.TokenInfo;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.global.constant.Properties;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -88,11 +89,6 @@ public class TokenService {
         OAuthToken oAuthToken = gson.fromJson(response.getBody(), OAuthToken.class);
 
         return oAuthToken;
-        // JSON -> 액세스 토큰 파싱
-//        String tokenJson = response.getBody();
-//        JsonObject jsonObject = gson.fromJson(tokenJson, JsonObject.class);
-//        String accessToken = jsonObject.get("access_token").getAsString();
-//        return accessToken;
     }
 
     /**
@@ -136,7 +132,6 @@ public class TokenService {
 
         log.info("member.getOauthId() : {} ", member.getOauthId());
         log.info("member.getEmail() : {}", member.getEmail());
-        log.info("tokenList.get(1) : {}", tokenList.get(1));
         memberRepository.updateRefreshToken(member.getOauthId(), member.getEmail(), tokenList.get(1));
 
         HttpHeaders headers = new HttpHeaders();
@@ -237,21 +232,8 @@ public class TokenService {
      * @return 토큰 검증 여부
      */
     public boolean validateToken(String token) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY());
-            DecodedJWT decodedJWT = JWT.require(algorithm)
-                    .build()
-                    .verify(token);
-
-            if(decodedJWT.getClaim("id").asLong() != null) {
-                return true;
-            }
-        } catch (TokenExpiredException e) {
-            // Token has expired
-            e.printStackTrace();
-        } catch (JWTVerificationException e) {
-            // Invalid token
-            e.printStackTrace();
+        if(getDecodedJWT(token).getClaim("id").asLong() != null) {
+            return true;
         }
         return false;
     }
@@ -265,22 +247,34 @@ public class TokenService {
     }
 
     public TokenInfo getTokenInfoFromToken(String token) {
-        log.info("getTokenInfoFromToken");
-        try {
-            DecodedJWT verify = JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY())).build().verify(token);
-            String oauthId = verify.getClaim("oauthId").asString();
-            String email = verify.getClaim("email").asString();
+        return TokenInfo.builder()
+                .oauthId(getDecodedJWT(token).getClaim("oauthId").toString())
+                .email(getDecodedJWT(token).getClaim("email").toString())
+                .build();
+    }
 
-            return TokenInfo.builder()
-                    .oauthId(oauthId)
-                    .email(email)
-                    .build();
+    private DecodedJWT getDecodedJWT(String token) {
+        try {
+            return JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY())).build().verify(token);
+        } catch (SignatureException ex) {
+            log.error("Invalid JWT signature");
+            throw ex;
+        } catch (MalformedJwtException ex) {
+            log.error("Invalid JWT token");
+            throw ex;
         } catch (TokenExpiredException e) {
-            throw new TokenExpiredException("token is expired.");
+            throw new TokenExpiredException("Expired JWT token");
         } catch (JWTVerificationException e) {
-            throw new JWTVerificationException("token is invalid.");
-        } catch (Exception e ) {
-            throw e;
+            throw new JWTVerificationException("Invalid JWT token");
+        } catch (ExpiredJwtException ex) {
+            log.error("Expired JWT token");
+            throw ex;
+        } catch (UnsupportedJwtException ex) {
+            log.error("Unsupported JWT token");
+            throw ex;
+        } catch (IllegalArgumentException ex) {
+            log.error("JWT claims string is empty.");
+            throw ex;
         }
     }
 

@@ -1,6 +1,6 @@
 jwt:
   secret:
-    key: IamSecretKey
+    key: TK9202@#$
   access:
     expiration: 50000
     header: Authorization

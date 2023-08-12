@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -24,9 +26,11 @@ public class LoginController {
             value = "로그아웃"
     )
     @GetMapping("/user/logout")
-    public void logout(@RequestHeader("Refresh") String refreshToken) {
-        // authorizedCode: 카카오 서버로부터 받은 인가 코드
-        TokenInfo decodedTokenInfo = tokenService.getTokenInfoFromToken(refreshToken);
+    public void logout(HttpServletRequest request) {
+        TokenInfo decodedTokenInfo = TokenInfo.builder()
+                .oauthId(request.getAttribute("oauthId").toString())
+                .email(request.getAttribute("email").toString())
+                .build();
         log.info("getEmail : {}", decodedTokenInfo.getEmail());
         log.info("getOauthId : {}", decodedTokenInfo.getOauthId());
         memberService.updateRefreshToken(decodedTokenInfo);

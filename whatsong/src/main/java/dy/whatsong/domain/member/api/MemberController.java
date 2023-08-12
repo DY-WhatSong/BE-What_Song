@@ -27,9 +27,7 @@ public class MemberController {
             value = "맴버 정보 조회"
     )
     @GetMapping(value = "/members/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getMemberInfo(@RequestHeader("Authorization") String accessToken,
-                                           HttpServletRequest request) {
-        log.info("getMemberInfo.accessToken : {}", accessToken);
+    public ResponseEntity<?> getMemberInfo(HttpServletRequest request) {
         TokenInfo decodedTokenInfo = TokenInfo.builder()
                 .oauthId(request.getAttribute("oauthId").toString())
                 .email(request.getAttribute("email").toString())

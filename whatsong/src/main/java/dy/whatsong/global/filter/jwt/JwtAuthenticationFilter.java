@@ -43,43 +43,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.info("====================== REQUEST-URL : {} ====================== ", request.getRequestURI());
         if(request.getRequestURI().equals("/user/kakao/callback")) {
             response.setStatus(HttpServletResponse.SC_OK);
-        } else if(request.getRequestURI().equals("/user/token/reissue")) {
+        } else if(request.getRequestURI().equals("/user/token/reissue") ||
+                  request.getRequestURI().equals("/user/logout")) {
             String refreshToken = request.getHeader(jwtProperties.getREFRESH_TOKEN_HEADER());
-            log.info(" Refresh-Token : {}", refreshToken);
+            log.info("refreshToken : {}", refreshToken);
             isTokenValid(refreshToken, request, response);
+
+            // DB에 리프레시 토큰 존재 여부 판별하여 로그아웃한 계정인지 체크
+            isAccountLoggedOut(getMemberInfo(request).getRefreshToken(), response);
         } else {
             // 해당 회원 DB null 체크
             String authorizationCode = request.getHeader(jwtProperties.getACCESS_TOKEN_HEADER());
-            String accessToken = authorizationCode.replace(jwtProperties.getTOKEN_PREFIX(), "");;
-            log.info("accessToken : {}", accessToken);
-            isTokenValid(accessToken, request, response);
-            TokenInfo tokenInfoFromToken = TokenInfo.builder()
-                    .oauthId(request.getAttribute("oauthId").toString())
-                    .email(request.getAttribute("email").toString())
-                    .build();
-            log.info("TokenInfo : {}", tokenInfoFromToken);
-            MemberDto.MemberResponseDto member = memberService.getMember(tokenInfoFromToken.getOauthId(), tokenInfoFromToken.getEmail());
-
-            if(!StringUtils.hasText(member.getRefreshToken())) {
-                response.setStatus(440);
+            if (!StringUtils.hasText(authorizationCode) || !authorizationCode.startsWith(jwtProperties.getTOKEN_PREFIX())) {
+                log.info("TOKEN IS EMPTY OR NO WITH PREFIX");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             } else {
-                // Access Token 확인
-                // 요청 헤더의 Authorization 항목 값을 가져와 jwtHeader 변수에 담음.
-                log.info("[HEADER-AUTHORIZATION] : {}", authorizationCode);
-                if (!StringUtils.hasText(authorizationCode) || !authorizationCode.startsWith(jwtProperties.getTOKEN_PREFIX())) {
-                    log.info("TOKEN IS EMPTY OR NO WITH PREFIX");
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    return;
-                }
+                String accessToken = authorizationCode.replace(jwtProperties.getTOKEN_PREFIX(), "");;
+                log.info("accessToken : {}", accessToken);
+                isTokenValid(accessToken, request, response);
 
-//                if(isT₩
+                // DB에 리프레시 토큰 존재 여부 판별하여 로그아웃한 계정인지 체크
+                isAccountLoggedOut(getMemberInfo(request).getRefreshToken(), response);
             }
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private boolean isTokenValid(String token, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private boolean isTokenValid(String token, HttpServletRequest request, HttpServletResponse response) {
         try {
             DecodedJWT verify = JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY())).build().verify(token);
             String oauthId = verify.getClaim("oauthId").asString();
@@ -89,8 +80,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             request.setAttribute("email", email);
             return true;
         } catch (TokenExpiredException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             throw new TokenExpiredException("token is expired.");
         } catch (JWTVerificationException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             throw new JWTVerificationException("token is invalid.");
         }
     }
@@ -102,5 +95,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    private MemberDto.MemberResponseDto getMemberInfo(HttpServletRequest request) {
+        TokenInfo tokenInfoFromToken = TokenInfo.builder()
+                .oauthId(request.getAttribute("oauthId").toString())
+                .email(request.getAttribute("email").toString())
+                .build();
+        return memberService.getMember(tokenInfoFromToken.getOauthId(), tokenInfoFromToken.getEmail());
+    }
+
+    private void isAccountLoggedOut(String refreshToken, HttpServletResponse response) {
+        if(!StringUtils.hasText(refreshToken)) {
+            response.setStatus(440);
+        }
     }
 }

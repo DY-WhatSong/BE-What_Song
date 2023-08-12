@@ -58,13 +58,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                             "/user/*",
                                             "/user/kakao/*",
                                             "/user/kakao/callback",
-//                                            "/api/v1/*",
-//                                            "/api/v1/**",
-//                                            "/api/v1/members/me",
                                             "/api/v1/healthcheck"
                     )
                         .permitAll()
                     .antMatchers("/api/v1/**").authenticated()
+                    .antMatchers("/chat/**").hasRole("USER") // chat으로 시작하는 리소스에 대한 접근 권한 설정
                     .anyRequest().authenticated()
 //                .and()
 //                    // 403 예외처리 핸들링 - 토큰에 대한 권한과 요청 권한이 달라짐
