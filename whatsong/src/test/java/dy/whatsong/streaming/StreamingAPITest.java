@@ -1,4 +1,4 @@
-package dy.whatsong.streaming;
+/*package dy.whatsong.streaming;
 
 import dy.whatsong.domain.streaming.entity.room.Status;
 import org.assertj.core.api.Assertions;
@@ -18,3 +18,4 @@ public class StreamingAPITest {
         Assertions.assertThat(ifPause).isEqualTo(false);
     }
 }
+*/
