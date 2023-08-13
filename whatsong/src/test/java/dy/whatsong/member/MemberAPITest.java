@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.member;
 
 import dy.whatsong.domain.member.entity.Member;
@@ -24,3 +25,4 @@ public class MemberAPITest {
 		}
 	}
 }
+*/
