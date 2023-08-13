@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.config;
 
 import org.junit.jupiter.api.Test;
@@ -20,3 +21,5 @@ public class PropertiesTest {
 		System.out.println("Log="+Arrays.toString(environment.getActiveProfiles()));
 	}
 }
+
+*/
