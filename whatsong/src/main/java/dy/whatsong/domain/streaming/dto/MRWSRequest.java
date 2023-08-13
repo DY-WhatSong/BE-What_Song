@@ -4,15 +4,10 @@ import dy.whatsong.domain.streaming.entity.room.Status;
 import lombok.Getter;
 
 @Getter
-public class MRSseRequest {
-
+public class MRWSRequest {
     @Getter
-    public static class OnlyUseTimeStamp{
-        private String timestamp;
-
-    }
-    @Getter
-    public static class OnlyUseStatus{
+    public static class playerCurrentState{
         private Status status;
+        private String timeStamp;
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisHash;
 @Getter
 @Builder
 @RedisHash(value = "mrsse",timeToLive = 60 * 60 * 24)
-public class MRSse {
+public class MRWS {
     @Id
     private String roomCode;
     private String timestamp;

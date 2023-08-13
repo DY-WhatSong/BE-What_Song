@@ -1,12 +1,12 @@
 package dy.whatsong.domain.streaming.application.service;
 
 import dy.whatsong.domain.reservation.entity.Reservation;
-import dy.whatsong.domain.streaming.entity.room.MRSse;
+import dy.whatsong.domain.streaming.entity.room.MRWS;
 
 import java.util.LinkedList;
 
 public interface RoomSseService{
-    LinkedList<MRSse> getCurrentReservationList(final Reservation reservation);
+    LinkedList<MRWS> getCurrentReservationList(final Reservation reservation);
 
-    MRSse getMRSseByRoomCode(String roomCode);
+    MRWS getMRSseByRoomCode(String roomCode);
 }

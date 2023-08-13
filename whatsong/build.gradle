@@ -94,6 +94,9 @@ dependencies {
     //assertj
     testImplementation 'org.assertj:assertj-core:3.24.2'
 
+    //ws
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 }
 
 tasks.named('test') {
