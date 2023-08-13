@@ -1,6 +1,5 @@
 package dy.whatsong.domain.streaming.dto;
 
-import dy.whatsong.domain.streaming.entity.MemberSse;
 import dy.whatsong.domain.streaming.entity.room.Status;
 import lombok.Builder;
 import lombok.Getter;
