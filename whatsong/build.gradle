@@ -88,6 +88,15 @@ dependencies {
     // org.json 라이브러리
     implementation 'org.json:json:20210307'
 
+    //ws
+    implementation 'org.webjars:sockjs-client:1.1.2'
+
+    //assertj
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+
+    //ws
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 }
 
 tasks.named('test') {
