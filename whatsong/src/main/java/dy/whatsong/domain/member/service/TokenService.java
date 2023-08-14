@@ -14,14 +14,17 @@ import dy.whatsong.domain.member.dto.TokenInfo;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.global.constant.Properties;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
-import springfox.documentation.service.OAuth;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -177,36 +180,6 @@ public class TokenService {
     }
 
     /**
-     * JWT토큰 생성하는 함수
-     * @param member 사용자
-     * @return 발급한 JWT 토큰
-     */
-    private String createToken(Member member) {
-        return JWT.create()
-                .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getACCESS_TOKEN_EXPIRED_TIME()))
-                .withClaim("oauthId", member.getOauthId())
-                .withClaim("email", member.getEmail())
-                .withClaim("nickname", member.getNickname())
-                .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
-    }
-
-    /**
-     * refresh 토큰을 생성하는 함수
-     * @param member 사용자
-     * @return 발급한 refresh token
-     */
-    private String createRefreshToken(Member member) {
-        return JWT.create()
-                .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
-                .withClaim("oauthId", member.getOauthId())
-                .withClaim("email", member.getEmail())
-                .withClaim("nickname", member.getNickname())
-                .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
-    }
-
-    /**
      * refresh token 을 받아 access token 과 refresh token 재발급
      * @param refreshToken
      * @return access token과 refresh token List
@@ -227,15 +200,61 @@ public class TokenService {
     }
 
     /**
+     * 토큰 정보를 통해서 고유한 유저 식별 값을 가져오는 메서드
+     * @param token 토큰
+     * @return 유저정보({})
+     */
+    public String getOauthIdAndSocialType(String token) {
+        String oauthId = this.getDecodedJWT(token).getClaim("oauthId").asString();
+        String socialType = this.getDecodedJWT(token).getClaim("socialType").asString();
+        if(StringUtils.hasText(oauthId) && StringUtils.hasText(socialType)) {
+            return oauthId + ":" + socialType;
+        }
+        return null;
+    }
+
+    /**
      * 토큰 정보를 검증하는 메서드
      * @param token 토큰
      * @return 토큰 검증 여부
      */
     public boolean validateToken(String token) {
-        if(getDecodedJWT(token).getClaim("id").asLong() != null) {
+        if(StringUtils.hasText(getDecodedJWT(token).getClaim("oauthId").asString())) {
             return true;
         }
         return false;
+    }
+
+    /**
+     * JWT토큰 생성하는 함수
+     * @param member 사용자
+     * @return 발급한 JWT 토큰
+     */
+    private String createToken(Member member) {
+        return JWT.create()
+                .withSubject(member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getACCESS_TOKEN_EXPIRED_TIME()))
+                .withClaim("oauthId", member.getOauthId())
+                .withClaim("socialType", member.getSocialType().toString())
+                .withClaim("email", member.getEmail())
+                .withClaim("nickname", member.getNickname())
+                .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
+    }
+
+    /**
+     * refresh 토큰을 생성하는 함수
+     * @param member 사용자
+     * @return 발급한 refresh token
+     */
+    private String createRefreshToken(Member member) {
+        return JWT.create()
+                .withSubject(member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
+                .withClaim("oauthId", member.getOauthId())
+                .withClaim("socialType", member.getSocialType().toString())
+                .withClaim("email", member.getEmail())
+                .withClaim("nickname", member.getNickname())
+                .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
     }
 
     private String getMemberOauthIdFromToken(String token) {

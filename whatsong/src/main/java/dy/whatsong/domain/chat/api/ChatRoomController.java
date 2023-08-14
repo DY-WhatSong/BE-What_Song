@@ -3,14 +3,14 @@ package dy.whatsong.domain.chat.api;
 import dy.whatsong.domain.chat.model.ChatRoom;
 import dy.whatsong.domain.chat.model.LoginInfo;
 import dy.whatsong.domain.chat.repo.ChatRoomRepository;
-import dy.whatsong.domain.chat.service.JwtTokenProvider;
+import dy.whatsong.domain.member.service.TokenService;
+import dy.whatsong.global.constant.Properties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -18,8 +18,9 @@ import java.util.List;
 @RequestMapping("/chat")
 public class ChatRoomController {
 
+    private final Properties.JwtProperties jwtProperties;
     private final ChatRoomRepository chatRoomRepository;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
 
     @GetMapping("/room")
     public String rooms() {
@@ -30,7 +31,8 @@ public class ChatRoomController {
     @ResponseBody
     public List<ChatRoom> room() {
         List<ChatRoom> chatRooms = chatRoomRepository.findAllRoom();
-        chatRooms.stream().forEach(room -> room.setUserCount(chatRoomRepository.getUserCount(room.getChatRoomSequence())));
+        chatRooms.stream()
+                .forEach(room -> room.setUserCount(chatRoomRepository.getUserCount(room.getChatRoomSequence())));
         return chatRooms;
     }
 
@@ -54,9 +56,10 @@ public class ChatRoomController {
 
     @GetMapping("/user")
     @ResponseBody
-    public LoginInfo getUserInfo() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String name = auth.getName();
-        return LoginInfo.builder().name(name).token(jwtTokenProvider.generateToken(name)).build();
+    public LoginInfo getUserInfo(HttpServletRequest request) {
+        String refreshToken = request.getHeader(jwtProperties.getREFRESH_TOKEN_HEADER());
+        return LoginInfo.builder()
+                .name(tokenService.getOauthIdAndSocialType(refreshToken))
+                .build();
     }
 }

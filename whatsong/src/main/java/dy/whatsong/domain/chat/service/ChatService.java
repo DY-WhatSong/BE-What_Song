@@ -16,9 +16,9 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
 
     /**
-     * destination정보에서 roomId 추출
+     * destination정보에서 chatRoomSequence 추출
      */
-    public String getRoomId(String destination) {
+    public String getChatRoomSequence(String destination) {
         int lastIndex = destination.lastIndexOf('/');
         if (lastIndex != -1)
             return destination.substring(lastIndex + 1);

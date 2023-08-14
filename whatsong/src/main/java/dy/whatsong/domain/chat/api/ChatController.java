@@ -1,10 +1,9 @@
 package dy.whatsong.domain.chat.api;
 
 import dy.whatsong.domain.chat.model.ChatMessage;
-import dy.whatsong.domain.chat.pubsub.RedisPublisher;
 import dy.whatsong.domain.chat.repo.ChatRoomRepository;
 import dy.whatsong.domain.chat.service.ChatService;
-import dy.whatsong.domain.chat.service.JwtTokenProvider;
+import dy.whatsong.domain.member.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.Header;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ChatController {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
 
@@ -25,9 +24,9 @@ public class ChatController {
      */
     @MessageMapping("/chat/message")
     public void message(ChatMessage message, @Header("token") String token) {
-        String nickname = jwtTokenProvider.getUserNameFromJwt(token);
+        String uniqueUserName = tokenService.getOauthIdAndSocialType(token);
         // 로그인 회원 정보로 대화명 설정
-        message.setSender(nickname);
+        message.setSender(uniqueUserName);
         // 채팅방 인원수 세팅
         message.setUserCount(chatRoomRepository.getUserCount(message.getChatRoomSequence()));
         // Websocket에 발행된 메시지를 redis로 발행(publish)

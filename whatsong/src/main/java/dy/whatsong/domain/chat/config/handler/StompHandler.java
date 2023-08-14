@@ -3,7 +3,7 @@ package dy.whatsong.domain.chat.config.handler;
 import dy.whatsong.domain.chat.model.ChatMessage;
 import dy.whatsong.domain.chat.repo.ChatRoomRepository;
 import dy.whatsong.domain.chat.service.ChatService;
-import dy.whatsong.domain.chat.service.JwtTokenProvider;
+import dy.whatsong.domain.member.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -21,7 +21,7 @@ import java.util.Optional;
 @Component
 public class StompHandler implements ChannelInterceptor {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenService tokenService;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
 
@@ -33,31 +33,39 @@ public class StompHandler implements ChannelInterceptor {
             String jwtToken = accessor.getFirstNativeHeader("token");
             log.info("CONNECT {}", jwtToken);
             // Header의 jwt token 검증
-            jwtTokenProvider.validateToken(jwtToken);
+            tokenService.validateToken(jwtToken);
         } else if (StompCommand.SUBSCRIBE == accessor.getCommand()) { // 채팅룸 구독요청
             // header정보에서 구독 destination정보를 얻고, roomId를 추출한다.
-            String roomId = chatService.getRoomId(Optional.ofNullable((String) message.getHeaders().get("simpDestination")).orElse("InvalidRoomId"));
-            // 채팅방에 들어온 클라이언트 sessionId를 roomId와 맵핑해 놓는다.(나중에 특정 세션이 어떤 채팅방에 들어가 있는지 알기 위함)
+            String chatRoomSequence = chatService.getChatRoomSequence(Optional.ofNullable((String) message.getHeaders().get("simpDestination")).orElse("InvalidChatRoomSequence"));
+            // 채팅방에 들어온 클라이언트 sessionId를 chatRoomSequence와 맵핑해 놓는다.(나중에 특정 세션이 어떤 채팅방에 들어가 있는지 알기 위함)
             String sessionId = (String) message.getHeaders().get("simpSessionId");
-            chatRoomRepository.setUserEnterInfo(sessionId, roomId);
+            chatRoomRepository.setUserEnterInfo(sessionId, chatRoomSequence);
             // 채팅방의 인원수를 +1한다.
-            chatRoomRepository.plusUserCount(roomId);
+            chatRoomRepository.plusUserCount(chatRoomSequence);
             // 클라이언트 입장 메시지를 채팅방에 발송한다.(redis publish)
             String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
-            chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.MessageType.ENTER).roomId(roomId).sender(name).build());
-            log.info("SUBSCRIBED {}, {}", name, roomId);
+            chatService.sendChatMessage(ChatMessage.builder()
+                                            .type(ChatMessage.MessageType.ENTER)
+                                            .chatRoomSequence(chatRoomSequence)
+                                            .sender(name)
+                                            .build());
+            log.info("SUBSCRIBED {}, {}", name, chatRoomSequence);
         } else if (StompCommand.DISCONNECT == accessor.getCommand()) { // Websocket 연결 종료
             // 연결이 종료된 클라이언트 sesssionId로 채팅방 id를 얻는다.
             String sessionId = (String) message.getHeaders().get("simpSessionId");
-            String roomId = chatRoomRepository.getUserEnterRoomId(sessionId);
+            String chatRoomSequence = chatRoomRepository.getUserEnterChatRoomSequence(sessionId);
             // 채팅방의 인원수를 -1한다.
-            chatRoomRepository.minusUserCount(roomId);
+            chatRoomRepository.minusUserCount(chatRoomSequence);
             // 클라이언트 퇴장 메시지를 채팅방에 발송한다.(redis publish)
             String name = Optional.ofNullable((Principal) message.getHeaders().get("simpUser")).map(Principal::getName).orElse("UnknownUser");
-            chatService.sendChatMessage(ChatMessage.builder().type(ChatMessage.MessageType.QUIT).roomId(roomId).sender(name).build());
-            // 퇴장한 클라이언트의 roomId 맵핑 정보를 삭제한다.
+            chatService.sendChatMessage(ChatMessage.builder()
+                                            .type(ChatMessage.MessageType.QUIT)
+                                            .chatRoomSequence(chatRoomSequence)
+                                            .sender(name)
+                                            .build());
+            // 퇴장한 클라이언트의 chatRoomSequence 맵핑 정보를 삭제한다.
             chatRoomRepository.removeUserEnterInfo(sessionId);
-            log.info("DISCONNECTED {}, {}", sessionId, roomId);
+            log.info("DISCONNECTED {}, {}", sessionId, chatRoomSequence);
         }
         return message;
     }
