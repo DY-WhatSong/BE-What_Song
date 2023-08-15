@@ -18,4 +18,10 @@ public class testAPI {
         System.out.println("소켓 연결!");
         template.convertAndSend("/sub/test","Success!");
     }
+
+    @MessageMapping("/post/test")
+    public void testPost(@RequestBody String testWord){
+        System.out.println("TesT!");
+        template.convertAndSend("/sub/test/post",testWord);
+    }
 }
