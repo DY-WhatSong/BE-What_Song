@@ -16,4 +16,9 @@ public class MemberRequestDTO {
 		private Long ownerSeq;
 		private String targetName;
 	}
+
+	@Getter
+	public static class OnlyRefreshToken{
+		private String refreshToken;
+	}
 }
