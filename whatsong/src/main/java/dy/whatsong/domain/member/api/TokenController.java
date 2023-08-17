@@ -61,9 +61,9 @@ public class TokenController {
     }
 
     @GetMapping("/member/info/refresh")
-    public ResponseEntity getMemberInfoByRefreshToken(@RequestBody MemberRequestDTO.OnlyRefreshToken onlyRefreshToken){
+    public ResponseEntity getMemberInfoByRefreshToken(@RequestHeader("refreshToken") String refreshToken ){
         return new ResponseEntity(
-                memberCheckService.getInfoByMemberRefreshToken(onlyRefreshToken.getRefreshToken()),
+                memberCheckService.getInfoByMemberRefreshToken(refreshToken),
                 HttpStatus.OK
         ) ;
     }
