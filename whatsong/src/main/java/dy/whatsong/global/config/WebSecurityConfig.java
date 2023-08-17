@@ -52,13 +52,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
             http
                     .authorizeRequests()
-                        .antMatchers("/oauth/**",
+                        .antMatchers(/*"/oauth/**",
                                                 "/**",
                                                 "/test",
                                                 "/user/**",
                                                 "/user/*",
                                                 "/user/kakao/*",
-                                                "/api/v1/healthcheck")
+                                                "/api/v1/healthcheck"*/
+                                                "/**")
                         .permitAll()
                         .antMatchers("/api/**").authenticated()
                         .anyRequest().authenticated()

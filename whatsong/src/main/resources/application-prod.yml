@@ -8,10 +8,10 @@ spring:
   
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/whatsong
+    url: jdbc:postgresql://whatsong.c9d71oyl8as0.ap-northeast-2.rds.amazonaws.com:5432/whatsong
     maximum-pool-size: '4'
-    username: root
-    password: root1234
+    username: postgresql
+    password: 12345678
 
   ######################################################################
   # JPA Settings
