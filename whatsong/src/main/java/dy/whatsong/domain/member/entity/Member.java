@@ -1,6 +1,8 @@
 package dy.whatsong.domain.member.entity;
 
 import dy.whatsong.domain.chat.entity.ChatRoomMember;
+import dy.whatsong.domain.member.dto.MemberRequestDTO;
+import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.music.entity.MusicRoomMember;
 import dy.whatsong.domain.profile.entity.GuestBook;
 import lombok.*;
@@ -49,4 +51,21 @@ public class Member {
 
 	@OneToMany(mappedBy = "member")
 	private List<MusicRoomMember> musicRoomMembers;
+
+
+	public MemberResponseDto.CheckResponse toInnerFieldDTO(){
+		return MemberResponseDto.CheckResponse
+				.builder()
+				.memberSeq(memberSeq)
+				.email(email)
+				.imgURL(imgURL)
+				.innerNickname(innerNickname)
+				.memberRole(memberRole)
+				.nickname(nickname)
+				.oauthId(oauthId)
+				.profileMusic(profileMusic)
+				.refreshToken(refreshToken)
+				.socialType(socialType)
+				.build();
+	}
 }
