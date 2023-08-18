@@ -13,7 +13,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class StompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws/stomp");
+        registry.addEndpoint("/ws/stomp").setAllowedOriginPatterns("http://localhost:3000/**","https://bba5-106-101-130-147.ngrok-free.app/**").withSockJS();
     }
 
     @Override
