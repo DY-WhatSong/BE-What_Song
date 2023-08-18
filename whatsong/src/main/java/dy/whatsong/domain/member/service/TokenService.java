@@ -8,21 +8,26 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dy.whatsong.common.domain.response.ResponseService;
-import dy.whatsong.common.domain.response.SingleResponse;
+import dy.whatsong.domain.member.domain.KakaoProfile;
+import dy.whatsong.domain.member.domain.OAuthToken;
+import dy.whatsong.domain.member.dto.MemberDto;
+import dy.whatsong.domain.member.dto.TokenInfo;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.global.constant.Properties;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -90,11 +95,6 @@ public class TokenService {
         OAuthToken oAuthToken = gson.fromJson(response.getBody(), OAuthToken.class);
 
         return oAuthToken;
-        // JSON -> 액세스 토큰 파싱
-//        String tokenJson = response.getBody();
-//        JsonObject jsonObject = gson.fromJson(tokenJson, JsonObject.class);
-//        String accessToken = jsonObject.get("access_token").getAsString();
-//        return accessToken;
     }
 
     */
@@ -140,6 +140,10 @@ public class TokenService {
 
         List<String> tokenList = getTokenList(member);
 
+        log.info("member.getOauthId() : {} ", member.getOauthId());
+        log.info("member.getEmail() : {}", member.getEmail());
+        memberRepository.updateRefreshToken(member.getOauthId(), member.getEmail(), tokenList.get(1));
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + tokenList.get(0));
         headers.add("Refresh", "Bearer " + tokenList.get(1));
@@ -149,28 +153,27 @@ public class TokenService {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(member);
+                .body(convertToMemberDto(member));
     }
 
     */
 /**
      * 토큰을 포함한 응답값 리턴 함수
-     *//*
+     */
+    public ResponseEntity<?> getReissusedTokensResponse(HttpServletRequest request) {
 
-    public ResponseEntity getKakaoProfileResponse(KakaoProfile kakaoProfile) {
+        String refreshToken = request.getHeader(jwtProperties.getREFRESH_TOKEN_HEADER());
 
         List<String> tokenList = reissueRefreshToken(refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + tokenList.get(0));
-        headers.add("Refresh", "Bearer " + tokenList.get(1));
+        headers.add("authorization", "Bearer " + tokenList.get(0));
+        headers.add("refresh", "Bearer " + tokenList.get(1));
 
-        log.info("Access-Token : {}", tokenList.get(0));
-        log.info("Refresh-Token : {}", tokenList.get(1));
+        log.info("Reissused-Access-Token : {}", headers.get("authorization"));
+        log.info("Reissused-Refresh-Token : {}", headers.get("refresh"));
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .build();
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
     /**
      * 토큰을 포함한 응답값 리턴 함수
@@ -184,49 +187,8 @@ public class TokenService {
                 .body(usersInfo);
     }
 
-    */
-/**
-     * JWT토큰 생성하는 함수
-     * @param member 사용자
-     * @return 발급한 JWT 토큰
-     *//*
-
-    private String createToken(Member member) {
-
-        String jwtToken = JWT.create()
-                .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getACCESS_TOKEN_EXPIRED_TIME()))
-
-                .withClaim("id", member.getMemberSeq())
-                .withClaim("email", member.getEmail())
-                .withClaim("nickname", member.getNickname())
-
-                .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
-        return jwtToken;
-    }
-
-    */
-/**
-     * refresh 토큰을 생성하는 함수
-     * @param member 사용자
-     * @return 발급한 refresh token
-     *//*
-
-    private String createRefreshToken(Member member) {
-
-        String refreshToken = JWT.create()
-                .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
-
-                .withClaim("id", member.getMemberSeq())
-
-                .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
-        return refreshToken;
-    }
-
-    */
-/**
-     * refresh token을 받아 access token과 refresh toekn 재발급
+    /**
+     * refresh token 을 받아 access token 과 refresh token 재발급
      * @param refreshToken
      * @return access token과 refresh token List
      *//*
@@ -235,14 +197,9 @@ public class TokenService {
 
         List<String> tokenList = new ArrayList<>();
 
-        // 토큰 만료 확인
-        if(!validateToken(refreshToken)){
-            throw new IllegalArgumentException("Token is expired");
-        }
+        String oauthId = getMemberOauthIdFromToken(refreshToken);
 
-        Long memberSeq = getMemberIdFromToken(refreshToken);
-
-        Optional<Member> optionalMember = memberRepository.findById(memberSeq);
+        Optional<Member> optionalMember = memberRepository.findByOauthId(oauthId);
         Member member = optionalMember.orElseThrow(() -> new IllegalArgumentException("Member not found"));
 
         tokenList.add(createToken(member));
@@ -251,40 +208,105 @@ public class TokenService {
         return tokenList;
     }
 
-    */
-/**
+    /**
+     * 토큰 정보를 통해서 고유한 유저 식별 값을 가져오는 메서드
+     * @param token 토큰
+     * @return 유저정보({})
+     */
+    public String getOauthIdAndSocialType(String token) {
+        String oauthId = this.getDecodedJWT(token).getClaim("oauthId").asString();
+        String socialType = this.getDecodedJWT(token).getClaim("socialType").asString();
+        if(StringUtils.hasText(oauthId) && StringUtils.hasText(socialType)) {
+            return oauthId + ":" + socialType;
+        }
+        return null;
+    }
+
+    /**
      * 토큰 정보를 검증하는 메서드
      * @param token 토큰
      * @return 토큰 검증 여부
      *//*
 
     public boolean validateToken(String token) {
-        try {
-            Algorithm algorithm = Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY());
-            DecodedJWT decodedJWT = JWT.require(algorithm)
-                    .build()
-                    .verify(token);
-
-            if(decodedJWT.getClaim("id").asLong() != null) {
-                return true;
-            }
-        } catch (TokenExpiredException e) {
-            // Token has expired
-            e.printStackTrace();
-        } catch (JWTVerificationException e) {
-            // Invalid token
-            e.printStackTrace();
+        if(StringUtils.hasText(getDecodedJWT(token).getClaim("oauthId").asString())) {
+            return true;
         }
         return false;
     }
 
-    private Long getMemberIdFromToken(String token) {
+    /**
+     * JWT토큰 생성하는 함수
+     * @param member 사용자
+     * @return 발급한 JWT 토큰
+     */
+    private String createToken(Member member) {
+        return JWT.create()
+                .withSubject(member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getACCESS_TOKEN_EXPIRED_TIME()))
+                .withClaim("oauthId", member.getOauthId())
+                .withClaim("socialType", member.getSocialType().toString())
+                .withClaim("email", member.getEmail())
+                .withClaim("nickname", member.getNickname())
+                .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
+    }
+
+    /**
+     * refresh 토큰을 생성하는 함수
+     * @param member 사용자
+     * @return 발급한 refresh token
+     */
+    private String createRefreshToken(Member member) {
+        return JWT.create()
+                .withSubject(member.getEmail())
+                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
+                .withClaim("oauthId", member.getOauthId())
+                .withClaim("socialType", member.getSocialType().toString())
+                .withClaim("email", member.getEmail())
+                .withClaim("nickname", member.getNickname())
+                .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
+    }
+
+    private String getMemberOauthIdFromToken(String token) {
         return require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()))
                 .build()
                 .verify(token)
-                .getClaim("id")
-                .asLong();
+                .getClaim("oauthId")
+                .asString();
     }
+
+    public TokenInfo getTokenInfoFromToken(String token) {
+        return TokenInfo.builder()
+                .oauthId(getDecodedJWT(token).getClaim("oauthId").toString())
+                .email(getDecodedJWT(token).getClaim("email").toString())
+                .build();
+    }
+
+    private DecodedJWT getDecodedJWT(String token) {
+        try {
+            return JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY())).build().verify(token);
+        } catch (SignatureException ex) {
+            log.error("Invalid JWT signature");
+            throw ex;
+        } catch (MalformedJwtException ex) {
+            log.error("Invalid JWT token");
+            throw ex;
+        } catch (TokenExpiredException e) {
+            throw new TokenExpiredException("Expired JWT token");
+        } catch (JWTVerificationException e) {
+            throw new JWTVerificationException("Invalid JWT token");
+        } catch (ExpiredJwtException ex) {
+            log.error("Expired JWT token");
+            throw ex;
+        } catch (UnsupportedJwtException ex) {
+            log.error("Unsupported JWT token");
+            throw ex;
+        } catch (IllegalArgumentException ex) {
+            log.error("JWT claims string is empty.");
+            throw ex;
+        }
+    }
+
     private List<String> getTokenList(Member member) {
         List<String> tokenList = new ArrayList<>();
 
@@ -292,6 +314,22 @@ public class TokenService {
         tokenList.add(createRefreshToken(member));
 
         return tokenList;
+    }
+
+    private MemberDto.MemberResponseDto convertToMemberDto(Member member) {
+
+        return MemberDto.MemberResponseDto.builder()
+                .memberSeq(member.getMemberSeq())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .innerNickname(member.getInnerNickname())
+                .imgURL(member.getImgURL())
+                .oauthId(member.getOauthId())
+                .refreshToken(member.getRefreshToken())
+                .profileMusic(member.getProfileMusic())
+                .memberRole(member.getMemberRole())
+                .socialType(member.getSocialType())
+                .build();
     }
 }
 */
