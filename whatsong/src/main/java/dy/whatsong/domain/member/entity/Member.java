@@ -52,20 +52,7 @@ public class Member {
 	@OneToMany(mappedBy = "member")
 	private List<MusicRoomMember> musicRoomMembers;
 
-
-	public MemberResponseDto.CheckResponse toInnerFieldDTO(){
-		return MemberResponseDto.CheckResponse
-				.builder()
-				.memberSeq(memberSeq)
-				.email(email)
-				.imgURL(imgURL)
-				.innerNickname(innerNickname)
-				.memberRole(memberRole)
-				.nickname(nickname)
-				.oauthId(oauthId)
-				.profileMusic(profileMusic)
-				.refreshToken(refreshToken)
-				.socialType(socialType)
-				.build();
+	public void updateRefreshToken(String updateRefreshToken) {
+		this.refreshToken = updateRefreshToken;
 	}
 }
