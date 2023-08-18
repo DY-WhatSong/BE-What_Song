@@ -1,60 +1,26 @@
-######################################################################
-# PostgreSQL Settings
-######################################################################
 spring:
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/whatsong
-    maximum-pool-size: '4'
-    username: root
-    password: root1234
-######################################################################
-# JPA Settings
-######################################################################
-  jpa:
-    hibernate:
-      ddl-auto: update
-      show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-######################################################################
-# MVC Settings
-######################################################################
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
-######################################################################
-# security Settings
-######################################################################
-  security:
-    oauth2:
-      client:
-        registration:
-          kakao:
-            client-id: 73ab336ae29a4c56ef25afe3c13ac54b
-            client-secret: QxpO9aGDJVmLQk6rSkPdyVgAL5cD9aeE
-            redirect-uri: http://localhost:8080/login/oauth2/code
-#            redirect-uri: http://localhost:8080/oauth2/authorization/kakao
-            client-authentication-method: POST
-            authorization-grant-type: authorization_code
-            client-name: Kakao
-            scope: profile_nickname, account_email #?? ??
-        provider:
-          kakao:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-name-attribute: id
-######################################################################
-# JWT Settings
-######################################################################
-jwt:
-  secret:
-    key: IamSecretKey
-  access:
-    expired: 1800000
-    header: authorization
-  refresh:
-    expired: 1800000
-    header: refresh
+  profiles:
+    active:
+      - prod
+    group:
+      develop:
+        - develop
+        - jwt
+        - oauth
+        - redis
+        - youtube
+      prod:
+        - prod
+        - oauth-prod
+        - jwt
+        - redis
+        - youtube
+      stage:
+        - stage
+        - oauth-prod
+        - jwt
+        - redis
+        - youtube
+
+server:
+  port: 8082

@@ -1,6 +1,8 @@
 package dy.whatsong.domain.member.entity;
 
 import dy.whatsong.domain.chat.entity.ChatRoomMember;
+import dy.whatsong.domain.member.dto.MemberRequestDTO;
+import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.music.entity.MusicRoomMember;
 import dy.whatsong.domain.profile.entity.GuestBook;
 import lombok.*;
@@ -31,6 +33,9 @@ public class Member {
 	private String refreshToken;
 
 	private String profileMusic;
+	// 엔티티 추가 내용
+//	private String socialType;
+//	private String socialId;
 
 	@Enumerated(EnumType.STRING)
 	private MemberRole memberRole;

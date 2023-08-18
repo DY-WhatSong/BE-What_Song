@@ -2,7 +2,10 @@ package dy.whatsong.global.constant;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 @Component
 public class Properties {
@@ -41,6 +44,18 @@ public class Properties {
         @Value("${jwt.refresh.header}")
         private String REFRESH_TOKEN_HEADER;
 
+        @Value("${jwt.refresh.expiration}")
+        private Long REFRESH_TOKEN_EXPIRED_TIME;
+
+        @Value("${jwt.access.header}")
+        private String ACCESS_TOKEN_HEADER;
+
+        @Value("${jwt.refresh.header}")
+        private String REFRESH_TOKEN_HEADER;
+
+        private String TOKEN_PREFIX = "Bearer ";
+
+        private String HEADER_STRING = "Authorization";
     }
 }
 

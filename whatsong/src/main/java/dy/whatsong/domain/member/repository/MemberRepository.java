@@ -3,6 +3,10 @@ package dy.whatsong.domain.member.repository;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.entity.SocialType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
 
 import java.util.Optional;
 

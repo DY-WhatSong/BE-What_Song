@@ -1,0 +1,27 @@
+######################################################################
+# PostgreSQL Settings
+######################################################################
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://whatsong.c9d71oyl8as0.ap-northeast-2.rds.amazonaws.com:5432/whatsong
+    maximum-pool-size: '4'
+    username: postgresql
+    password: 12345678
+
+  ######################################################################
+  # JPA Settings
+  ######################################################################
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    format_sql: true
+    use_sql_comments: true

@@ -13,6 +13,7 @@ import dy.whatsong.common.domain.response.SingleResponse;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.global.constant.Properties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -30,28 +31,27 @@ import java.util.Optional;
 import static com.auth0.jwt.JWT.require;
 
 @Component
+@Slf4j
 public class TokenService {
 
     private final Gson gson;
     private final Properties.KakaoProperties kakaoProperties;
     private final Properties.JwtProperties jwtProperties;
     private final MemberRepository memberRepository;
-    private final ResponseService responseService;
 
-    public TokenService(Properties.KakaoProperties kakaoProperties, Properties.JwtProperties jwtProperties, MemberRepository memberRepository, ResponseService responseService) {
+    public TokenService(Properties.KakaoProperties kakaoProperties, Properties.JwtProperties jwtProperties, MemberRepository memberRepository) {
         this.gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
         this.kakaoProperties = kakaoProperties;
         this.jwtProperties = jwtProperties;
         this.memberRepository = memberRepository;
-        this.responseService = responseService;
     }
 
-    public KakaoProfile getUserInfo(String authorizedCode) {
+    public KakaoProfile.UsersInfo getUserInfo(String authorizedCode) {
         // 1. 인가코드 -> 액세스 토큰
         OAuthToken accessToken = getAccessToken(authorizedCode);
 
         // 2. 액세스 토큰 -> 카카오 사용자 정보
-        KakaoProfile userInfo = getUserInfoByToken(accessToken.getAccess_token());
+        KakaoProfile.UsersInfo userInfo = getUserInfoByToken(accessToken.getAccess_token());
 
         return userInfo;
     }
@@ -72,7 +72,7 @@ public class TokenService {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
         params.add("client_id", kakaoProperties.getCLIENT_ID());
-        params.add("redirect_uri", "http://localhost:8080/user/kakao/callback");
+        params.add("redirect_uri", kakaoProperties.getREDIRECT_URI());
         params.add("code", authorizedCode);
 
         // HttpHeader와 HttpBody를 하나의 오브젝트에 담기
@@ -121,9 +121,9 @@ public class TokenService {
                 kakaoProfileRequest,
                 String.class
         );
-        KakaoProfile kakaoProfile = gson.fromJson(response.getBody(), KakaoProfile.class);
+        KakaoProfile.UsersInfo usersInfo = gson.fromJson(response.getBody(), KakaoProfile.UsersInfo.class);
 
-        return kakaoProfile;
+        return usersInfo;
 
 //        Long id = jsonObject.get("id").getAsLong();
 //        String email = jsonObject.getAsJsonObject("kakao_account").get("email").getAsString();
@@ -138,20 +138,18 @@ public class TokenService {
 
     public ResponseEntity getTokensResponse(Member member) {
 
-        List<String> tokenList = new ArrayList<>();
-
-        tokenList.add(createToken(member));
-        tokenList.add(createRefreshToken(member));
+        List<String> tokenList = getTokenList(member);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + tokenList.get(0));
         headers.add("Refresh", "Bearer " + tokenList.get(1));
 
-        SingleResponse<Member> singleResponse = responseService.getSingleResponse(member);
+        log.info("Access-Token : {}", tokenList.get(0));
+        log.info("Refresh-Token : {}", tokenList.get(1));
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(singleResponse);
+                .body(member);
     }
 
     */
@@ -161,11 +159,29 @@ public class TokenService {
 
     public ResponseEntity getKakaoProfileResponse(KakaoProfile kakaoProfile) {
 
-        SingleResponse<KakaoProfile> singleResponse = responseService.getSingleResponse(kakaoProfile);
+        List<String> tokenList = reissueRefreshToken(refreshToken);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + tokenList.get(0));
+        headers.add("Refresh", "Bearer " + tokenList.get(1));
+
+        log.info("Access-Token : {}", tokenList.get(0));
+        log.info("Refresh-Token : {}", tokenList.get(1));
 
         return ResponseEntity.ok()
+                .headers(headers)
+                .build();
+    }
+    /**
+     * 토큰을 포함한 응답값 리턴 함수
+     */
+    public ResponseEntity getKakaoProfileResponse(KakaoProfile.UsersInfo usersInfo) {
+
+//        SingleResponse<KakaoProfile.UsersInfo> singleResponse = responseService.getSingleResponse(usersInfo);
+        log.info("getKakaoProfileResponse.KakaoProfile : {}", usersInfo);
+        return ResponseEntity.ok()
                 .headers(new HttpHeaders())
-                .body(singleResponse);
+                .body(usersInfo);
     }
 
     */
@@ -268,6 +284,14 @@ public class TokenService {
                 .verify(token)
                 .getClaim("id")
                 .asLong();
+    }
+    private List<String> getTokenList(Member member) {
+        List<String> tokenList = new ArrayList<>();
+
+        tokenList.add(createToken(member));
+        tokenList.add(createRefreshToken(member));
+
+        return tokenList;
     }
 }
 */

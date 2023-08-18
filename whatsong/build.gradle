@@ -67,14 +67,39 @@ dependencies {
     implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
     implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
 
-    // gson
-    implementation 'com.google.code.gson:gson:2.10.1'
-
     // webflux
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     // https://mvnrepository.com/artifact/com.auth0/java-jwt
     implementation group: 'com.auth0', name: 'java-jwt', version: '3.10.2'
+
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    //youtube
+    implementation group: 'com.google.apis', name: 'google-api-services-youtube', version: 'v3-rev222-1.25.0'
+
+    //json
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.12.4'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.4'
+
+    // Gson 라이브러리
+    implementation 'com.google.code.gson:gson:2.8.9'
+
+    // org.json 라이브러리
+    implementation 'org.json:json:20210307'
+
+    //ws
+    implementation 'org.webjars:sockjs-client:1.1.2'
+
+    //assertj
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+
+    //ws
+    implementation 'org.webjars:webjars-locator-core'
+    implementation group: 'org.webjars', name: 'sockjs-client', version: '1.5.1'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation group: 'org.webjars', name: 'stomp-websocket', version: '2.3.4'
 
 }
 
