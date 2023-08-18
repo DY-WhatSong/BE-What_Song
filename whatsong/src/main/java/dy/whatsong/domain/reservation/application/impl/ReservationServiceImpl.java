@@ -6,8 +6,10 @@ import dy.whatsong.domain.reservation.dto.ReservationDTO;
 import dy.whatsong.domain.reservation.entity.Recognize;
 import dy.whatsong.domain.reservation.entity.Reservation;
 import dy.whatsong.domain.reservation.repo.ReservationRepository;
+import dy.whatsong.domain.streaming.application.service.RoomSseService;
 import dy.whatsong.domain.youtube.dto.VideoDTO;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
+import dy.whatsong.global.handler.exception.InvalidRequestAPIException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,8 @@ public class ReservationServiceImpl implements ReservationService {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	private final ReservationRepository reservationRepository;
+
+	private final RoomSseService roomSseService;
 
 	@Override
 	public ResponseEntity<?> reservationMusic(ReservationDTO.Select selectDTO) {
@@ -52,11 +56,37 @@ public class ReservationServiceImpl implements ReservationService {
 
 		reservationRepository.findAll()
 				.forEach(reservation -> {
-					if(reservation.getRoomSeq()!=null&&reservation.getRoomSeq().equals(roomSeq)){
+					if(Optional.ofNullable(reservation).isPresent()&&reservation.getRoomSeq().equals(roomSeq)){
 						reservationList.add(reservation);
 					}
 				});
 		System.out.println(reservationList.toString());
 		return new ResponseEntity<>(reservationList,HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<?> approveReservation(final ReservationDTO.Approve approveDTO) {
+		Optional<Reservation> findOptionReservation = reservationRepository.findById(approveDTO.getReservationId());
+		if (findOptionReservation.isEmpty()){
+			throw new InvalidRequestAPIException("Invalid Request",400);
+		}
+		Reservation reSaveReserv = reSaveReservationEntity(
+				findOptionReservation.get()
+				, approveDTO.getRecognize());
+		return new ResponseEntity<>(
+					roomSseService.getCurrentReservationList(reSaveReserv)
+					,HttpStatus.OK);
+	}
+
+	private Reservation reSaveReservationEntity(final Reservation reservation,final Recognize changeRecognize){
+		Reservation changeReserEntity = Reservation.builder()
+				.reservationId(reservation.getReservationId())
+				.selectVideo(reservation.getSelectVideo())
+				.recognize(changeRecognize)
+				.roomSeq(reservation.getRoomSeq())
+				.build();
+
+		reservationRepository.delete(reservation);
+		return reservationRepository.save(changeReserEntity);
 	}
 }

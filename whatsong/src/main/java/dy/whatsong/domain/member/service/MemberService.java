@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.domain.member.service;
 
 import dy.whatsong.domain.member.domain.KakaoProfile;
@@ -92,3 +93,4 @@ public class MemberService {
                 .build();
     }
 }
+*/

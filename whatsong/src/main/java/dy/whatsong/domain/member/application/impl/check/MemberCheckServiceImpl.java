@@ -18,4 +18,9 @@ public class MemberCheckServiceImpl implements MemberCheckService {
 	public Member getInfoByMemberSeq(Long memberSeq) {
 		return memberRepository.findById(memberSeq).orElseThrow(()->new IllegalArgumentException("회원 찾을수 없음"));
 	}
+
+	@Override
+	public Member getInfoByMemberRefreshToken(String refershToken) {
+		return memberRepository.findByRefreshToken(refershToken).get();
+	}
 }

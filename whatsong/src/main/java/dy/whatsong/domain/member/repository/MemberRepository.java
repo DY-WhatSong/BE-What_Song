@@ -10,9 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import java.util.Optional;
+
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    Optional<Member> findByMemberSeq(Long memberSeq);
+    Optional<Member> findByEmail(String email);
 
     Optional<Member> findByOauthId(String oauthId);
 

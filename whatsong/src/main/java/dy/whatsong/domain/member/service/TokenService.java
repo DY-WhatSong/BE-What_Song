@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.domain.member.service;
 
 import com.auth0.jwt.JWT;
@@ -60,11 +61,13 @@ public class TokenService {
         return userInfo;
     }
 
-    /**
+    */
+/**
      * 인가 코드를 통해서 access_token 발급받는 메서드
      * @param authorizedCode
      * @return OAuthToken
-     */
+     *//*
+
     public OAuthToken getAccessToken(String authorizedCode) {
         // HttpHeader 오브젝트 생성
         HttpHeaders headers = new HttpHeaders();
@@ -94,12 +97,14 @@ public class TokenService {
         return oAuthToken;
     }
 
-    /**
+    */
+/**
      * 카카오 서버에 접근해서 사용자의 정보를 받아오는 메서드
      * @param accessToken
      * @return KakaoProfile
-     */
-    public KakaoProfile.UsersInfo getUserInfoByToken(String accessToken) {
+     *//*
+
+    public KakaoProfile getUserInfoByToken(String accessToken) {
         // HttpHeader 오브젝트 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -126,9 +131,11 @@ public class TokenService {
 //        return new KakaoProfile(id, email, nickname);
     }
 
-    /**
+    */
+/**
      * 토큰을 포함한 응답값 리턴 함수
-     */
+     *//*
+
     public ResponseEntity getTokensResponse(Member member) {
 
         List<String> tokenList = getTokenList(member);
@@ -149,7 +156,8 @@ public class TokenService {
                 .body(convertToMemberDto(member));
     }
 
-    /**
+    */
+/**
      * 토큰을 포함한 응답값 리턴 함수
      */
     public ResponseEntity<?> getReissusedTokensResponse(HttpServletRequest request) {
@@ -183,7 +191,8 @@ public class TokenService {
      * refresh token 을 받아 access token 과 refresh token 재발급
      * @param refreshToken
      * @return access token과 refresh token List
-     */
+     *//*
+
     public List<String> reissueRefreshToken(String refreshToken){
 
         List<String> tokenList = new ArrayList<>();
@@ -217,7 +226,8 @@ public class TokenService {
      * 토큰 정보를 검증하는 메서드
      * @param token 토큰
      * @return 토큰 검증 여부
-     */
+     *//*
+
     public boolean validateToken(String token) {
         if(StringUtils.hasText(getDecodedJWT(token).getClaim("oauthId").asString())) {
             return true;
@@ -322,3 +332,4 @@ public class TokenService {
                 .build();
     }
 }
+*/

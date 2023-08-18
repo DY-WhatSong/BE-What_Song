@@ -17,6 +17,9 @@ public class Properties {
         @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
         private String REDIRECT_URI;
 
+//        @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+//        private String CLIENT_SECRET;
+
     }
 
     @Getter
@@ -26,8 +29,17 @@ public class Properties {
         @Value("${jwt.secret.key}")
         private String JWT_SECRET_KEY;
 
-        @Value("${jwt.access.expiration}")
+        @Value("${jwt.access.expired}")
         private Long ACCESS_TOKEN_EXPIRED_TIME;
+
+        @Value("${jwt.refresh.expired}")
+        private Long REFRESH_TOKEN_EXPIRED_TIME;
+
+        @Value("${jwt.access.header}")
+        private String ACCESS_TOKEN_HEADER;
+
+        @Value("${jwt.refresh.header}")
+        private String REFRESH_TOKEN_HEADER;
 
         @Value("${jwt.refresh.expiration}")
         private Long REFRESH_TOKEN_EXPIRED_TIME;
