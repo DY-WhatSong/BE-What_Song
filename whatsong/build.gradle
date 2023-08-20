@@ -105,13 +105,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation group: 'org.webjars', name: 'stomp-websocket', version: '2.3.4'
 
-    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
-    implementation 'org.webjars.bower:bootstrap:5.2.2'
-    implementation 'org.webjars.bower:vue:2.6.14'
-    implementation 'org.webjars.bower:axios:0.21.1'
-    implementation 'org.webjars:sockjs-client:1.1.2'
-    implementation 'org.webjars:stomp-websocket:2.3.4'
-
 }
 
 tasks.named('test') {
