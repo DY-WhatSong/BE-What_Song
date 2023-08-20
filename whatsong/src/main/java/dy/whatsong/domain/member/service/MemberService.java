@@ -1,7 +1,6 @@
-/*
 package dy.whatsong.domain.member.service;
 
-import dy.whatsong.domain.member.domain.KakaoProfile;
+import dy.whatsong.domain.member.dto.KakaoProfile;
 import dy.whatsong.domain.member.dto.MemberDto;
 import dy.whatsong.domain.member.dto.TokenInfo;
 import dy.whatsong.domain.member.entity.Member;
@@ -93,4 +92,3 @@ public class MemberService {
                 .build();
     }
 }
-*/

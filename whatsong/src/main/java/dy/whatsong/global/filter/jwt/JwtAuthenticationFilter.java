@@ -40,7 +40,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         response.setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization");
 
         log.info("====================== REQUEST-URL : {} ====================== ", request.getRequestURI());
-        if(request.getRequestURI().equals("/user/kakao/callback")) {
+        if(request.getRequestURI().contains("/chat")) {
+
+        } else if(request.getRequestURI().equals("/user/kakao/callback")) {
             response.setStatus(HttpServletResponse.SC_OK);
         } else if(request.getRequestURI().equals("/user/token/reissue") ||
                   request.getRequestURI().equals("/user/logout")) {

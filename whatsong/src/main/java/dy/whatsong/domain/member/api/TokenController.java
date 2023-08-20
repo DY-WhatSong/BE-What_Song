@@ -1,13 +1,12 @@
 package dy.whatsong.domain.member.api;
 
-import dy.whatsong.domain.member.domain.KakaoProfile;
-import dy.whatsong.domain.member.domain.OAuthToken;
+import dy.whatsong.domain.member.dto.KakaoProfile;
+import dy.whatsong.domain.member.dto.OAuthToken;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.service.MemberService;
 import dy.whatsong.domain.member.service.TokenService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

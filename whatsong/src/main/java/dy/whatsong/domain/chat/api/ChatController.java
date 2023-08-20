@@ -24,6 +24,7 @@ public class ChatController {
      */
     @MessageMapping("/chat/message")
     public void message(ChatMessage message, @Header("token") String token) {
+        log.info("message : {}, token", message, token);
         String uniqueUserName = tokenService.getOauthIdAndSocialType(token);
         // 로그인 회원 정보로 대화명 설정
         message.setSender(uniqueUserName);

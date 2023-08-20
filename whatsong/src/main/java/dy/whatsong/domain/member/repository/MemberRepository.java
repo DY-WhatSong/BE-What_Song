@@ -10,18 +10,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import java.util.Optional;
-
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    Optional<Member> findByEmail(String email);
+    Optional<Member> findByMemberSeq(Long memberSeq);
 
     Optional<Member> findByOauthId(String oauthId);
 
+    Optional<Member> findByRefreshToken(String refreshToken);
+
     Optional<Member> findByOauthIdAndEmail(String oauthId, String email);
 
-    @Query("select m from Member m where m.email = :email")
-    Optional<Member> findByEmail(@Param("email") String email);
+    Optional<Member> findByEmail(String email);
 
     Optional<Member> findByEmailAndSocialType(String email, SocialType socialType);
 
