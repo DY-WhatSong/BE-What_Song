@@ -13,13 +13,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class StompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws/stomp").setAllowedOriginPatterns("http://localhost:3000/**","https://bba5-106-101-130-147.ngrok-free.app/**").withSockJS();
+        registry.addEndpoint("/ws-stomp").setAllowedOriginPatterns("*").withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app");
-        registry.enableSimpleBroker("/topic")
+        registry.enableSimpleBroker("/topic","/queue")
                 .setTaskScheduler(taskScheduler())
                 .setHeartbeatValue(new long[] {3000L, 3000L});
     }

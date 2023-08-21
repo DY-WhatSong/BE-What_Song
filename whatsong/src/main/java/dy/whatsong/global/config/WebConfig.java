@@ -7,12 +7,14 @@ import org.springframework.web.servlet.config.annotation.*;
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 
+	private final String ipAddress="localhost";
+	private final String frontEndPort="3000";
+
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
-				.allowedOrigins("/**")
-				.allowedHeaders("http://localhost:3000/**")
-				.allowedHeaders("Access-Control-Allow-Origin","Origin","Accept","X-Requested-With","Content-Type","Access-Control-Request-Method","Access-Control-Request-Headers","Authorization","x-requested-with, origin, content-type, accept")
+				.allowedOrigins("http://"+this.ipAddress+":"+this.frontEndPort,"https://cecd-114-205-30-236.ngrok-free.app","http:localhost:8082","*")
+				.allowedHeaders("Access-Control-Allow-Origin","*")
 				.exposedHeaders("Access-Control-Allow-Origin","*")
 				.allowCredentials(false)
 				.allowedMethods("OPTIONS","GET","POST","PUT","DELETE");
