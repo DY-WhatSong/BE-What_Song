@@ -1,4 +1,4 @@
-package dy.whatsong.domain.member.domain;
+package dy.whatsong.domain.member.dto;
 
 import lombok.*;
 

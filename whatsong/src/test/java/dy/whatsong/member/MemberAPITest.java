@@ -10,8 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class MemberAPITest {
 
-	@Autowired
-	MemberRepository memberRepository;
+	@Autowired MemberRepository memberRepository;
 
 	@Test
 	public void 회원_더미(){

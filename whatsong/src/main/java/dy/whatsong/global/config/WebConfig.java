@@ -9,40 +9,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	private final String ipAddress="localhost";
 	private final String frontEndPort="3000";
-	//resolve conflict
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	//resolve conflict
+	
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
@@ -73,4 +40,5 @@ public class WebConfig implements WebMvcConfigurer {
 
 		WebMvcConfigurer.super.addResourceHandlers(registry);
 	}
+
 }
