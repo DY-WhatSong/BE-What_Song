@@ -16,7 +16,6 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws-stomp").setAllowedOriginPatterns("*").withSockJS();
     }
 
-
     /**
      * WS(WebSocket) Config Broker
      * Subscribe Spec Annotation
@@ -25,6 +24,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
      * @ queue : 1:N Message 구독
      * @ stream : 뮤직 플레이어 관련 구독
      */
+  
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app");

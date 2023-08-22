@@ -1,4 +1,4 @@
-package dy.whatsong.domain.member.domain;
+package dy.whatsong.domain.member.dto;
 
 import lombok.*;
 
@@ -13,7 +13,7 @@ public class KakaoProfile {
     public static class UsersInfo {
 
         private String id;
-//        private String synched_at;
+        //        private String synched_at;
         private String connected_at;
         private KakaoAccount kakao_account;
         private Properties properties;
@@ -65,5 +65,4 @@ public class KakaoProfile {
         private String nickname;
 
     }
-
 }

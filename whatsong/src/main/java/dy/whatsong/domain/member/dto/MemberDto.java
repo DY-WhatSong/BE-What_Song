@@ -49,4 +49,40 @@ public class MemberDto {
 
     }
 
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @ToString
+    public static class LogoutRequestDto {
+
+        @NotNull(message = "email field should not be null")
+        private String email;
+        @NotNull(message = "oauthId field should not be null")
+        private String oauthId;
+
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @ToString
+    public static class MemberResponseDto {
+
+        private Long memberSeq;
+        private String email;
+        private String nickname;
+        private String innerNickname;
+        private String imgURL;
+        private String oauthId;
+        private String refreshToken;
+        private String profileMusic;
+        private MemberRole memberRole;
+        private SocialType socialType;
+
+    }
+
 }
