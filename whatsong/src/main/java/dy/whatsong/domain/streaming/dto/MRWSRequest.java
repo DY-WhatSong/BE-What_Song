@@ -10,4 +10,9 @@ public class MRWSRequest {
         private Status status;
         private String timeStamp;
     }
+
+    @Getter
+    public static class userEnterState{
+        private Long memberSeq;
+    }
 }
