@@ -15,5 +15,4 @@ public class MRWS {
     private String timestamp;
     private Status status;
     private String videoId;
-
 }
