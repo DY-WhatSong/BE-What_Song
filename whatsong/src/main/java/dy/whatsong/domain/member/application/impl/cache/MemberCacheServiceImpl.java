@@ -6,12 +6,14 @@ import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,5 +50,15 @@ public class MemberCacheServiceImpl implements MemberCacheService {
         List<Member> roomMembers = currentRoomMember.get(roomCode);
         System.out.println("roomMembers:"+roomMembers);
         return roomMembers;
+    }
+
+    @CachePut(key = "roomCode")
+    @CacheEvict(key = "'all'")
+    public void leaveMemberInCache(String roomCode,Long memberSeq){
+        List<Member> curretntList = currentRoomMember.get(roomCode);
+        List<Member> returnedList=new ArrayList<>();
+        for (Member m:curretntList){
+            if (!m.getMemberSeq().equals(memberSeq)) returnedList.add(m);
+        }
     }
 }
