@@ -7,7 +7,13 @@ import lombok.Getter;
 public class MRWSRequest {
     @Getter
     public static class playerCurrentState{
+        private String videoId;
         private Status status;
         private String timeStamp;
+    }
+
+    @Getter
+    public static class userEnterState{
+        private Long memberSeq;
     }
 }

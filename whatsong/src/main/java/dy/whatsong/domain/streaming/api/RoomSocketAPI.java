@@ -16,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/channels/stream/room/{roomCode}")
+@RequestMapping("api/v1/{roomCode}")
 public class RoomSocketAPI {
 
     private final SimpMessagingTemplate template;
@@ -24,11 +24,17 @@ public class RoomSocketAPI {
     private static Map<String, Member> currentUserInfo=new LinkedHashMap<>();
 
     @MessageMapping("/current/info")
-    public void currentRoomStateInfo(@DestinationVariable String roomCode, @RequestBody MRWSRequest mrwsRequest){
+    public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody MRWSRequest.playerCurrentState playerCurrentState){
         System.out.println("소켓 연결!");
-        template.convertAndSend("/sub/"+roomCode+"/current/info",mrwsRequest);
+        template.convertAndSend("/stream/"+roomCode+"/current/info",playerCurrentState);
     }
 
-    /*@MessageMapping
-    public void currentRoomUserInfo(@DestinationVariable String roomCode,)*/
+    @MessageMapping
+    public void currentRoomUserInfo(@DestinationVariable String roomCode,@RequestBody MRWSRequest.userEnterState userEnterState){
+
+    }
+    @MessageMapping("")
+    public void currentRoomStateInfo(){
+
+    }
 }

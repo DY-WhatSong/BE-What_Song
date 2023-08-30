@@ -6,8 +6,7 @@ import dy.whatsong.domain.reservation.dto.ReservationDTO;
 import dy.whatsong.domain.reservation.entity.Recognize;
 import dy.whatsong.domain.reservation.entity.Reservation;
 import dy.whatsong.domain.reservation.repo.ReservationRepository;
-import dy.whatsong.domain.streaming.application.service.RoomSseService;
-import dy.whatsong.domain.youtube.dto.VideoDTO;
+import dy.whatsong.domain.streaming.application.service.RoomWsService;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
 import dy.whatsong.global.handler.exception.InvalidRequestAPIException;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 	private final ReservationRepository reservationRepository;
 
-	private final RoomSseService roomSseService;
+	private final RoomWsService roomWsService;
 
 	@Override
 	public ResponseEntity<?> reservationMusic(ReservationDTO.Select selectDTO) {
@@ -74,7 +73,7 @@ public class ReservationServiceImpl implements ReservationService {
 				findOptionReservation.get()
 				, approveDTO.getRecognize());
 		return new ResponseEntity<>(
-					roomSseService.getCurrentReservationList(reSaveReserv)
+					roomWsService.getCurrentReservationList(reSaveReserv)
 					,HttpStatus.OK);
 	}
 
