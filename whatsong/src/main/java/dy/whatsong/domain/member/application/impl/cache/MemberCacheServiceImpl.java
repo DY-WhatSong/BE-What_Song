@@ -2,6 +2,7 @@ package dy.whatsong.domain.member.application.impl.cache;
 
 import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
 import dy.whatsong.domain.member.application.service.check.MemberCheckService;
+import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
 import lombok.RequiredArgsConstructor;
@@ -36,18 +37,20 @@ public class MemberCacheServiceImpl implements MemberCacheService {
     }
 
     @Override
-    @CachePut(key = "roomCode", unless = "#result == null")
+    @CachePut(key = "#roomCode", unless = "#result == null")
     public ResponseEntity<?> putMemberInCacheIfEmpty(String roomCode,Long memberSeq) {
         Member findBySeqMember = memberCheckService.getInfoByMemberSeq(memberSeq);
-        List<Member> findValue = currentRoomMember.get(roomCode);
-        findValue.add(findBySeqMember);
-        currentRoomMember.put(roomCode,findValue);
+        List<Member> memberList = currentRoomMember.computeIfAbsent(roomCode, k -> new ArrayList<>());
+        memberList.add(findBySeqMember);
+        currentRoomMember.put(roomCode,memberList);
         return new ResponseEntity<>(getRoomOfMemberList(roomCode), HttpStatus.OK);
     }
 
     @Cacheable("'all'")
-    public List<Member> getRoomOfMemberList(String roomCode){
-        List<Member> roomMembers = currentRoomMember.get(roomCode);
+    public List<MemberResponseDto.CheckResponse> getRoomOfMemberList(String roomCode){
+        List<MemberResponseDto.CheckResponse> roomMembers = currentRoomMember.get(roomCode).stream()
+                .map(Member::toDTO)
+                .collect(Collectors.toList());
         System.out.println("roomMembers:"+roomMembers);
         return roomMembers;
     }
@@ -60,5 +63,11 @@ public class MemberCacheServiceImpl implements MemberCacheService {
         for (Member m:curretntList){
             if (!m.getMemberSeq().equals(memberSeq)) returnedList.add(m);
         }
+        currentRoomMember.put(roomCode,returnedList);
+        System.out.println("modify?:"+currentRoomMember.toString());
+    }
+
+    private boolean noOneUserTheRoom(String roomCode){
+        return currentRoomMember.get(roomCode).isEmpty();
     }
 }
