@@ -1,8 +1,6 @@
 package dy.whatsong.domain.member.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import dy.whatsong.domain.chat.entity.ChatRoomMember;
-import dy.whatsong.domain.member.dto.MemberRequestDTO;
 import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.music.entity.MusicRoomMember;
 import dy.whatsong.domain.profile.entity.GuestBook;
@@ -44,10 +42,6 @@ public class Member {
 	@Enumerated(EnumType.STRING)
 	private SocialType socialType;
 
-	@OneToMany(mappedBy = "member")
-	@JsonManagedReference
-	private List<ChatRoomMember> chatMembers;
-
 	@OneToMany(mappedBy = "ownerMember")
 	@JsonManagedReference
 	private List<GuestBook> guestBooks;
@@ -58,5 +52,17 @@ public class Member {
 
 	public void updateRefreshToken(String updateRefreshToken) {
 		this.refreshToken = updateRefreshToken;
+	}
+
+	public MemberResponseDto.CheckResponse toDTO(){
+		return MemberResponseDto.CheckResponse.builder()
+				.memberSeq(memberSeq)
+				.oauthId(oauthId)
+				.socialType(socialType)
+				.imgURL(imgURL)
+				.email(email)
+				.nickname(nickname)
+				.innerNickname(innerNickname)
+				.build();
 	}
 }
