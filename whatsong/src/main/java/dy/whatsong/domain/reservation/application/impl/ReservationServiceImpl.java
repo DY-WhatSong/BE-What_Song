@@ -64,6 +64,19 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
+	public List<Reservation> approveReservationList(Long roomSeq) {
+		List<Reservation> reservationList=new ArrayList<>();
+		reservationRepository.findAll()
+				.forEach(reservation -> {
+					if (Optional.ofNullable(reservation).isPresent()&&reservation.getRoomSeq().equals(roomSeq)&&reservation.getRecognize().equals(Recognize.APPROVE)){
+						reservationList.add(reservation);
+					}
+				});
+
+		return reservationList;
+	}
+
+	@Override
 	public ResponseEntity<?> approveReservation(final ReservationDTO.Approve approveDTO) {
 		Optional<Reservation> findOptionReservation = reservationRepository.findById(approveDTO.getReservationId());
 		if (findOptionReservation.isEmpty()){
