@@ -14,10 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -46,9 +43,9 @@ public class MemberCacheServiceImpl implements MemberCacheService {
         return new ResponseEntity<>(getRoomOfMemberList(roomCode), HttpStatus.OK);
     }
 
-    @Cacheable("'all'")
     public List<MemberResponseDto.CheckResponse> getRoomOfMemberList(String roomCode){
-        List<MemberResponseDto.CheckResponse> roomMembers = currentRoomMember.get(roomCode).stream()
+        List<MemberResponseDto.CheckResponse> roomMembers = currentRoomMember.getOrDefault(roomCode, Collections.emptyList())
+                .stream()
                 .map(Member::toDTO)
                 .collect(Collectors.toList());
         System.out.println("roomMembers:"+roomMembers);
