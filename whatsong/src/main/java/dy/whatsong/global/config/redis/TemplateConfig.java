@@ -1,5 +1,6 @@
 package dy.whatsong.global.config.redis;
 
+import dy.whatsong.global.constant.Properties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,8 @@ import java.net.URISyntaxException;
 @RequiredArgsConstructor
 @EnableRedisRepositories
 public class TemplateConfig {
-    private final RedisProperties redisProperties;
+
+    private final Properties.RedisProperties redisProperties;
 
     /*private RedisServer redisServer;
     @PostConstruct
