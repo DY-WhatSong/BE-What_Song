@@ -171,9 +171,6 @@ public class TokenService {
      * 토큰을 포함한 응답값 리턴 함수
      */
     public ResponseEntity getKakaoProfileResponse(KakaoProfile.UsersInfo usersInfo) {
-
-//        SingleResponse<KakaoProfile.UsersInfo> singleResponse = responseService.getSingleResponse(usersInfo);
-        log.info("getKakaoProfileResponse.KakaoProfile : {}", usersInfo);
         return ResponseEntity.ok()
                 .headers(new HttpHeaders())
                 .body(usersInfo);
