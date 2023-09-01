@@ -235,7 +235,7 @@ public class TokenService {
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getACCESS_TOKEN_EXPIRED_TIME()))
                 .withClaim("oauthId", member.getOauthId())
-                .withClaim("socialType", member.getSocialType().toString())
+                .withClaim("socialType", "kakao")
                 .withClaim("email", member.getEmail())
                 .withClaim("nickname", member.getNickname())
                 .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));
@@ -251,7 +251,7 @@ public class TokenService {
                 .withSubject(member.getEmail())
                 .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
                 .withClaim("oauthId", member.getOauthId())
-                .withClaim("socialType", member.getSocialType().toString())
+                .withClaim("socialType", "kakao")
                 .withClaim("email", member.getEmail())
                 .withClaim("nickname", member.getNickname())
                 .sign(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY()));

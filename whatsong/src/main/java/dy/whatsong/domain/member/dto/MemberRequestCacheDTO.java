@@ -6,7 +6,7 @@ import lombok.Getter;
 public class MemberRequestCacheDTO {
 
     @Getter
-    public static class PutDTO{
+    public static class PutOrModify{
         private String roomCode;
         private Long memberSeq;
     }
