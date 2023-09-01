@@ -64,7 +64,4 @@ public class MemberCacheServiceImpl implements MemberCacheService {
         return getRoomOfMemberList(roomCode);
     }
 
-    private boolean noOneUserTheRoom(String roomCode){
-        return currentRoomMember.get(roomCode).isEmpty();
-    }
 }
