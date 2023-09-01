@@ -64,4 +64,9 @@ public class MemberCacheServiceImpl implements MemberCacheService {
         return getRoomOfMemberList(roomCode);
     }
 
+    @Override
+    public Integer getUserCountInRoom(String roomCode) {
+        return currentRoomMember.get(roomCode).size();
+    }
+
 }
