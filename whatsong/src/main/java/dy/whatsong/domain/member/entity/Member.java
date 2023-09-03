@@ -30,6 +30,7 @@ public class Member {
 
 	private String oauthId;
 
+	@Column(length = 500)
 	private String refreshToken;
 
 	private String profileMusic;
