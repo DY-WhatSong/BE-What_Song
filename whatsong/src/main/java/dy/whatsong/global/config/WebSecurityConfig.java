@@ -41,14 +41,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()    // jwt 토큰을 사용하게 되면 세션을 사용하지 않는다고 서버에 명시적으로 선언해 주어야 합니다.
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-            http.cors().configurationSource(request -> {
-                var cors = new CorsConfiguration();
-                cors.setAllowedOrigins(List.of("http://localhost:3000"));
-                cors.setAllowedMethods(List.of("GET","POST", "PUT", "DELETE", "OPTIONS"));
-                cors.setAllowedHeaders(List.of("*"));
-                return cors;
-            });
-
             http.authorizeRequests()
                     .antMatchers("/oauth/**",
                                             "/**",
