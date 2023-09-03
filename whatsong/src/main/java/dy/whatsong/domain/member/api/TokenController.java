@@ -1,6 +1,8 @@
 package dy.whatsong.domain.member.api;
 
+import dy.whatsong.domain.member.application.service.check.MemberCheckService;
 import dy.whatsong.domain.member.dto.KakaoProfile;
+import dy.whatsong.domain.member.dto.MemberRequestDTO;
 import dy.whatsong.domain.member.dto.OAuthToken;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.service.MemberService;
@@ -8,11 +10,9 @@ import dy.whatsong.domain.member.service.TokenService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,6 +24,7 @@ public class TokenController {
 
     private final TokenService tokenService;
     private final MemberService memberService;
+    private final MemberCheckService memberCheckService;
 
     // 프론트에서 인가 코드 받는 API
     // 인가 코드로 엑세스 토큰 발급 -> 사용자 정보 조회 -> DB 저장 -> jwt 토큰 발급 -> 프론트에 토큰 전달
@@ -61,4 +62,11 @@ public class TokenController {
         return tokenService.getReissusedTokensResponse(request);
     }
 
+    @GetMapping("/member/info/refresh")
+    public ResponseEntity getMemberInfoByRefreshToken(@RequestBody MemberRequestDTO.OnlyRefreshToken onlyRefreshToken){
+        return new ResponseEntity(
+                memberCheckService.getInfoByMemberRefreshToken(onlyRefreshToken.getRefreshToken()),
+                HttpStatus.OK
+        ) ;
+    }
 }
