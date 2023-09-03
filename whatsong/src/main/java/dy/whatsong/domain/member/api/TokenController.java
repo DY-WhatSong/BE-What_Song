@@ -7,6 +7,7 @@ import dy.whatsong.domain.member.service.MemberService;
 import dy.whatsong.domain.member.service.TokenService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -44,6 +46,7 @@ public class TokenController {
         Member member = memberService.getMember(usersInfo.getId());
 //        Member member = memberService.existsByEmail(usersInfo.getKakao_account().getEmail());
 
+        log.info("member : {}", member);
         if(member != null) {
             // 3.1. 회원 정보 DB 에 존재하면? 토큰받기
             return tokenService.getTokensResponse(member);

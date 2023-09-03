@@ -24,7 +24,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-stomp")
                 .setAllowedOriginPatterns("*")
-                .setAllowedOrigins("*")
+//                .setAllowedOrigins("*")
                 .withSockJS();
                  // sock.js를 통하여 낮은 버전의 브라우저에서도 websocket이 동작할 수 있게 한다.
     }

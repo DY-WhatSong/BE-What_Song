@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final TokenService tokenService;
 
     public Member saveMember(KakaoProfile.UsersInfo usersInfo) {
         Member member = convertKakaoProfileToMember(usersInfo);
@@ -27,7 +28,7 @@ public class MemberService {
 
     public ResponseEntity<?> saveMember(MemberDto.MemberJoinReqDto memberJoinReqDto) {
         Member member = memberRepository.save(convertMemberJoinReqDtoToMember(memberJoinReqDto));
-        return new ResponseEntity<>(member, HttpStatus.OK);
+        return tokenService.getTokensResponse(member);
     }
 
     public int updateRefreshToken(TokenInfo decodedTokenInfo) {
@@ -35,7 +36,7 @@ public class MemberService {
     }
 
     public Member getMember(String oauthId) {
-        return memberRepository.findByOauthId(oauthId).orElse(new Member());
+        return memberRepository.findByOauthId(oauthId).orElse(null);
     }
 
     public MemberDto.MemberResponseDto getMember(String oauthId, String email) {

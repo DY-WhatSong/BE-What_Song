@@ -58,7 +58,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                                             "/user/*",
                                             "/user/kakao/*",
                                             "/user/kakao/callback",
-                                            "/api/v1/healthcheck"
+                                            "/api/v1/healthcheck",
+                                            "/user/login"
                     )
                         .permitAll()
                     .antMatchers("/api/v1/**").authenticated()

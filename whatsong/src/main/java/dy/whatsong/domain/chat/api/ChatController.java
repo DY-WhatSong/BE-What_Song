@@ -20,10 +20,10 @@ public class ChatController {
     private final ChatService chatService;
 
     /**
-     * websocket "/pub/chat/message"로 들어오는 메시징을 처리한다.
+     * websocket "/app/chat/message"로 들어오는 메시징을 처리한다.
      */
     @MessageMapping("/chat/message")
-    public void message(ChatMessage message, @Header("token") String token) {
+    public void message(ChatMessage message, @Header("authorization") String token) {
         log.info("message : {}, token", message, token);
         String uniqueUserName = tokenService.getOauthIdAndSocialType(token);
         // 로그인 회원 정보로 대화명 설정
