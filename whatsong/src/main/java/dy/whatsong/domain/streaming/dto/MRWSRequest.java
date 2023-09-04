@@ -16,6 +16,12 @@ public class MRWSRequest {
     public static class OnlyRoomSeq{
         private Long roomSeq;
     }
+
+    @Getter
+    public static class OnlyMemberSeq{
+        private Long memberSeq;
+    }
+
     @Getter
     public static class userEnterState{
         private Long memberSeq;

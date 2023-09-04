@@ -69,4 +69,11 @@ public class MemberCacheServiceImpl implements MemberCacheService {
         return currentRoomMember.get(roomCode).size();
     }
 
+    @Override
+    public Boolean memberIfExistEnter(Long memberSeq,String roomCode) {
+        Member infoByMemberSeq = memberCheckService.getInfoByMemberSeq(memberSeq);
+        return currentRoomMember.get(roomCode).stream()
+                .anyMatch(member -> member.getMemberSeq().equals(memberSeq));
+    }
+
 }

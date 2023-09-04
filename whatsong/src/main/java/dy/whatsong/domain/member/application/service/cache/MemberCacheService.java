@@ -15,4 +15,6 @@ public interface MemberCacheService {
     List<MemberResponseDto.CheckResponse> leaveMemberInCache(String roomCode,Long memberSeq);
 
     Integer getUserCountInRoom(String roomCode);
+
+    Boolean memberIfExistEnter(Long memberSeq,String roomCode);
 }
