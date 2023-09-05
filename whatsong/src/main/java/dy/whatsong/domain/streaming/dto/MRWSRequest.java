@@ -22,8 +22,4 @@ public class MRWSRequest {
         private Long memberSeq;
     }
 
-    @Getter
-    public static class userEnterState{
-        private Long memberSeq;
-    }
 }
