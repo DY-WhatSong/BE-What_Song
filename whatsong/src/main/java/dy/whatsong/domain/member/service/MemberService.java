@@ -68,6 +68,7 @@ public class MemberService {
 
     private static MemberDto.MemberResponseDto convertToMemberResponseDto(Member member) {
         return MemberDto.MemberResponseDto.builder()
+                .memberSeq(member.getMemberSeq())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
                 .innerNickname(member.getInnerNickname())

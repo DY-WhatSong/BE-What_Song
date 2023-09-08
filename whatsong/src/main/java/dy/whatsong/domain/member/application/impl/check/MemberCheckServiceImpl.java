@@ -4,6 +4,7 @@ import dy.whatsong.domain.member.application.service.check.MemberCheckService;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
+import dy.whatsong.global.constant.Properties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -13,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 public class MemberCheckServiceImpl implements MemberCheckService {
 
 	private final MemberRepository memberRepository;
+	private final Properties.JwtProperties jwtProperties;
 
 	@Override
 	public Member getInfoByMemberSeq(Long memberSeq) {
@@ -21,7 +23,9 @@ public class MemberCheckServiceImpl implements MemberCheckService {
 	}
 
 	@Override
-	public Member getInfoByMemberRefreshToken(String refershToken) {
-		return memberRepository.findByRefreshToken(refershToken).get();
+	public Member getInfoByMemberRefreshToken(String refreshToken) {
+		refreshToken = refreshToken.replace(jwtProperties.getTOKEN_PREFIX(), "");
+		log.info("getInfoByMemberRefreshToken-refreshToken : {}", refreshToken);
+		return memberRepository.findByRefreshToken(refreshToken).get();
 	}
 }
