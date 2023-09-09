@@ -16,4 +16,6 @@ public interface ReservationService {
 	List<Reservation> approveReservationList(Long roomSeq);
 
 	ResponseEntity<?> approveReservation(ReservationDTO.Approve approveDTO);
+
+	ResponseEntity<?> musicSkipByController(Long roomSeq);
 }

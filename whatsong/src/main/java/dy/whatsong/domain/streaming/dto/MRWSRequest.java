@@ -1,5 +1,6 @@
 package dy.whatsong.domain.streaming.dto;
 
+import dy.whatsong.domain.streaming.entity.room.Controller;
 import dy.whatsong.domain.streaming.entity.room.Status;
 import lombok.Getter;
 
@@ -10,14 +11,17 @@ public class MRWSRequest {
         private String videoId;
         private Status status;
         private String timeStamp;
+        private Controller controller;
+        private Long roomSeq;
     }
 
     @Getter
     public static class OnlyRoomSeq{
         private Long roomSeq;
     }
+
     @Getter
-    public static class userEnterState{
+    public static class OnlyMemberSeq{
         private Long memberSeq;
     }
 }

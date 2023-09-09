@@ -32,6 +32,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 	@Override
 	public ResponseEntity<?> reservationMusic(ReservationDTO.Select selectDTO) {
+		System.out.println("대기열 등록");
 		Reservation currentReservation = reservationRepository.save(Reservation.builder()
 				.reservationId(UUID.randomUUID().toString())
 				.roomSeq(selectDTO.getRoomSeq())
@@ -76,6 +77,13 @@ public class ReservationServiceImpl implements ReservationService {
 		return reservationList;
 	}
 
+
+
+	/**
+		승인 뿐 아니라 거절 되면 리스트 삭제 또한 구현되어야함
+
+	 	이로 인해 승인리스트와 대기열 리스트를 별도의 도메인으로 분류해야한다고 판단
+	*/
 	@Override
 	public ResponseEntity<?> approveReservation(final ReservationDTO.Approve approveDTO) {
 		Optional<Reservation> findOptionReservation = reservationRepository.findById(approveDTO.getReservationId());
@@ -88,6 +96,11 @@ public class ReservationServiceImpl implements ReservationService {
 		return new ResponseEntity<>(
 					roomWsService.getCurrentReservationList(reSaveReserv)
 					,HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<?> musicSkipByController(Long roomSeq) {
+		return null;
 	}
 
 	private Reservation reSaveReservationEntity(final Reservation reservation,final Recognize changeRecognize){

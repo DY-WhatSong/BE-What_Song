@@ -35,12 +35,12 @@ public class MemberCacheServiceImpl implements MemberCacheService {
 
     @Override
     @CachePut(key = "#roomCode", unless = "#result == null")
-    public ResponseEntity<?> putMemberInCacheIfEmpty(String roomCode,Long memberSeq) {
+    public List<MemberResponseDto.CheckResponse> putMemberInCacheIfEmpty(String roomCode,Long memberSeq) {
         Member findBySeqMember = memberCheckService.getInfoByMemberSeq(memberSeq);
         List<Member> memberList = currentRoomMember.computeIfAbsent(roomCode, k -> new ArrayList<>());
         memberList.add(findBySeqMember);
         currentRoomMember.put(roomCode,memberList);
-        return new ResponseEntity<>(getRoomOfMemberList(roomCode), HttpStatus.OK);
+        return getRoomOfMemberList(roomCode);
     }
 
     public List<MemberResponseDto.CheckResponse> getRoomOfMemberList(String roomCode){
@@ -52,9 +52,8 @@ public class MemberCacheServiceImpl implements MemberCacheService {
         return roomMembers;
     }
 
-    @CachePut(key = "roomCode")
-    @CacheEvict(key = "'all'")
-    public void leaveMemberInCache(String roomCode,Long memberSeq){
+    @CachePut(key = "#roomCode")
+    public List<MemberResponseDto.CheckResponse> leaveMemberInCache(String roomCode,Long memberSeq){
         List<Member> curretntList = currentRoomMember.get(roomCode);
         List<Member> returnedList=new ArrayList<>();
         for (Member m:curretntList){
@@ -62,9 +61,19 @@ public class MemberCacheServiceImpl implements MemberCacheService {
         }
         currentRoomMember.put(roomCode,returnedList);
         System.out.println("modify?:"+currentRoomMember.toString());
+        return getRoomOfMemberList(roomCode);
     }
 
-    private boolean noOneUserTheRoom(String roomCode){
-        return currentRoomMember.get(roomCode).isEmpty();
+    @Override
+    public Integer getUserCountInRoom(String roomCode) {
+        return currentRoomMember.get(roomCode).size();
     }
+
+    @Override
+    public Boolean memberIfExistEnter(Long memberSeq,String roomCode) {
+        Member infoByMemberSeq = memberCheckService.getInfoByMemberSeq(memberSeq);
+        return currentRoomMember.get(roomCode).stream()
+                .anyMatch(member -> member.getMemberSeq().equals(memberSeq));
+    }
+
 }

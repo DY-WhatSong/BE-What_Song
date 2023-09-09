@@ -88,6 +88,7 @@ public class MusicCheckServiceImpl implements MusicCheckService {
 				.extraInfo(RoomResponseDTO.ExtraInfo.builder()
 						.view(1)
 						.hostName(musicRoomMember.getMember().getNickname())
+						.hostSeq(musicRoomMember.getMember().getMemberSeq())
 						.build())
 				.build();
 	}

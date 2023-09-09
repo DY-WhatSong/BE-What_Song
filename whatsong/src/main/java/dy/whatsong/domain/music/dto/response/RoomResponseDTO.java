@@ -28,6 +28,7 @@ public class RoomResponseDTO {
 	@Getter
 	@Builder
 	public static class ExtraInfo{
+		private Long hostSeq;
 		private String hostName;
 		private long view;
 	}
