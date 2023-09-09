@@ -9,23 +9,26 @@ import dy.whatsong.domain.member.entity.SocialType;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final TokenService tokenService;
 
     public Member saveMember(KakaoProfile.UsersInfo usersInfo) {
         Member member = convertKakaoProfileToMember(usersInfo);
         return memberRepository.save(member);
     }
 
-    public Member saveMember(MemberDto.MemberJoinReqDto memberJoinReqDto) {
-        Member member = convertMemberJoinReqDtoToMember(memberJoinReqDto);
-        return memberRepository.save(member);
+    public ResponseEntity<?> saveMember(MemberDto.MemberJoinReqDto memberJoinReqDto) {
+        Member member = memberRepository.save(convertMemberJoinReqDtoToMember(memberJoinReqDto));
+        return tokenService.getTokensResponse(member);
     }
 
     public int updateRefreshToken(TokenInfo decodedTokenInfo) {
@@ -33,7 +36,7 @@ public class MemberService {
     }
 
     public Member getMember(String oauthId) {
-        return memberRepository.findByOauthId(oauthId).orElse(new Member());
+        return memberRepository.findByOauthId(oauthId).orElse(null);
     }
 
     public MemberDto.MemberResponseDto getMember(String oauthId, String email) {
@@ -65,6 +68,7 @@ public class MemberService {
 
     private static MemberDto.MemberResponseDto convertToMemberResponseDto(Member member) {
         return MemberDto.MemberResponseDto.builder()
+                .memberSeq(member.getMemberSeq())
                 .email(member.getEmail())
                 .nickname(member.getNickname())
                 .innerNickname(member.getInnerNickname())

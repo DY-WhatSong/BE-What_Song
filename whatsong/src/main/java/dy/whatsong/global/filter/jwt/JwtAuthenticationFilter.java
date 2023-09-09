@@ -34,8 +34,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        // Ngrok
+//        response.setHeader("Access-Control-Allow-Origin","*");
+//        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PATCH, PUT");
+//        response.setHeader("Access-Control-Max-Age", "3600");
+//        response.setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization");
+
+        String[] excludedUri = {"/chat", "/ws-stomp", "/user/login"};
         log.info("====================== REQUEST-URL : {} ====================== ", request.getRequestURI());
-        if(request.getRequestURI().contains("/chat")) {
+        if(containsAnySubstring(request.getRequestURI(), excludedUri)) {
 
         } else if(request.getRequestURI().equals("/user/kakao/callback")) {
             response.setStatus(HttpServletResponse.SC_OK);
@@ -54,7 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.info("TOKEN IS EMPTY OR NO WITH PREFIX");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             } else {
-                String accessToken = authorizationCode.replace(jwtProperties.getTOKEN_PREFIX(), "");;
+                String accessToken = authorizationCode.replace(jwtProperties.getTOKEN_PREFIX(), "");
                 log.info("accessToken : {}", accessToken);
                 isTokenValid(accessToken, request, response);
 
@@ -105,5 +112,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(!StringUtils.hasText(refreshToken)) {
             response.setStatus(440);
         }
+    }
+
+    public boolean containsAnySubstring(String mainString, String[] substrings) {
+        for (String substring : substrings) {
+            if (mainString.contains(substring)) {
+                return true; // exit early if a match is found
+            }
+        }
+        return false;
     }
 }

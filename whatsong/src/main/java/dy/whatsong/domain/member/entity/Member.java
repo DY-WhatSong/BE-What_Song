@@ -14,6 +14,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class Member {
 	@Id
 	@GeneratedValue
@@ -29,6 +30,7 @@ public class Member {
 
 	private String oauthId;
 
+	@Column(length = 500)
 	private String refreshToken;
 
 	private String profileMusic;

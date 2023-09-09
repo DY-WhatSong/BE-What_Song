@@ -1,4 +1,4 @@
-package dy.whatsong.domain.chat.config.handler;
+package dy.whatsong.domain.chat.api.handler;
 
 import dy.whatsong.domain.chat.model.ChatMessage;
 import dy.whatsong.domain.chat.repo.ChatRoomRepository;

@@ -20,17 +20,19 @@ public class ChatController {
     private final ChatService chatService;
 
     /**
-     * websocket "/pub/chat/message"로 들어오는 메시징을 처리한다.
+     * websocket "/app/chat/message"로 들어오는 메시징을 처리한다.
      */
     @MessageMapping("/chat/message")
-    public void message(ChatMessage message, @Header("token") String token) {
-        log.info("message : {}, token", message, token);
+    public void message(ChatMessage message, @Header("authorization") String token) {
+        log.info("message : {}, token : {}", message, token);
         String uniqueUserName = tokenService.getOauthIdAndSocialType(token);
-        // 로그인 회원 정보로 대화명 설정
-        message.setSender(uniqueUserName);
-        // 채팅방 인원수 세팅
-        message.setUserCount(chatRoomRepository.getUserCount(message.getChatRoomSequence()));
-        // Websocket에 발행된 메시지를 redis로 발행(publish)
-        chatService.sendChatMessage(message);
+        if(uniqueUserName != null) {
+            // 로그인 회원 정보로 대화명 설정
+            message.setSender(uniqueUserName);
+            // 채팅방 인원수 세팅
+            message.setUserCount(chatRoomRepository.getUserCount(message.getChatRoomSequence()));
+            // Websocket에 발행된 메시지를 redis로 발행(publish)
+            chatService.sendChatMessage(message);
+        }
     }
 }

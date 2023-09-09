@@ -28,6 +28,7 @@ public class MemberDto {
         private String refreshToken;
         private String profileMusic;
         private MemberRole memberRole;
+        @NotNull(message = "socialType field should not be null")
         private SocialType socialType;
 
     }
