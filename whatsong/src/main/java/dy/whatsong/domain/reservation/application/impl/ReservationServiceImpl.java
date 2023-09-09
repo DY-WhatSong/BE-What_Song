@@ -98,6 +98,11 @@ public class ReservationServiceImpl implements ReservationService {
 					,HttpStatus.OK);
 	}
 
+	@Override
+	public ResponseEntity<?> musicSkipByController(Long roomSeq) {
+		return null;
+	}
+
 	private Reservation reSaveReservationEntity(final Reservation reservation,final Recognize changeRecognize){
 		Reservation changeReserEntity = Reservation.builder()
 				.reservationId(reservation.getReservationId())

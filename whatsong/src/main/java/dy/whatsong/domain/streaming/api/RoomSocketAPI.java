@@ -3,9 +3,11 @@ package dy.whatsong.domain.streaming.api;
 import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
 import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.member.entity.Member;
+import dy.whatsong.domain.music.application.service.check.MusicCheckService;
 import dy.whatsong.domain.reservation.application.service.ReservationService;
 import dy.whatsong.domain.reservation.entity.Reservation;
 import dy.whatsong.domain.streaming.dto.MRWSRequest;
+import dy.whatsong.domain.streaming.entity.room.Controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -30,12 +32,20 @@ public class RoomSocketAPI {
 
     private final MemberCacheService memberCacheService;
 
+    private final MusicCheckService musicCheckService;
 
-    @MessageMapping("/current/info")
+
+    /*@MessageMapping("/current/info")
     public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody MRWSRequest.OnlyRoomSeq onlyRoomSeq){
         System.out.println("소켓 연결!");
         List<Reservation> reservationList = reservationService.approveReservationList(onlyRoomSeq.getRoomSeq());
         template.convertAndSend("/stream/"+roomCode+"/current/info",reservationList);
+    }*/
+
+    @MessageMapping("/member/update/new")
+    public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody MRWSRequest.playerCurrentState playerCurrentState){
+
+//        template.convertAndSendToUser("/stream/"+roomCode+"/current/info",reservationList);
     }
 
     @MessageMapping("/room/enter")
@@ -53,12 +63,14 @@ public class RoomSocketAPI {
         template.convertAndSend("/stream/"+roomCode+"/room/leve",nowMemberInRoom);
     }
 
-    @MessageMapping
-    public void currentRoomUserInfo(@DestinationVariable String roomCode,@RequestBody MRWSRequest.userEnterState userEnterState){
+    @MessageMapping("/room/info/current")
+    public void currentRoomStateInfo(@DestinationVariable String roomCode,@RequestBody MRWSRequest.playerCurrentState playerCurrentState){
+        if (playerCurrentState.getController().equals(Controller.CURRENT)){
+            List<Reservation> reservationList = reservationService.approveReservationList(playerCurrentState.getRoomSeq());
+            template.convertAndSend("/stream/"+roomCode+"/info/current",reservationList);
+        }
+        else if (playerCurrentState.getController().equals(Controller.NEXT)){
 
-    }
-    @MessageMapping("")
-    public void currentRoomStateInfo(){
-
+        }
     }
 }
