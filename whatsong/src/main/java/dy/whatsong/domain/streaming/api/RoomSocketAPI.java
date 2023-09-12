@@ -1,5 +1,6 @@
 package dy.whatsong.domain.streaming.api;
 
+import dy.whatsong.domain.chat.model.TestDTO;
 import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
 import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.member.entity.Member;
@@ -9,6 +10,7 @@ import dy.whatsong.domain.reservation.entity.Reservation;
 import dy.whatsong.domain.streaming.dto.MRWSRequest;
 import dy.whatsong.domain.streaming.entity.room.Controller;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Test;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -25,6 +27,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("api/v1/{roomCode}")
 public class RoomSocketAPI {
+
+    private final String test_username="psb4644@gmail.com";
 
     private final SimpMessagingTemplate template;
 
@@ -43,9 +47,9 @@ public class RoomSocketAPI {
     }*/
 
     @MessageMapping("/member/update/new")
-    public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody MRWSRequest.playerCurrentState playerCurrentState){
-
-//        template.convertAndSendToUser("/stream/"+roomCode+"/current/info",reservationList);
+    public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody TestDTO testDTO){
+        System.out.println("message:"+testDTO.getMessage());
+        template.convertAndSend("/stream/"+roomCode+"/current/info",testDTO);
     }
 
     @MessageMapping("/room/enter")
