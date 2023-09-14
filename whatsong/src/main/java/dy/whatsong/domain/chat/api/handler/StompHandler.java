@@ -1,9 +1,9 @@
 package dy.whatsong.domain.chat.api.handler;
 
-import dy.whatsong.domain.chat.model.ChatMessage;
 import dy.whatsong.domain.chat.repo.ChatRoomRepository;
 import dy.whatsong.domain.chat.service.ChatService;
 import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
+import dy.whatsong.domain.member.dto.MemberCacheDTO;
 import dy.whatsong.domain.member.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,12 +12,12 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 
 import java.security.Principal;
-import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,11 +34,11 @@ public class StompHandler implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompCommand commandType = accessor.getCommand();
+        String destinationUrl = accessor.getDestination();
+        String jwtToken = accessor.getFirstNativeHeader("Authorization");
         // STOMP 프레임의 목적지(Destination) 추출
         if (StompCommand.CONNECT == commandType) { // websocket 연결요청
-            MessageHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(message, MessageHeaderAccessor.class);
             System.out.println("Connect");
-            String jwtToken = accessor.getFirstNativeHeader("Authorization");
             log.info("CONNECT {}", jwtToken);
             // Header의 jwt token 검증
             tokenService.validateToken(eliminateInBearerToken(jwtToken));
@@ -75,7 +75,12 @@ public class StompHandler implements ChannelInterceptor {
             chatRoomRepository.removeUserEnterInfo(sessionId);
             log.info("DISCONNECTED {}, {}", sessionId, chatRoomSequence);
         }else if (StompCommand.SEND==commandType){
-            System.out.println("url:"+accessor.getDestination());
+            System.out.println("url:"+ destinationUrl);
+            if (destinationUrl.contains("enter")){
+                memberCacheService.putMemberInCacheIfEmpty(processMemberCache(destinationUrl,jwtToken));
+            }else if (destinationUrl.contains("leave")){
+                memberCacheService.leaveMemberInCache(processMemberCache(destinationUrl,jwtToken));
+            }
         }
         return message;
     }
@@ -85,5 +90,17 @@ public class StompHandler implements ChannelInterceptor {
 
     public String eliminateInBearerToken(String accessToken){
         return accessToken.replaceAll("Bearer ","");
+    }
+
+    public String getRoomCodeInDestUrl(String destinationUrl){
+        Matcher matcher = Pattern.compile("/app/([a-fA-F0-9-]+)/").matcher(destinationUrl);
+        return matcher.find() ? matcher.group(1) : null;
+    }
+
+    public MemberCacheDTO.BasicInfo processMemberCache(String destinationUrl, String jwtToken) {
+        return MemberCacheDTO.BasicInfo.builder()
+                        .roomCode(getRoomCodeInDestUrl(destinationUrl))
+                        .username(getUsernameByTokenDecode(jwtToken))
+                        .build();
     }
 }

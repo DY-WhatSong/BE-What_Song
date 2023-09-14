@@ -25,7 +25,6 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v1/{roomCode}")
 public class RoomSocketAPI {
 
     private final String test_username="psb4644@gmail.com";
@@ -40,30 +39,27 @@ public class RoomSocketAPI {
 
 
     /*@MessageMapping("/current/info")
-    public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody MRWSRequest.OnlyRoomSeq onlyRoomSeq){
-        System.out.println("소켓 연결!");
-        List<Reservation> reservationList = reservationService.approveReservationList(onlyRoomSeq.getRoomSeq());
-        template.convertAndSend("/stream/"+roomCode+"/current/info",reservationList);
+    public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody TestDTO testDTO){
+        System.out.println("소켓 연결!:"+testDTO.getMessage());
+//        List<Reservation> reservationList = reservationService.approveReservationList(onlyRoomSeq.getRoomSeq());
+        template.convertAndSendToUser(test_username,"/stream/"+roomCode+"/current/info",te);
     }*/
 
-    @MessageMapping("/member/update/new")
+    /*@MessageMapping("/{roomCode}/member/update/new")
     public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody TestDTO testDTO){
         System.out.println("message:"+testDTO.getMessage());
         template.convertAndSend("/stream/"+roomCode+"/current/info",testDTO);
-    }
+    }*/
 
-    @MessageMapping("/room/enter")
-    public void memberEnterTheMusicRoom(@DestinationVariable String roomCode,@RequestBody MRWSRequest.OnlyMemberSeq onlyMemberSeq){
-        /*if (memberCacheService.memberIfExistEnter(onlyMemberSeq.getMemberSeq(),roomCode)){
-            System.out.println("이미 방에 있는 유저");
-        }*/
-        List<MemberResponseDto.CheckResponse> nowMemberInRoom = memberCacheService.putMemberInCacheIfEmpty(roomCode, onlyMemberSeq.getMemberSeq());
+    @MessageMapping("/{roomCode}/room/enter")
+    public void memberEnterTheMusicRoom(@DestinationVariable String roomCode){
+        List<MemberResponseDto.CheckResponse> nowMemberInRoom = memberCacheService.getRoomOfMemberList(roomCode);
         template.convertAndSend("/stream/"+roomCode+"/room/enter",nowMemberInRoom);
     }
     
-    @MessageMapping("/room/leave")
+    @MessageMapping("/{roomCode}/room/leave")
     public void memberLeaveTheMusicRoom(@DestinationVariable String roomCode,@RequestBody MRWSRequest.OnlyMemberSeq onlyMemberSeq){
-        List<MemberResponseDto.CheckResponse> nowMemberInRoom = memberCacheService.leaveMemberInCache(roomCode, onlyMemberSeq.getMemberSeq());
+        List<MemberResponseDto.CheckResponse> nowMemberInRoom = memberCacheService.getRoomOfMemberList(roomCode);
         template.convertAndSend("/stream/"+roomCode+"/room/leve",nowMemberInRoom);
     }
 
