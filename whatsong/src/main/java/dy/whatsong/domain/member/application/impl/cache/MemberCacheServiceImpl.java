@@ -35,7 +35,7 @@ public class MemberCacheServiceImpl implements MemberCacheService {
 
     @Override
     @CachePut(key = "#roomCode", unless = "#result == null")
-    public List<MemberResponseDto.CheckResponse> putMemberInCacheIfEmpty(String roomCode,Long memberSeq) {
+    public List<MemberResponseDto.CheckResponse> putMemberInCacheIfEmpty(String roomCode,String username) {
         Member findBySeqMember = memberCheckService.getInfoByMemberSeq(memberSeq);
         List<Member> memberList = currentRoomMember.computeIfAbsent(roomCode, k -> new ArrayList<>());
         memberList.add(findBySeqMember);
