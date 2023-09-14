@@ -1,5 +1,6 @@
 package dy.whatsong.domain.streaming.api;
 
+import dy.whatsong.domain.chat.model.TestDTO;
 import dy.whatsong.domain.streaming.dto.MRWSRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -20,8 +21,8 @@ public class testAPI {
     }
 
     @MessageMapping("/post/test")
-    public void testPost(@RequestBody String testWord){
-        System.out.println("TesT!");
-        template.convertAndSend("/stream/test/post",testWord);
+    public void testPost(@RequestBody TestDTO testDTO){
+        System.out.println("TesT!:"+testDTO.getMessage());
+        template.convertAndSend("/stream/test/post",testDTO);
     }
 }
