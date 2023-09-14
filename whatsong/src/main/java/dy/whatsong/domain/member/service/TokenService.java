@@ -270,7 +270,7 @@ public class TokenService {
     }
 
     private DecodedJWT getDecodedJWT(String token) {
-        try {
+        /*try {
             return JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY())).build().verify(token);
         } catch (SignatureException ex) {
             log.error("Invalid JWT signature");
@@ -291,7 +291,8 @@ public class TokenService {
         } catch (IllegalArgumentException ex) {
             log.error("JWT claims string is empty.");
             throw ex;
-        }
+        }*/
+        return JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY())).build().verify(token);
     }
 
     private List<String> getTokenList(Member member) {
@@ -317,5 +318,13 @@ public class TokenService {
                 .memberRole(member.getMemberRole())
                 .socialType(member.getSocialType())
                 .build();
+    }
+
+    public String getUsernameByToken(String accessToken){
+        String originToken = accessToken.replaceAll("Bearer ", "");
+        System.out.println(originToken);
+        DecodedJWT decodedJWT = getDecodedJWT(originToken);
+        System.out.println("decodedJWT:"+decodedJWT.toString());
+        return decodedJWT.getSubject();
     }
 }
