@@ -34,7 +34,6 @@ public class StompHandler implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompCommand commandType = accessor.getCommand();
-        System.out.println("url:"+accessor.getDestination());
         // STOMP 프레임의 목적지(Destination) 추출
         if (StompCommand.CONNECT == commandType) { // websocket 연결요청
             MessageHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(message, MessageHeaderAccessor.class);
@@ -76,6 +75,7 @@ public class StompHandler implements ChannelInterceptor {
             chatRoomRepository.removeUserEnterInfo(sessionId);
             log.info("DISCONNECTED {}, {}", sessionId, chatRoomSequence);
         }else if (StompCommand.SEND==commandType){
+            System.out.println("url:"+accessor.getDestination());
         }
         return message;
     }
