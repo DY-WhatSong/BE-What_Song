@@ -35,12 +35,11 @@ public class MemberCacheServiceImpl implements MemberCacheService {
 
     @Override
     @CachePut(key = "#roomCode", unless = "#result == null")
-    public List<MemberResponseDto.CheckResponse> putMemberInCacheIfEmpty(String roomCode,String username) {
-        Member findBySeqMember = memberCheckService.getInfoByMemberSeq(memberSeq);
+    public void putMemberInCacheIfEmpty(String roomCode,String username) {
+        Member findBySeqMember = memberCheckService.getInfoByMemberEmail(username);
         List<Member> memberList = currentRoomMember.computeIfAbsent(roomCode, k -> new ArrayList<>());
         memberList.add(findBySeqMember);
         currentRoomMember.put(roomCode,memberList);
-        return getRoomOfMemberList(roomCode);
     }
 
     public List<MemberResponseDto.CheckResponse> getRoomOfMemberList(String roomCode){
@@ -53,11 +52,11 @@ public class MemberCacheServiceImpl implements MemberCacheService {
     }
 
     @CachePut(key = "#roomCode")
-    public List<MemberResponseDto.CheckResponse> leaveMemberInCache(String roomCode,Long memberSeq){
+    public List<MemberResponseDto.CheckResponse> leaveMemberInCache(String roomCode,String username){
         List<Member> curretntList = currentRoomMember.get(roomCode);
         List<Member> returnedList=new ArrayList<>();
         for (Member m:curretntList){
-            if (!m.getMemberSeq().equals(memberSeq)) returnedList.add(m);
+            if (!m.getEmail().equals(username)) returnedList.add(m);
         }
         currentRoomMember.put(roomCode,returnedList);
         System.out.println("modify?:"+currentRoomMember.toString());
