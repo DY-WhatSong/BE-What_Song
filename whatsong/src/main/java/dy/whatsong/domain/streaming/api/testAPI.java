@@ -20,9 +20,4 @@ public class testAPI {
         template.convertAndSend("/stream/test","Success!");
     }
 
-    @MessageMapping("/post/test")
-    public void testPost(@RequestBody TestDTO testDTO){
-        System.out.println("TesT!:"+testDTO.getMessage());
-        template.convertAndSend("/stream/test/post",testDTO);
-    }
 }
