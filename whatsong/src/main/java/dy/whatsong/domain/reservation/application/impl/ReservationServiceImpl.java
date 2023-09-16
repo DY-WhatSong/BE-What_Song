@@ -111,7 +111,6 @@ public class ReservationServiceImpl implements ReservationService {
 				.roomSeq(reservation.getRoomSeq())
 				.build();
 
-		reservationRepository.delete(reservation);
 		return reservationRepository.save(changeReserEntity);
 	}
 }
