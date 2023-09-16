@@ -1,6 +1,7 @@
 package dy.whatsong.domain.music.application.impl.check;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
 import dy.whatsong.domain.music.application.service.check.MusicCheckService;
 import dy.whatsong.domain.music.dto.MusicRoomDTO;
 import dy.whatsong.domain.music.dto.response.RoomResponseDTO;
@@ -29,6 +30,8 @@ public class MusicCheckServiceImpl implements MusicCheckService {
 	private final MusicRoomRepository musicRoomRepository;
 
 	private final JPAQueryFactory jpaQueryFactory;
+
+	private final MemberCacheService memberCacheService;
 
 	@Override
 	public MusicRoom getInfoMRBySeq(Long musicRoomSeq) {
@@ -73,7 +76,8 @@ public class MusicCheckServiceImpl implements MusicCheckService {
 							.have(fetchMusicRoom.toHaveRoomDTO())
 							.extraInfo(RoomResponseDTO.ExtraInfo.builder()
 									.hostName(musicRoomMember.getMember().getNickname())
-									.view(1)
+									.hostEmail(musicRoomMember.getMember().getEmail())
+									.view(memberCacheService.countMemberInRoom(fetchMusicRoom.getRoomCode()))
 									.build())
 							.build();
 
@@ -86,9 +90,9 @@ public class MusicCheckServiceImpl implements MusicCheckService {
 				.builder()
 				.have(musicRoomMember.getMusicRoom().toHaveRoomDTO())
 				.extraInfo(RoomResponseDTO.ExtraInfo.builder()
-						.view(1)
+						.view(memberCacheService.countMemberInRoom(musicRoomMember.getMusicRoom().getRoomCode()))
 						.hostName(musicRoomMember.getMember().getNickname())
-						.hostSeq(musicRoomMember.getMember().getMemberSeq())
+						.hostEmail(musicRoomMember.getMember().getEmail())
 						.build())
 				.build();
 	}

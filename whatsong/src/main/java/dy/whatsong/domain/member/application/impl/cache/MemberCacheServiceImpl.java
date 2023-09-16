@@ -88,4 +88,14 @@ public class MemberCacheServiceImpl implements MemberCacheService {
         );
     }
 
+    @Override
+    public Integer countMemberInRoom(String roomCode) {
+        Optional<RoomMember> roomMemberInfoByRoomCode = roomMemberService.getRoomMemberInfoByRoomCode(roomCode);
+        if (roomMemberInfoByRoomCode.isEmpty()||Optional.ofNullable(roomMemberInfoByRoomCode.get().getMemberList()).isEmpty()){
+            return 0;
+        }
+
+        return roomMemberInfoByRoomCode.get().getMemberList().size();
+    }
+
 }

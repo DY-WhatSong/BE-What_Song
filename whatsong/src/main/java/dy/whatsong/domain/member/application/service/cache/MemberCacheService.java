@@ -17,4 +17,6 @@ public interface MemberCacheService {
     RoomMember getRoomOfMemberList(String roomCode);
 
     void leaveMemberInCache(MemberRequestCacheDTO.BasicInfo basicInfo);
+
+    Integer countMemberInRoom(String roomCode);
 }
