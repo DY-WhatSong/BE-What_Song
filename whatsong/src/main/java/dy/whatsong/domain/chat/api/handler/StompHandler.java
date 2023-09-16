@@ -3,7 +3,7 @@ package dy.whatsong.domain.chat.api.handler;
 import dy.whatsong.domain.chat.repo.ChatRoomRepository;
 import dy.whatsong.domain.chat.service.ChatService;
 import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
-import dy.whatsong.domain.member.dto.MemberCacheDTO;
+import dy.whatsong.domain.member.dto.MemberRequestCacheDTO;
 import dy.whatsong.domain.member.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -97,8 +97,8 @@ public class StompHandler implements ChannelInterceptor {
         return matcher.find() ? matcher.group(1) : null;
     }
 
-    public MemberCacheDTO.BasicInfo processMemberCache(String destinationUrl, String jwtToken) {
-        return MemberCacheDTO.BasicInfo.builder()
+    public MemberRequestCacheDTO.BasicInfo processMemberCache(String destinationUrl, String jwtToken) {
+        return MemberRequestCacheDTO.BasicInfo.builder()
                         .roomCode(getRoomCodeInDestUrl(destinationUrl))
                         .username(getUsernameByTokenDecode(jwtToken))
                         .build();

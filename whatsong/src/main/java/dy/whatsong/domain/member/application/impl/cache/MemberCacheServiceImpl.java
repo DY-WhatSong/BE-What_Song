@@ -2,13 +2,14 @@ package dy.whatsong.domain.member.application.impl.cache;
 
 import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
 import dy.whatsong.domain.member.application.service.check.MemberCheckService;
-import dy.whatsong.domain.member.dto.MemberCacheDTO;
+import dy.whatsong.domain.member.dto.MemberRequestCacheDTO;
 import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -31,12 +32,14 @@ public class MemberCacheServiceImpl implements MemberCacheService {
     }
 
     @Override
-    @CachePut(key = "#roomCode", unless = "#result == null")
-    public void putMemberInCacheIfEmpty(MemberCacheDTO.BasicInfo basicInfoDTO) {
+    @CachePut(key = "#roomCode")
+    public List<MemberResponseDto.CheckResponse> putMemberInCacheIfEmpty(MemberRequestCacheDTO.BasicInfo basicInfoDTO) {
         Member findBySeqMember = memberCheckService.getInfoByMemberEmail(basicInfoDTO.getUsername());
         List<Member> memberList = currentRoomMember.computeIfAbsent(basicInfoDTO.getRoomCode(), k -> new ArrayList<>());
         memberList.add(findBySeqMember);
         currentRoomMember.put(basicInfoDTO.getRoomCode(),memberList);
+        System.out.println(getRoomOfMemberList(basicInfoDTO.getRoomCode()));
+        return getRoomOfMemberList(basicInfoDTO.getRoomCode());
     }
 
     public List<MemberResponseDto.CheckResponse> getRoomOfMemberList(String roomCode){
@@ -49,7 +52,7 @@ public class MemberCacheServiceImpl implements MemberCacheService {
     }
 
     @CachePut(key = "#roomCode")
-    public void leaveMemberInCache(MemberCacheDTO.BasicInfo basicInfoDTO){
+    public List<MemberResponseDto.CheckResponse> leaveMemberInCache(MemberRequestCacheDTO.BasicInfo basicInfoDTO){
         List<Member> curretntList = currentRoomMember.get(basicInfoDTO.getRoomCode());
         List<Member> returnedList=new ArrayList<>();
         for (Member m:curretntList){
@@ -57,6 +60,7 @@ public class MemberCacheServiceImpl implements MemberCacheService {
         }
         currentRoomMember.put(basicInfoDTO.getRoomCode(),returnedList);
         System.out.println("modify?:"+currentRoomMember.toString());
+        return getRoomOfMemberList(basicInfoDTO.getRoomCode());
     }
 
     @Override

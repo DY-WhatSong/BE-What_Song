@@ -45,11 +45,10 @@ public class RoomSocketAPI {
         template.convertAndSendToUser(test_username,"/stream/"+roomCode+"/current/info",te);
     }*/
 
-    /*@MessageMapping("/{roomCode}/member/update/new")
-    public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody TestDTO testDTO){
-        System.out.println("message:"+testDTO.getMessage());
-        template.convertAndSend("/stream/"+roomCode+"/current/info",testDTO);
-    }*/
+    @MessageMapping("/{roomCode}/member/update/new")
+    public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody MRWSRequest.updateInfo updateInfoDTO){
+        template.convertAndSend("/stream/"+roomCode+"/current/info",updateInfoDTO);
+    }
 
     @MessageMapping("/{roomCode}/room/enter")
     public void memberEnterTheMusicRoom(@DestinationVariable String roomCode){
@@ -58,8 +57,10 @@ public class RoomSocketAPI {
     }
     
     @MessageMapping("/{roomCode}/room/leave")
-    public void memberLeaveTheMusicRoom(@DestinationVariable String roomCode,@RequestBody MRWSRequest.OnlyMemberSeq onlyMemberSeq){
+    public void memberLeaveTheMusicRoom(@DestinationVariable String roomCode){
         List<MemberResponseDto.CheckResponse> nowMemberInRoom = memberCacheService.getRoomOfMemberList(roomCode);
+        System.out.println("roomCode!!!!!!!="+roomCode);
+        System.out.println("Reut:"+nowMemberInRoom);
         template.convertAndSend("/stream/"+roomCode+"/room/leve",nowMemberInRoom);
     }
 
