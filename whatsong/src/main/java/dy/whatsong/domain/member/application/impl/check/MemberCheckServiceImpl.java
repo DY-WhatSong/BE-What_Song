@@ -31,6 +31,7 @@ public class MemberCheckServiceImpl implements MemberCheckService {
 
 	@Override
 	public Member getInfoByMemberEmail(String email) {
+		System.out.println("Email="+email);
 		return memberRepository.findByEmail(email).orElseThrow(()->new IllegalArgumentException("이메일 존재하지 않음"));
 	}
 }

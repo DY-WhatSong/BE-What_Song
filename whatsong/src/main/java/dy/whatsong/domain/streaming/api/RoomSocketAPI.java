@@ -8,6 +8,7 @@ import dy.whatsong.domain.music.application.service.check.MusicCheckService;
 import dy.whatsong.domain.reservation.application.service.ReservationService;
 import dy.whatsong.domain.reservation.entity.Reservation;
 import dy.whatsong.domain.streaming.dto.MRWSRequest;
+import dy.whatsong.domain.streaming.entity.redis.RoomMember;
 import dy.whatsong.domain.streaming.entity.room.Controller;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Test;
@@ -45,23 +46,22 @@ public class RoomSocketAPI {
         template.convertAndSendToUser(test_username,"/stream/"+roomCode+"/current/info",te);
     }*/
 
-    @MessageMapping("/{roomCode}/member/update/new")
+    @MessageMapping("/{roomCode}/music/current/new")
     public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody MRWSRequest.updateInfo updateInfoDTO){
-        template.convertAndSend("/stream/"+roomCode+"/current/info",updateInfoDTO);
+        template.convertAndSend("/stream/"+roomCode+"/music/current/info",updateInfoDTO);
     }
 
     @MessageMapping("/{roomCode}/room/enter")
     public void memberEnterTheMusicRoom(@DestinationVariable String roomCode){
-        List<MemberResponseDto.CheckResponse> nowMemberInRoom = memberCacheService.getRoomOfMemberList(roomCode);
-        template.convertAndSend("/stream/"+roomCode+"/room/enter",nowMemberInRoom);
+        RoomMember roomOfMemberList = memberCacheService.getRoomOfMemberList(roomCode);
+        template.convertAndSend("/stream/"+roomCode+"/room/enter",roomOfMemberList);
     }
     
     @MessageMapping("/{roomCode}/room/leave")
     public void memberLeaveTheMusicRoom(@DestinationVariable String roomCode){
-        List<MemberResponseDto.CheckResponse> nowMemberInRoom = memberCacheService.getRoomOfMemberList(roomCode);
+        RoomMember roomOfMemberList = memberCacheService.getRoomOfMemberList(roomCode);
         System.out.println("roomCode!!!!!!!="+roomCode);
-        System.out.println("Reut:"+nowMemberInRoom);
-        template.convertAndSend("/stream/"+roomCode+"/room/leve",nowMemberInRoom);
+        template.convertAndSend("/stream/"+roomCode+"/room/leave",roomOfMemberList);
     }
 
     @MessageMapping("/room/info/current")
