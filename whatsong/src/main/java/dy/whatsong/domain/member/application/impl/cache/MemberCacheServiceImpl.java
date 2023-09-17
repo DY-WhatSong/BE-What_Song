@@ -2,6 +2,7 @@ package dy.whatsong.domain.member.application.impl.cache;
 
 import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
 import dy.whatsong.domain.member.application.service.check.MemberCheckService;
+import dy.whatsong.domain.member.dto.MemberDto;
 import dy.whatsong.domain.member.dto.MemberRequestCacheDTO;
 import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.member.entity.Member;
@@ -31,40 +32,11 @@ public class MemberCacheServiceImpl implements MemberCacheService {
 
     private final RoomMemberService roomMemberService;
 
-    private final RoomMemberRepository m;
-
     @Override
     public void putMemberInCacheIfEmpty(MemberRequestCacheDTO.BasicInfo basicInfoDTO) {
         String roomCode = basicInfoDTO.getRoomCode();
-        Member findBySeqMember = memberCheckService.getInfoByMemberEmail(basicInfoDTO.getUsername());
-        Optional<RoomMember> findRM = roomMemberService.getRoomMemberInfoByRoomCode(roomCode);
-        if (findRM.isEmpty()){
-            roomMemberService.saveRoomMemberInRedis(
-                    RoomMember.builder()
-                            .roomCode(roomCode)
-                            .memberList(new ArrayList<>(List.of(findBySeqMember)))
-                            .build()
-            );
-        }else {
-            List<Member> originList = findRM.get().getMemberList();
-            if (Optional.ofNullable(originList).isEmpty()){
-                roomMemberService.saveRoomMemberInRedis(
-                        RoomMember.builder()
-                                .roomCode(roomCode)
-                                .memberList(new ArrayList<>(List.of(findBySeqMember)))
-                                .build()
-                );
-            }
-            else {
-                originList.add(findBySeqMember);
-                roomMemberService.saveRoomMemberInRedis(
-                        RoomMember.builder()
-                                .roomCode(roomCode)
-                                .memberList(originList)
-                                .build()
-                );
-            }
-        }
+        String email = basicInfoDTO.getUsername();
+        roomMemberService.saveRoomMemberInRedis(roomCode,email);
     }
 
     public RoomMember getRoomOfMemberList(String roomCode){
@@ -74,18 +46,13 @@ public class MemberCacheServiceImpl implements MemberCacheService {
     public void leaveMemberInCache(MemberRequestCacheDTO.BasicInfo basicInfoDTO){
         String roomCode = basicInfoDTO.getRoomCode();
 
-        List<Member> originList = roomMemberService.getRoomMemberInfoByRoomCode(roomCode).get().getMemberList();
-        List<Member> modifyList= new ArrayList<>();
-        for (Member m:originList){
+        ArrayList<MemberDto.MemberStomp> originList = roomMemberService.getRoomMemberInfoByRoomCode(roomCode).get().getMemberList();
+        ArrayList<MemberDto.MemberStomp> modifyList= new ArrayList<>();
+        for (MemberDto.MemberStomp m:originList){
             if (!m.getEmail().equals(basicInfoDTO.getUsername())) modifyList.add(m);
         }
 
-        roomMemberService.saveRoomMemberInRedis(
-                    RoomMember.builder()
-                            .roomCode(roomCode)
-                            .memberList(modifyList)
-                            .build()
-        );
+        roomMemberService.modifyRoomMemberInRedis(roomCode,modifyList);
     }
 
     @Override

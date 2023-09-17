@@ -86,4 +86,15 @@ public class MemberDto {
 
     }
 
+    @Getter
+    @Builder
+    public static class MemberStomp{
+        private Long memberSeq;
+
+        private String email;
+
+        private String nickname;
+
+        private String imgURL;
+    }
 }

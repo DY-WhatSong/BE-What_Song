@@ -4,5 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class TestDTO {
-    private String message;
+    private String roomCode;
+    private String username;
 }

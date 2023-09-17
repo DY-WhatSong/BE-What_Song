@@ -1,37 +1,25 @@
 package dy.whatsong.domain.streaming.api;
 
-import dy.whatsong.domain.chat.model.TestDTO;
 import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
-import dy.whatsong.domain.member.dto.MemberResponseDto;
-import dy.whatsong.domain.member.entity.Member;
-import dy.whatsong.domain.music.application.service.check.MusicCheckService;
 import dy.whatsong.domain.reservation.application.service.ReservationService;
 import dy.whatsong.domain.reservation.entity.Reservation;
 import dy.whatsong.domain.streaming.application.service.StompService;
 import dy.whatsong.domain.streaming.dto.MRWSRequest;
 import dy.whatsong.domain.streaming.dto.MRWSResponse;
 import dy.whatsong.domain.streaming.entity.redis.RoomMember;
-import dy.whatsong.domain.streaming.entity.room.Controller;
 import dy.whatsong.domain.streaming.entity.room.Status;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Test;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 public class RoomSocketAPI {
-
-    private final String test_username="psb4644@gmail.com";
 
     private final SimpMessagingTemplate template;
 
@@ -39,12 +27,7 @@ public class RoomSocketAPI {
 
     private final MemberCacheService memberCacheService;
 
-    private final MusicCheckService musicCheckService;
-
     private final StompService stompService;
-
-    private static Status status=Status.PLAYING;
-
 
     /*@MessageMapping("/current/info")
     public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody TestDTO testDTO){
@@ -56,14 +39,8 @@ public class RoomSocketAPI {
     @MessageMapping("/{roomCode}/music/current/new")
     public void currentRoomStateInfoUptoDate(@DestinationVariable String roomCode, @RequestBody MRWSRequest.updateInfo updateInfoDTO){
         System.out.println("!!!!");
-        MRWSResponse.updateInfoRes updateInfoRes;
-        if (updateInfoDTO.getStatus()==null){
-            updateInfoRes=getUpdateInfoToResDTO(updateInfoDTO);
-        }else {
-            status=updateInfoDTO.getStatus();
-            updateInfoRes=getUpdateInfoToResDTO(updateInfoDTO);
-        }
-        System.out.println("status:"+status);
+        System.out.println("status:"+updateInfoDTO.getStatus());
+        MRWSResponse.updateInfoRes updateInfoRes = getUpdateInfoToResDTO(updateInfoDTO);
         template.convertAndSend("/stream/"+roomCode+"/music/current/info",updateInfoRes);
     }
 
@@ -102,7 +79,7 @@ public class RoomSocketAPI {
                 .username(updateInfo.getUsername())
                 .timeStamp(updateInfo.getTimeStamp())
                 .videoId(updateInfo.getVideoId())
-                .status(status)
+                .status(updateInfo.getStatus())
                 .build();
     }
 }
