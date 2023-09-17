@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.global.config.cache;
 
 import org.springframework.boot.autoconfigure.cache.CacheManagerCustomizer;
@@ -11,3 +12,4 @@ public class CacheCustomizer implements CacheManagerCustomizer<ConcurrentMapCach
         cacheManager.setAllowNullValues(false);
     }
 }
+*/
