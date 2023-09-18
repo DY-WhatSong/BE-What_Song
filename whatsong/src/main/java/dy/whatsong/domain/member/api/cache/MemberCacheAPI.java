@@ -1,10 +1,12 @@
 package dy.whatsong.domain.member.api.cache;
 
+import dy.whatsong.domain.chat.model.TestDTO;
 import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
 import dy.whatsong.domain.member.dto.MemberRequestCacheDTO;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.global.annotation.EssentialController;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,12 +20,12 @@ public class MemberCacheAPI {
     private final MemberCacheService memberCacheService;
 
     @PostMapping("/cache/member/put")
-    public ResponseEntity<?> memberEnterTheMusicRoom(@RequestBody MemberRequestCacheDTO.PutOrModify req){
-        return new ResponseEntity<>(memberCacheService.putMemberInCacheIfEmpty(
-                            req.getRoomCode()
-                            ,req.getMemberSeq()
-        )
-                ,HttpStatus.OK);
+    public void memberEnterTheMusicRoom(@RequestBody TestDTO testDTO){
+        memberCacheService.putMemberInCacheIfEmpty(
+                MemberRequestCacheDTO.BasicInfo.builder()
+                        .roomCode(testDTO.getRoomCode())
+                        .username(testDTO.getUsername())
+                .build());
     }
 
     @GetMapping("/cache/member/list")
@@ -33,11 +35,10 @@ public class MemberCacheAPI {
     }
 
     @PostMapping("/cache/member/modify")
-    public ResponseEntity<?> memberLeaveTheMusicRoom(@RequestBody MemberRequestCacheDTO.PutOrModify req){
-        return new ResponseEntity<>(memberCacheService.leaveMemberInCache(
-                            req.getRoomCode(),
-                            req.getMemberSeq()
-        ),
-                HttpStatus.OK);
+    public void memberLeaveTheMusicRoom(@RequestBody TestDTO testDTO){
+        memberCacheService.leaveMemberInCache(MemberRequestCacheDTO.BasicInfo.builder()
+                .roomCode(testDTO.getRoomCode())
+                .username(testDTO.getUsername())
+                .build());
     }
 }

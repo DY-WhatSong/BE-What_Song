@@ -3,7 +3,9 @@ package dy.whatsong.domain.reservation.api;
 import dy.whatsong.domain.reservation.application.service.ReservationService;
 import dy.whatsong.domain.reservation.dto.ReservationDTO;
 import dy.whatsong.global.annotation.EssentialController;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,11 +25,18 @@ public class ReservationAPI {
 
 	@GetMapping("/reservation")
 	public ResponseEntity<?> getInfoReservationList(@RequestParam("roomSeq") Long roomSeq){
-		return reservationService.reservationList(roomSeq);
+		return new ResponseEntity<>(reservationService.reservationList(roomSeq), HttpStatus.OK);
 	}
 
 	@PostMapping("/reservation/approve")
 	public ResponseEntity<?> approveToMusic(@RequestBody ReservationDTO.Approve approveDTO){
 		return reservationService.approveReservation(approveDTO);
+	}
+
+	@GetMapping("/reservation/approve/list")
+	public ResponseEntity<?> approveMusicList(@RequestParam("roomSeq") Long roomSeq){
+		return new ResponseEntity<>(
+					reservationService.approveReservationList(roomSeq),
+					HttpStatus.OK);
 	}
 }

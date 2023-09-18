@@ -6,4 +6,6 @@ public interface MemberCheckService {
 	Member getInfoByMemberSeq(Long memberSeq);
 
 	Member getInfoByMemberRefreshToken(String refershToken);
+
+	Member getInfoByMemberEmail(String email);
 }

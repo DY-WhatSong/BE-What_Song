@@ -11,7 +11,7 @@ import java.util.List;
 public interface ReservationService {
 	ResponseEntity<?> reservationMusic(ReservationDTO.Select selectDTO);
 
-	ResponseEntity<?> reservationList(Long roomSeq);
+	List<Reservation> reservationList(Long roomSeq);
 
 	List<Reservation> approveReservationList(Long roomSeq);
 

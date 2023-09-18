@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.global.config.cache;
 
 import org.springframework.cache.CacheManager;
@@ -20,3 +21,4 @@ public class CachingConfig {
         return cacheManager;
     }
 }
+*/

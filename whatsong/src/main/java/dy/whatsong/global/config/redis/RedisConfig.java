@@ -13,6 +13,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -21,6 +22,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfig {
 
 	private final Properties.RedisProperties redisProperties;
+
+	@Bean
+	public RedisSerializer<Object> redisSerializer() {
+		return new Jackson2JsonRedisSerializer<>(Object.class); // Jackson JSON Serializer 사용
+	}
 
 	@Bean
 	public RedisConnectionFactory redisConnectionFactory(){

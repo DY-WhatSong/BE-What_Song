@@ -50,7 +50,7 @@ public class RoomWsServiceImpl implements RoomWsService {
         return mrSseRepository.save(
                 MRWS.builder()
                         .videoId(reservation.getSelectVideo().getVideoId())
-                        .roomCode(infoMRBySeq.getRoomCode())
+                        .roomCode(infoMRBySeq.getRoomCode()+reservation.getSelectVideo().getVideoId())
                         .status(Status.PAUSE)
                         .timestamp("0")
                         .build()

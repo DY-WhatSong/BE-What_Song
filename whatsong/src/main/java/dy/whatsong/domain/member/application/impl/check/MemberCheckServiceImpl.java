@@ -28,4 +28,10 @@ public class MemberCheckServiceImpl implements MemberCheckService {
 		log.info("getInfoByMemberRefreshToken-refreshToken : {}", refreshToken);
 		return memberRepository.findByRefreshToken(refreshToken).get();
 	}
+
+	@Override
+	public Member getInfoByMemberEmail(String email) {
+		System.out.println("Email="+email);
+		return memberRepository.findByEmail(email).orElseThrow(()->new IllegalArgumentException("이메일 존재하지 않음"));
+	}
 }
