@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class ChatMessage {
+public class ChatMessage implements Serializable{
 
     public ChatMessage() {
     }

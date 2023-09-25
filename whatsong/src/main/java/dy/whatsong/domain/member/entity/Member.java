@@ -1,6 +1,7 @@
 package dy.whatsong.domain.member.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import dy.whatsong.domain.member.dto.MemberDto;
 import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.music.entity.MusicRoomMember;
 import dy.whatsong.domain.profile.entity.GuestBook;
@@ -65,6 +66,15 @@ public class Member {
 				.email(email)
 				.nickname(nickname)
 				.innerNickname(innerNickname)
+				.build();
+	}
+
+	public MemberDto.MemberStomp toStompDTO(){
+		return MemberDto.MemberStomp.builder()
+				.email(email)
+				.imgURL(imgURL)
+				.nickname(nickname)
+				.memberSeq(memberSeq)
 				.build();
 	}
 }

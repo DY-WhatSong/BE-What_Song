@@ -292,6 +292,7 @@ public class TokenService {
             log.error("JWT claims string is empty.");
             throw ex;
         }
+//        return JWT.require(Algorithm.HMAC512(jwtProperties.getJWT_SECRET_KEY())).build().verify(token);
     }
 
     private List<String> getTokenList(Member member) {
@@ -317,5 +318,15 @@ public class TokenService {
                 .memberRole(member.getMemberRole())
                 .socialType(member.getSocialType())
                 .build();
+    }
+
+    public String getUsernameByToken(String accessToken){
+        DecodedJWT decodedJWT = getDecodedJWT(getEliminateBearer(accessToken));
+        System.out.println("decodedJWT:"+decodedJWT.toString());
+        return decodedJWT.getSubject();
+    }
+
+    public String getEliminateBearer(String token){
+        return token.replaceAll("Bearer ", "");
     }
 }

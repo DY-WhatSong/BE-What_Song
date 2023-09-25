@@ -2,16 +2,21 @@ package dy.whatsong.domain.member.application.impl.cache;
 
 import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
 import dy.whatsong.domain.member.application.service.check.MemberCheckService;
+import dy.whatsong.domain.member.dto.MemberDto;
+import dy.whatsong.domain.member.dto.MemberRequestCacheDTO;
 import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.member.entity.Member;
+import dy.whatsong.domain.streaming.application.service.RoomMemberService;
+import dy.whatsong.domain.streaming.entity.redis.RoomMember;
+import dy.whatsong.domain.streaming.repo.RoomMemberRepository;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.webjars.NotFoundException;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -25,55 +30,39 @@ public class MemberCacheServiceImpl implements MemberCacheService {
 
     private final MemberCheckService memberCheckService;
 
-    private HashMap<String,List<Member>> currentRoomMember;
-
-
-    @PostConstruct
-    public void initializeMemberCaching(){
-        currentRoomMember=new LinkedHashMap<>();
-    }
+    private final RoomMemberService roomMemberService;
 
     @Override
-    @CachePut(key = "#roomCode", unless = "#result == null")
-    public List<MemberResponseDto.CheckResponse> putMemberInCacheIfEmpty(String roomCode,Long memberSeq) {
-        Member findBySeqMember = memberCheckService.getInfoByMemberSeq(memberSeq);
-        List<Member> memberList = currentRoomMember.computeIfAbsent(roomCode, k -> new ArrayList<>());
-        memberList.add(findBySeqMember);
-        currentRoomMember.put(roomCode,memberList);
-        return getRoomOfMemberList(roomCode);
+    public void putMemberInCacheIfEmpty(MemberRequestCacheDTO.BasicInfo basicInfoDTO) {
+        String roomCode = basicInfoDTO.getRoomCode();
+        String email = basicInfoDTO.getUsername();
+        roomMemberService.saveRoomMemberInRedis(roomCode,email);
     }
 
-    public List<MemberResponseDto.CheckResponse> getRoomOfMemberList(String roomCode){
-        List<MemberResponseDto.CheckResponse> roomMembers = currentRoomMember.getOrDefault(roomCode, Collections.emptyList())
-                .stream()
-                .map(Member::toDTO)
-                .collect(Collectors.toList());
-        System.out.println("roomMembers:"+roomMembers);
-        return roomMembers;
+    public RoomMember getRoomOfMemberList(String roomCode){
+        return roomMemberService.getRoomMemberInfoByRoomCode(roomCode).orElseThrow(()->new NotFoundException("값이 없어"));
     }
 
-    @CachePut(key = "#roomCode")
-    public List<MemberResponseDto.CheckResponse> leaveMemberInCache(String roomCode,Long memberSeq){
-        List<Member> curretntList = currentRoomMember.get(roomCode);
-        List<Member> returnedList=new ArrayList<>();
-        for (Member m:curretntList){
-            if (!m.getMemberSeq().equals(memberSeq)) returnedList.add(m);
+    public void leaveMemberInCache(MemberRequestCacheDTO.BasicInfo basicInfoDTO){
+        String roomCode = basicInfoDTO.getRoomCode();
+
+        ArrayList<MemberDto.MemberStomp> originList = roomMemberService.getRoomMemberInfoByRoomCode(roomCode).get().getMemberList();
+        ArrayList<MemberDto.MemberStomp> modifyList= new ArrayList<>();
+        for (MemberDto.MemberStomp m:originList){
+            if (!m.getEmail().equals(basicInfoDTO.getUsername())) modifyList.add(m);
         }
-        currentRoomMember.put(roomCode,returnedList);
-        System.out.println("modify?:"+currentRoomMember.toString());
-        return getRoomOfMemberList(roomCode);
+
+        roomMemberService.modifyRoomMemberInRedis(roomCode,modifyList);
     }
 
     @Override
-    public Integer getUserCountInRoom(String roomCode) {
-        return currentRoomMember.get(roomCode).size();
-    }
+    public Integer countMemberInRoom(String roomCode) {
+        Optional<RoomMember> roomMemberInfoByRoomCode = roomMemberService.getRoomMemberInfoByRoomCode(roomCode);
+        if (roomMemberInfoByRoomCode.isEmpty()||Optional.ofNullable(roomMemberInfoByRoomCode.get().getMemberList()).isEmpty()){
+            return 0;
+        }
 
-    @Override
-    public Boolean memberIfExistEnter(Long memberSeq,String roomCode) {
-        Member infoByMemberSeq = memberCheckService.getInfoByMemberSeq(memberSeq);
-        return currentRoomMember.get(roomCode).stream()
-                .anyMatch(member -> member.getMemberSeq().equals(memberSeq));
+        return roomMemberInfoByRoomCode.get().getMemberList().size();
     }
 
 }

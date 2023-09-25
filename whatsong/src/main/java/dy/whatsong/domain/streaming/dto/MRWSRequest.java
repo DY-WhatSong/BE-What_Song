@@ -8,11 +8,16 @@ import lombok.Getter;
 public class MRWSRequest {
     @Getter
     public static class playerCurrentState{
+        private Controller controller;
+        private Long roomSeq;
+    }
+
+    @Getter
+    public static class updateInfo{
         private String videoId;
         private Status status;
         private String timeStamp;
-        private Controller controller;
-        private Long roomSeq;
+        private String username;
     }
 
     @Getter

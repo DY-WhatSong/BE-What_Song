@@ -50,7 +50,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
-	public ResponseEntity<?> reservationList(Long roomSeq) {
+	public List<Reservation> reservationList(Long roomSeq) {
 		System.out.println("roomSeq="+roomSeq);
 		List<Reservation> reservationList=new ArrayList<>();
 
@@ -60,8 +60,7 @@ public class ReservationServiceImpl implements ReservationService {
 						reservationList.add(reservation);
 					}
 				});
-		System.out.println(reservationList.toString());
-		return new ResponseEntity<>(reservationList,HttpStatus.OK);
+		return reservationList;
 	}
 
 	@Override
@@ -111,7 +110,6 @@ public class ReservationServiceImpl implements ReservationService {
 				.roomSeq(reservation.getRoomSeq())
 				.build();
 
-		reservationRepository.delete(reservation);
 		return reservationRepository.save(changeReserEntity);
 	}
 }
