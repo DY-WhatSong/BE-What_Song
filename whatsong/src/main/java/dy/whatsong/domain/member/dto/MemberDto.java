@@ -97,4 +97,12 @@ public class MemberDto {
 
         private String imgURL;
     }
+
+    public static class MemberStory{
+        private Long memberSeq;
+
+        private String nickname;
+
+        private String imgURL;
+    }
 }
