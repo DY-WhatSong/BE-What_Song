@@ -98,6 +98,8 @@ public class MemberDto {
         private String imgURL;
     }
 
+    @Builder
+    @Getter
     public static class MemberStory{
         private Long memberSeq;
 
