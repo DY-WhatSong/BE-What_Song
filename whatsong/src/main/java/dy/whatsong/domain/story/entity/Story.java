@@ -7,12 +7,13 @@ import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @RedisHash(timeToLive = 86400)
 @Getter
 @Builder
-public class Story {
+public class Story implements Serializable {
 
     @Id
     private String id;

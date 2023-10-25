@@ -5,6 +5,7 @@ import dy.whatsong.domain.member.entity.SocialType;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 public class MemberDto {
 
@@ -100,7 +101,7 @@ public class MemberDto {
 
     @Builder
     @Getter
-    public static class MemberStory{
+    public static class MemberStory implements Serializable {
         private Long memberSeq;
 
         private String nickname;
