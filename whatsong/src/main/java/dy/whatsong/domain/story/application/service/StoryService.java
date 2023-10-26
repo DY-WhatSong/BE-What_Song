@@ -38,7 +38,7 @@ public class StoryService {
         System.out.println("POST TIME :"+postTime);
         Member memberInfoBySeq = memberCheckService.getInfoByMemberSeq(storyPostReq.getMemberSeq());
         String memberNickName = memberInfoBySeq.getNickname();
-        String storyKeyValue = "story:" + memberNickName + postTime;
+        String storyKeyValue = memberNickName + ":" + postTime;
         Story postedStory = storyRepository.save(
                 Story.builder()
                         .id(storyKeyValue + UUID.randomUUID())
@@ -68,11 +68,12 @@ public class StoryService {
         postedStoryList.set(storyKey,postedStoryHistory);
     }
 
-    public LinkedList<Story> getFriendsStoryByList(final FriendsStoryReq friendsStoryReq){
+    /*public LinkedList<Story> getFriendsStoryByList(final FriendsStoryReq friendsStoryReq){
         List<Member> members = memberDetailCheckService.friendsListByOwnerSeq(friendsStoryReq.getOwnerSeq());
         for (Member m: members){
-            m.getNickname()
-            storyRepository.findAllById();
+            String memberNickName = m.getNickname();
+            "story:"
         }
-    }
+
+    }*/
 }
