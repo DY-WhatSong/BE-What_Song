@@ -36,11 +36,11 @@ public class StoryService {
     public Story memberPostStory(final StoryPostReq storyPostReq){
         LocalDateTime postTime = LocalDateTime.now();
         System.out.println("POST TIME :"+postTime);
-        Member memberInfoBySeq = memberCheckService.getInfoByMemberSeq(storyPostReq.getMemberSeq());
-        String keyNickName = memberInfoBySeq.getNickname();
+        Long memberSeq = storyPostReq.getMemberSeq();
+        Member memberInfoBySeq = memberCheckService.getInfoByMemberSeq(memberSeq);
         Story postedStory = storyRepository.save(
                 Story.builder()
-                        .id(keyNickName + ":" + UUID.randomUUID())
+                        .id(memberSeq + ":" + UUID.randomUUID())
                         .memberStory(
                                 MemberDto.MemberStory.builder()
                                         .memberSeq(memberInfoBySeq.getMemberSeq())
@@ -55,11 +55,12 @@ public class StoryService {
                         .storyVideo(storyPostReq.getStoryVideoReq().reqToSaveTarget())
                         .build()
         );
-        postedHistory(keyNickName,postedStory);
+        postedHistory(memberSeq,postedStory);
         return postedStory;
     }
 
-    private void postedHistory(String storyKey,Story postedStory){
+    private void postedHistory(Long memberSeq,Story postedStory){
+        String storyKey ="story:" + memberSeq.toString();
         ValueOperations<String, List<Story>> postedStoryList = redisTemplate.opsForValue();
         List<Story> postedStoryHistory = postedStoryList.get(storyKey);
         if (postedStoryHistory == null) postedStoryHistory = new ArrayList<>();
@@ -67,12 +68,24 @@ public class StoryService {
         postedStoryList.set(storyKey,postedStoryHistory);
     }
 
-    /*public LinkedList<Story> getFriendsStoryByList(final FriendsStoryReq friendsStoryReq){
+    public LinkedList<List<Story>> getFriendsStoryByList(final FriendsStoryReq friendsStoryReq){
         List<Member> members = memberDetailCheckService.friendsListByOwnerSeq(friendsStoryReq.getOwnerSeq());
-        for (Member m: members){
-            String memberNickName = m.getNickname();
-            "story:"
-        }
 
-    }*/
+        LinkedList<List<Story>> friendsStoryList = members.stream()
+                .map(m -> {
+                    String storyKey = "story:" + m.getMemberSeq();
+                    List<Story> friendsStoryFor24Hours = getStoryFor24Hours(redisTemplate.opsForValue().get(storyKey));
+                    return friendsStoryFor24Hours;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(LinkedList::new));
+        return friendsStoryList;
+    }
+
+    private List<Story> getStoryFor24Hours(List<Story> memberStory){
+        LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
+        return memberStory.stream()
+                .filter(story -> story.getPostTime().isAfter(twentyFourHoursAgo))
+                .collect(Collectors.toList());
+    }
 }
