@@ -37,15 +37,14 @@ public class StoryService {
         LocalDateTime postTime = LocalDateTime.now();
         System.out.println("POST TIME :"+postTime);
         Member memberInfoBySeq = memberCheckService.getInfoByMemberSeq(storyPostReq.getMemberSeq());
-        String memberNickName = memberInfoBySeq.getNickname();
-        String storyKeyValue = memberNickName + ":" + postTime;
+        String keyNickName = memberInfoBySeq.getNickname();
         Story postedStory = storyRepository.save(
                 Story.builder()
-                        .id(storyKeyValue + UUID.randomUUID())
+                        .id(keyNickName + ":" + UUID.randomUUID())
                         .memberStory(
                                 MemberDto.MemberStory.builder()
                                         .memberSeq(memberInfoBySeq.getMemberSeq())
-                                        .nickname(memberNickName)
+                                        .nickname(memberInfoBySeq.getNickname())
                                         .imgURL(memberInfoBySeq.getImgURL())
                                         .build()
                         )
@@ -56,7 +55,7 @@ public class StoryService {
                         .storyVideo(storyPostReq.getStoryVideoReq().reqToSaveTarget())
                         .build()
         );
-        postedHistory(storyKeyValue,postedStory);
+        postedHistory(keyNickName,postedStory);
         return postedStory;
     }
 
