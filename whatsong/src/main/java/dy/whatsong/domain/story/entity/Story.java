@@ -26,4 +26,18 @@ public class Story implements Serializable {
     private String start;
     private String end;
     private StoryVideo storyVideo;
+
+
+    @Override
+    public String toString() {
+        return "Story{" +
+                "id='" + id + '\'' +
+                ", memberStory=" + memberStory +
+                ", postTime=" + postTime +
+                ", img_url='" + img_url + '\'' +
+                ", start='" + start + '\'' +
+                ", end='" + end + '\'' +
+                ", storyVideo=" + storyVideo +
+                '}';
+    }
 }
