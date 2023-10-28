@@ -27,17 +27,16 @@ public class Story implements Serializable {
     private String end;
     private StoryVideo storyVideo;
 
-
     @Override
     public String toString() {
-        return "Story{" +
-                "id='" + id + '\'' +
-                ", memberStory=" + memberStory +
-                ", postTime=" + postTime +
-                ", img_url='" + img_url + '\'' +
-                ", start='" + start + '\'' +
-                ", end='" + end + '\'' +
-                ", storyVideo=" + storyVideo +
-                '}';
+        return "{" +
+                "\"id\":\"" + id + "\"," +
+                "\"memberStory\":" + memberStory.toString() + "," +
+                "\"postTime\":\"" + postTime + "\"," +
+                "\"img_url\":\"" + img_url + "\"," +
+                "\"start\":\"" + start + "\"," +
+                "\"end\":\"" + end + "\"," +
+                "\"storyVideo\":" + storyVideo.toString() +
+                "}";
     }
 }

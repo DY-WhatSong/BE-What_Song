@@ -107,5 +107,14 @@ public class MemberDto {
         private String nickname;
 
         private String imgURL;
+
+        @Override
+        public String toString() {
+            return "MemberStory{" +
+                    "memberSeq=" + memberSeq +
+                    ", nickname='" + nickname + '\'' +
+                    ", imgURL='" + imgURL + '\'' +
+                    '}';
+        }
     }
 }

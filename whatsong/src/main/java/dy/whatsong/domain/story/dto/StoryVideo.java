@@ -12,4 +12,14 @@ public class StoryVideo implements Serializable {
     private String title;
     private String channelName;
     private String thumbnailUrl;
+
+    @Override
+    public String toString() {
+        return "StoryVideo{" +
+                "videoId='" + videoId + '\'' +
+                ", title='" + title + '\'' +
+                ", channelName='" + channelName + '\'' +
+                ", thumbnailUrl='" + thumbnailUrl + '\'' +
+                '}';
+    }
 }
