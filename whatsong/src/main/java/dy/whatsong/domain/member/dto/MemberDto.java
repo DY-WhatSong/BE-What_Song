@@ -110,11 +110,11 @@ public class MemberDto {
 
         @Override
         public String toString() {
-            return "MemberStory{" +
-                    "memberSeq=" + memberSeq +
-                    ", nickname='" + nickname + '\'' +
-                    ", imgURL='" + imgURL + '\'' +
-                    '}';
+            return "{" +
+                    "\"memberSeq\":" + memberSeq + "," +
+                    "\"nickname\":\"" + nickname + "\"," +
+                    "\"imgURL\":\"" + imgURL + "\"" +
+                    "}";
         }
     }
 }

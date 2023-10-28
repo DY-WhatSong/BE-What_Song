@@ -15,11 +15,11 @@ public class StoryVideo implements Serializable {
 
     @Override
     public String toString() {
-        return "StoryVideo{" +
-                "videoId='" + videoId + '\'' +
-                ", title='" + title + '\'' +
-                ", channelName='" + channelName + '\'' +
-                ", thumbnailUrl='" + thumbnailUrl + '\'' +
-                '}';
+        return "{" +
+                "\"videoId\":\"" + videoId + "\"," +
+                "\"title\":\"" + title + "\"," +
+                "\"channelName\":\"" + channelName + "\"," +
+                "\"thumbnailUrl\":\"" + thumbnailUrl + "\"" +
+                "}";
     }
 }
