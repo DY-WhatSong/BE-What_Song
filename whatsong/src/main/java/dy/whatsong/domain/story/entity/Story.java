@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import dy.whatsong.domain.member.dto.MemberDto;
 import dy.whatsong.domain.story.dto.StoryVideo;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
@@ -14,7 +13,10 @@ import java.time.LocalDateTime;
 
 @RedisHash(timeToLive = 86400,value = "story")
 @Getter
+@Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Story implements Serializable {
 
     @Id
