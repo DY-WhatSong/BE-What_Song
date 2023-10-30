@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.dto.MemberRequestDTO;
+import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.member.entity.*;
 import dy.whatsong.domain.member.repo.FriendsStateRepository;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @EssentialServiceLayer
 @RequiredArgsConstructor
@@ -82,12 +84,13 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 	public ResponseEntity<?> memberSearchOnFriendsList(MemberRequestDTO.Search searchDTO) {
 		QMember qMember= QMember.member;
 		BooleanExpression friendsCandidate = qMember.memberSeq.ne(searchDTO.getOwnerSeq())
-				.and(qMember.innerNickname.startsWith(searchDTO.getTargetName()));
+				.and(qMember.nickname.startsWith(searchDTO.getTargetName()));
 		List<Member> fetchResult = jpaQueryFactory.selectFrom(qMember)
 				.where(friendsCandidate)
 				.fetch();
 
-		return new ResponseEntity<>(fetchResult,HttpStatus.OK);
+		List<MemberResponseDto.CheckResponse> searchList = fetchResult.stream().map(Member::toDTO).collect(Collectors.toList());
+		return new ResponseEntity<>(searchList,HttpStatus.OK);
 	}
 
 	@Override
