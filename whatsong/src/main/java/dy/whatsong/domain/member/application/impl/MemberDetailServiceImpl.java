@@ -60,7 +60,7 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 	@Override
 	public boolean isOwnerAlreadyFriendsRequest(Long ownerSeq, Long requestMemberSeq){
 		QFriendsState qfs=QFriendsState.friendsState;
-
+		System.out.println("ownerSeq:"+ownerSeq);
 		BooleanExpression friendConditon = qfs.ownerSeq.eq(ownerSeq)
 				.and(qfs.targetSeq.eq(requestMemberSeq));
 
@@ -91,6 +91,11 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 
 		List<MemberResponseDto.CheckResponse> searchList = fetchResult.stream().map(Member::toDTO).collect(Collectors.toList());
 		return new ResponseEntity<>(searchList,HttpStatus.OK);
+	}
+
+	@Override
+	public List<FriendsState> getMemberFriendsList(Long ownerSeq) {
+		return friendsStateRepository.findByOwnerSeq(ownerSeq).get();
 	}
 
 	@Override
