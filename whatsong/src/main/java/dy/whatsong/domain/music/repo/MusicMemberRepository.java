@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface MusicMemberRepository extends JpaRepository<MusicRoomMember,Long> {
 	Optional<List<MusicRoomMember>> findByMember(Member member);
 	Optional<MusicRoomMember> findByMusicRoom(MusicRoom musicRoom);
+
 }

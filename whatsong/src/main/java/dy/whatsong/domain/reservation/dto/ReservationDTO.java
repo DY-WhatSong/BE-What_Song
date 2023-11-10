@@ -1,6 +1,7 @@
 package dy.whatsong.domain.reservation.dto;
 
 import dy.whatsong.domain.reservation.entity.Recognize;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,6 +13,7 @@ public class ReservationDTO {
 		private String channelName;
 		private String thumbnailUrl;
 		private Long roomSeq;
+		private Long memberSeq;
 	}
 
 	@Getter
@@ -29,6 +31,7 @@ public class ReservationDTO {
 	}
 
 	@Getter
+	@AllArgsConstructor
 	public static class Approve{
 		private String reservationId;
 		private Recognize recognize;

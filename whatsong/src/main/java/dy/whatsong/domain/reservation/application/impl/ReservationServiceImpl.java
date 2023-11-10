@@ -1,6 +1,7 @@
 package dy.whatsong.domain.reservation.application.impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import dy.whatsong.domain.music.application.service.MusicMemberService;
 import dy.whatsong.domain.reservation.application.service.ReservationService;
 import dy.whatsong.domain.reservation.dto.ReservationDTO;
 import dy.whatsong.domain.reservation.entity.Recognize;
@@ -28,6 +29,8 @@ public class ReservationServiceImpl implements ReservationService {
 
 	private final ReservationRepository reservationRepository;
 
+	private final MusicMemberService musicMemberService;
+
 	private final RoomWsService roomWsService;
 
 	@Override
@@ -45,7 +48,9 @@ public class ReservationServiceImpl implements ReservationService {
 						.build())
 				.recognize(Recognize.NONE)
 				.build());
-
+		if (musicMemberService.memberIsRoomOwner(selectDTO.getMemberSeq(), selectDTO.getRoomSeq())){
+			approveReservation(new ReservationDTO.Approve(currentReservation.getReservationId(),Recognize.APPROVE));
+		}
 		return new ResponseEntity<>(currentReservation, HttpStatus.OK);
 	}
 
