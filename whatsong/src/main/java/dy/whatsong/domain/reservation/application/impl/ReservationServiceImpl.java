@@ -15,10 +15,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @EssentialServiceLayer
 @RequiredArgsConstructor
@@ -57,28 +56,22 @@ public class ReservationServiceImpl implements ReservationService {
 	@Override
 	public List<Reservation> reservationList(Long roomSeq) {
 		System.out.println("roomSeq="+roomSeq);
-		List<Reservation> reservationList=new ArrayList<>();
+		List<Reservation> reservations = StreamSupport.stream(reservationRepository.findAll().spliterator(), false)
+				.filter(Objects::nonNull)
+				.filter(reservation -> reservation.getRoomSeq().equals(roomSeq) && reservation.getRecognize().equals(Recognize.NONE))
+				.collect(Collectors.toList());
 
-		reservationRepository.findAll()
-				.forEach(reservation -> {
-					if(Optional.ofNullable(reservation).isPresent()&&reservation.getRoomSeq().equals(roomSeq)&&reservation.getRecognize().equals(Recognize.NONE)){
-						reservationList.add(reservation);
-					}
-				});
-		return reservationList;
+		return Optional.of(reservations).orElse(new ArrayList<>());
 	}
 
 	@Override
 	public List<Reservation> approveReservationList(Long roomSeq) {
-		List<Reservation> reservationList=new ArrayList<>();
-		reservationRepository.findAll()
-				.forEach(reservation -> {
-					if (Optional.ofNullable(reservation).isPresent()&&reservation.getRoomSeq().equals(roomSeq)&&reservation.getRecognize().equals(Recognize.APPROVE)){
-						reservationList.add(reservation);
-					}
-				});
+		List<Reservation> reservations = StreamSupport.stream(reservationRepository.findAll().spliterator(), false)
+				.filter(Objects::nonNull)
+				.filter(reservation -> reservation.getRoomSeq().equals(roomSeq) && reservation.getRecognize().equals(Recognize.APPROVE))
+				.collect(Collectors.toList());
 
-		return reservationList;
+		return Optional.of(reservations).orElse(new ArrayList<>());
 	}
 
 
@@ -116,5 +109,11 @@ public class ReservationServiceImpl implements ReservationService {
 				.build();
 
 		return reservationRepository.save(changeReserEntity);
+	}
+
+	@Override
+	public List<Reservation> reservationReject(Long roomSeq,String reservationId){
+		reservationRepository.deleteById(reservationId);
+		return reservationList(roomSeq);
 	}
 }

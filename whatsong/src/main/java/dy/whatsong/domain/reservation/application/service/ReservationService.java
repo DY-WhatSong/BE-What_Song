@@ -18,4 +18,6 @@ public interface ReservationService {
 	ResponseEntity<?> approveReservation(ReservationDTO.Approve approveDTO);
 
 	ResponseEntity<?> musicSkipByController(Long roomSeq);
+
+	List<Reservation> reservationReject(Long roomSeq,String reservationId);
 }

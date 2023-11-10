@@ -2,15 +2,13 @@ package dy.whatsong.domain.reservation.api;
 
 import dy.whatsong.domain.reservation.application.service.ReservationService;
 import dy.whatsong.domain.reservation.dto.ReservationDTO;
+import dy.whatsong.domain.reservation.dto.ReservationRejectDTO;
 import dy.whatsong.global.annotation.EssentialController;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @EssentialController
 @RequiredArgsConstructor
@@ -38,5 +36,13 @@ public class ReservationAPI {
 		return new ResponseEntity<>(
 					reservationService.approveReservationList(roomSeq),
 					HttpStatus.OK);
+	}
+
+	@DeleteMapping("/reservation")
+	public ResponseEntity<?> reservationReject(@RequestBody ReservationRejectDTO reservationRejectDTO){
+		return new ResponseEntity<>(
+					reservationService.reservationReject(reservationRejectDTO.getRoomSeq(),reservationRejectDTO.getReservationId()),
+					HttpStatus.OK
+		);
 	}
 }
