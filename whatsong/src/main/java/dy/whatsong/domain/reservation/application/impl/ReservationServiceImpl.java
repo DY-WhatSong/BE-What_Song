@@ -61,7 +61,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 		reservationRepository.findAll()
 				.forEach(reservation -> {
-					if(Optional.ofNullable(reservation).isPresent()&&reservation.getRoomSeq().equals(roomSeq)){
+					if(Optional.ofNullable(reservation).isPresent()&&reservation.getRoomSeq().equals(roomSeq)&&reservation.getRecognize().equals(Recognize.NONE)){
 						reservationList.add(reservation);
 					}
 				});
