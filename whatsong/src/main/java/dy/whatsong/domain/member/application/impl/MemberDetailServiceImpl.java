@@ -4,6 +4,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
+import dy.whatsong.domain.member.dto.FriendsSearchListDTO;
 import dy.whatsong.domain.member.dto.MemberRequestDTO;
 import dy.whatsong.domain.member.dto.MemberResponseDto;
 import dy.whatsong.domain.member.entity.*;
@@ -89,7 +90,9 @@ public class MemberDetailServiceImpl implements MemberDetailService {
 				.where(friendsCandidate)
 				.fetch();
 
-		List<MemberResponseDto.CheckResponse> searchList = fetchResult.stream().map(Member::toDTO).collect(Collectors.toList());
+		List<FriendsSearchListDTO> searchList = fetchResult.stream().map(member -> {
+			return new FriendsSearchListDTO(member, isOwnerAlreadyFriendsRequest(searchDTO.getOwnerSeq(), member.getMemberSeq()));
+		}).collect(Collectors.toList());
 		return new ResponseEntity<>(searchList,HttpStatus.OK);
 	}
 
