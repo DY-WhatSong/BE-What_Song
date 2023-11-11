@@ -31,9 +31,13 @@ public class ReservationDTO {
 	}
 
 	@Getter
-	@AllArgsConstructor
 	public static class Approve{
 		private String reservationId;
 		private Recognize recognize;
+
+		public Approve(String reservationId, Recognize recognize) {
+			this.reservationId = reservationId;
+			this.recognize = recognize;
+		}
 	}
 }
