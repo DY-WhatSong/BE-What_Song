@@ -1,8 +1,5 @@
 package dy.whatsong.domain.member.dto;
 
-import dy.whatsong.domain.member.entity.Member;
-import dy.whatsong.domain.member.entity.MemberRole;
-import dy.whatsong.domain.member.entity.SocialType;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,11 +12,11 @@ public class FriendsSearchListDTO {
     private String imgURL;
     private boolean isAlreadyFollowing;
 
-    public FriendsSearchListDTO(Member member,boolean isAlreadyFollowing) {
-        this.memberSeq = member.getMemberSeq();
-        this.email = member.getEmail();
-        this.nickname = member.getNickname();
-        this.imgURL = member.getImgURL();
+    public FriendsSearchListDTO(Long memberSeq, String email, String nickname, String imgURL, boolean isAlreadyFollowing) {
+        this.memberSeq = memberSeq;
+        this.email = email;
+        this.nickname = nickname;
+        this.imgURL = imgURL;
         this.isAlreadyFollowing = isAlreadyFollowing;
     }
 }
