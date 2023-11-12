@@ -73,11 +73,13 @@ public class StoryService {
     public LinkedList<StoryListInfo> getFriendsStoryByList(final Long memberSeq) {
         ValueOperations<String, List<Story>> op = redisTemplate.opsForValue();
         List<Story> ownStoryList = op.get("story:" + memberSeq);
-        String nickname = memberCheckService.getInfoByMemberSeq(memberSeq).getNickname();
 
         LinkedList<StoryListInfo> listInfos = new LinkedList<>();
-        StoryListInfo myStoryInfo = new StoryListInfo(nickname, ownStoryList);
-        listInfos.add(myStoryInfo);
+        if (ownStoryList != null) {
+            String nickname = memberCheckService.getInfoByMemberSeq(memberSeq).getNickname();
+            StoryListInfo myStoryInfo = new StoryListInfo(nickname, ownStoryList);
+            listInfos.add(myStoryInfo);
+        }
 
         List<Member> members = memberDetailCheckService.friendsListByOwnerSeq(memberSeq);
         for (Member m : members) {
