@@ -83,7 +83,9 @@ public class StoryService {
         for (Member m : members) {
             String storyKey = String.format("story:%s", m.getMemberSeq());
             List<Story> memberStory = op.get(storyKey);
-            listInfos.add(new StoryListInfo(m.getNickname(), memberStory));
+            if (memberStory != null) {
+                listInfos.add(new StoryListInfo(m.getNickname(), memberStory));
+            }
         }
         /*members.stream()
                 .map(m -> {
