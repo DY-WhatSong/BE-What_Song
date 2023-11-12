@@ -2,6 +2,7 @@ package dy.whatsong.domain.story.api;
 
 
 import dy.whatsong.domain.story.application.service.StoryService;
+import dy.whatsong.domain.story.dto.StoryListInfo;
 import dy.whatsong.domain.story.dto.req.StoryPostReq;
 import dy.whatsong.domain.story.entity.Story;
 import dy.whatsong.global.annotation.EssentialController;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.LinkedList;
-import java.util.List;
 
 @EssentialController
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ public class StoryAPI {
 
     @GetMapping("/story")
     public ResponseEntity<?> getRedis(@RequestParam Long memberSeq) {
-        LinkedList<List<Story>> friendsStory = storyService.getFriendsStoryByList(memberSeq);
-        return new ResponseEntity<>(friendsStory, HttpStatus.OK);
+        LinkedList<StoryListInfo> friendsStories = storyService.getFriendsStoryByList(memberSeq);
+        return new ResponseEntity<>(friendsStories, HttpStatus.OK);
     }
 }

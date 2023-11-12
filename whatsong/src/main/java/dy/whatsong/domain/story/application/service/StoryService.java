@@ -4,6 +4,7 @@ import dy.whatsong.domain.member.application.service.check.MemberCheckService;
 import dy.whatsong.domain.member.application.service.check.MemberDetailCheckService;
 import dy.whatsong.domain.member.dto.MemberDto;
 import dy.whatsong.domain.member.entity.Member;
+import dy.whatsong.domain.story.dto.StoryListInfo;
 import dy.whatsong.domain.story.dto.req.StoryPostReq;
 import dy.whatsong.domain.story.entity.Story;
 import dy.whatsong.domain.story.repo.StoryRepository;
@@ -15,8 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -67,20 +70,32 @@ public class StoryService {
     }
 
 
-    public LinkedList<List<Story>> getFriendsStoryByList(final Long memberSeq) {
-        List<Member> members = memberDetailCheckService.friendsListByOwnerSeq(memberSeq);
+    public LinkedList<StoryListInfo> getFriendsStoryByList(final Long memberSeq) {
         ValueOperations<String, List<Story>> op = redisTemplate.opsForValue();
-        LinkedList<List<Story>> friendsStoryList = members.stream()
+        List<Story> ownStoryList = op.get("story:" + memberSeq);
+        String nickname = memberCheckService.getInfoByMemberSeq(memberSeq).getNickname();
+
+        LinkedList<StoryListInfo> listInfos = new LinkedList<>();
+        StoryListInfo myStoryInfo = new StoryListInfo(nickname, ownStoryList);
+        listInfos.add(myStoryInfo);
+
+        List<Member> members = memberDetailCheckService.friendsListByOwnerSeq(memberSeq);
+        for (Member m : members) {
+            String storyKey = String.format("story:%s", m.getMemberSeq());
+            List<Story> memberStory = op.get(storyKey);
+            listInfos.add(new StoryListInfo(m.getNickname(), memberStory));
+        }
+        /*members.stream()
                 .map(m -> {
                     String storyKey = String.format("story:%s", m.getMemberSeq());
-                    /*List<Story> memberStory= op.get(storyKey);
+                    *//*List<Story> memberStory= op.get(storyKey);
                     System.out.println(memberStory);
-                    return getStoryFor24Hours(memberStory);*/
+                    return getStoryFor24Hours(memberStory);*//*
                     return op.get(storyKey);
                 })
                 .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(LinkedList::new));
-        return friendsStoryList;
+                .collect(Collectors.toList());*/
+        return listInfos;
     }
 
     private List<Story> getStoryFor24Hours(List<Story> memberStory) {
