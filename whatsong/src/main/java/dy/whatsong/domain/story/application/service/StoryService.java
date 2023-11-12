@@ -4,7 +4,6 @@ import dy.whatsong.domain.member.application.service.check.MemberCheckService;
 import dy.whatsong.domain.member.application.service.check.MemberDetailCheckService;
 import dy.whatsong.domain.member.dto.MemberDto;
 import dy.whatsong.domain.member.entity.Member;
-import dy.whatsong.domain.story.dto.req.FriendsStoryReq;
 import dy.whatsong.domain.story.dto.req.StoryPostReq;
 import dy.whatsong.domain.story.entity.Story;
 import dy.whatsong.domain.story.repo.StoryRepository;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +28,12 @@ public class StoryService {
 
     private final MemberDetailCheckService memberDetailCheckService;
 
-    private final RedisTemplate<String,List<Story>> redisTemplate;
+    private final RedisTemplate<String, List<Story>> redisTemplate;
 
     @Transactional
-    public Story memberPostStory(final StoryPostReq storyPostReq){
+    public Story memberPostStory(final StoryPostReq storyPostReq) {
         LocalDateTime postTime = LocalDateTime.now();
-        System.out.println("POST TIME :"+postTime);
+        System.out.println("POST TIME :" + postTime);
         Long memberSeq = storyPostReq.getMemberSeq();
         Member memberInfoBySeq = memberCheckService.getInfoByMemberSeq(memberSeq);
         Story postedStory = storyRepository.save(
@@ -55,37 +53,42 @@ public class StoryService {
                         .storyVideo(storyPostReq.getStoryVideoReq().reqToSaveTarget())
                         .build()
         );
-        postedHistory(memberSeq,postedStory);
+        postedHistory(memberSeq, postedStory);
         return postedStory;
     }
 
-    private void postedHistory(Long memberSeq,Story postedStory){
-        String storyKey ="story:" + memberSeq.toString();
-        ValueOperations<String, List<Story>> postedStoryList = redisTemplate.opsForValue();
-        List<Story> postedStoryHistory = postedStoryList.get(storyKey);
-        if (postedStoryHistory == null) postedStoryHistory = new ArrayList<>();
-        postedStoryHistory.add(postedStory);
-        postedStoryList.set(storyKey,postedStoryHistory);
+    private void postedHistory(Long memberSeq, Story postedStory) {
+        String storyKey = "story:" + memberSeq.toString();
+        ValueOperations<String, List<Story>> op = redisTemplate.opsForValue();
+        List<Story> storyList = op.get(storyKey);
+        if (storyList == null) storyList = new ArrayList<>();
+        storyList.add(postedStory);
+        op.set(storyKey, storyList);
     }
 
-    public LinkedList<List<Story>> getFriendsStoryByList(final FriendsStoryReq friendsStoryReq){
-        List<Member> members = memberDetailCheckService.friendsListByOwnerSeq(friendsStoryReq.getOwnerSeq());
 
+    public LinkedList<List<Story>> getFriendsStoryByList(final Long memberSeq) {
+        List<Member> members = memberDetailCheckService.friendsListByOwnerSeq(memberSeq);
+        ValueOperations<String, List<Story>> op = redisTemplate.opsForValue();
         LinkedList<List<Story>> friendsStoryList = members.stream()
                 .map(m -> {
-                    String storyKey = "story:" + m.getMemberSeq();
-                    List<Story> friendsStoryFor24Hours = getStoryFor24Hours(redisTemplate.opsForValue().get(storyKey));
-                    return friendsStoryFor24Hours;
+                    String storyKey = String.format("story:%s", m.getMemberSeq());
+                    /*List<Story> memberStory= op.get(storyKey);
+                    System.out.println(memberStory);
+                    return getStoryFor24Hours(memberStory);*/
+                    return op.get(storyKey);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toCollection(LinkedList::new));
         return friendsStoryList;
     }
 
-    private List<Story> getStoryFor24Hours(List<Story> memberStory){
-        LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
+    private List<Story> getStoryFor24Hours(List<Story> memberStory) {
+        /*LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
         return memberStory.stream()
                 .filter(story -> story.getPostTime().isAfter(twentyFourHoursAgo))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
+        return null;
     }
+
 }
