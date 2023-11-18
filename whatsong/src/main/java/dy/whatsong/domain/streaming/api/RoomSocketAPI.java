@@ -45,12 +45,14 @@ public class RoomSocketAPI {
 
     @MessageMapping("/{roomCode}/room/enter")
     public void memberEnterTheMusicRoom(@DestinationVariable String roomCode) {
+        System.out.println("User ROOM ENTER");
         RoomMember roomOfMemberList = memberCacheService.getRoomOfMemberList(roomCode);
         template.convertAndSend("/stream/" + roomCode + "/room/enter", roomOfMemberList);
     }
 
     @MessageMapping("/{roomCode}/room/leave")
     public void memberLeaveTheMusicRoom(@DestinationVariable String roomCode) {
+        System.out.println("User ROOM LEVAE");
         RoomMember roomOfMemberList = memberCacheService.getRoomOfMemberList(roomCode);
         System.out.println("roomCode!!!!!!!=" + roomCode);
         template.convertAndSend("/stream/" + roomCode + "/room/leave", roomOfMemberList);
@@ -59,6 +61,7 @@ public class RoomSocketAPI {
     @MessageMapping("/{roomCode}/room/member")
     public void memberCurrentInRoom(@DestinationVariable String roomCode) {
         RoomMember roomOfMemberList = memberCacheService.getRoomOfMemberList(roomCode);
+        System.out.println(roomOfMemberList);
         template.convertAndSend("/stream/" + roomCode + "/room/member", roomOfMemberList);
     }
 

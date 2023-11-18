@@ -103,6 +103,7 @@ public class MemberDetailServiceImpl implements MemberDetailService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<?> memberUnfollowRequest(MemberRequestDTO.FriendsApply friendsApplyDTO) {
         QFriendsState qf = QFriendsState.friendsState;
         Long o = friendsApplyDTO.getOwnerSeq();
@@ -110,8 +111,14 @@ public class MemberDetailServiceImpl implements MemberDetailService {
         BooleanExpression findCondition = qf.ownerSeq.eq(o).
                 and(qf.targetSeq.eq(t));
 
-        jpaQueryFactory.delete(qf)
-                .where(findCondition);
+        /*jpaQueryFactory.delete(qf)
+                .where(findCondition);*/
+        List<FriendsState> friendsStates = friendsStateRepository.findByOwnerSeq(o).get();
+        for (FriendsState f : friendsStates) {
+            if (f.getTargetSeq().equals(t)) {
+                friendsStateRepository.delete(f);
+            }
+        }
 
         return new ResponseEntity<>(o + "unfollowed" + t, HttpStatus.OK);
     }
