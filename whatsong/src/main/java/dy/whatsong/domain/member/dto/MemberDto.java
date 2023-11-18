@@ -5,6 +5,7 @@ import dy.whatsong.domain.member.entity.SocialType;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 public class MemberDto {
 
@@ -96,5 +97,24 @@ public class MemberDto {
         private String nickname;
 
         private String imgURL;
+    }
+
+    @Builder
+    @Getter
+    public static class MemberStory implements Serializable {
+        private Long memberSeq;
+
+        private String nickname;
+
+        private String imgURL;
+
+        @Override
+        public String toString() {
+            return "{" +
+                    "\"memberSeq\":" + memberSeq + "," +
+                    "\"nickname\":\"" + nickname + "\"," +
+                    "\"imgURL\":\"" + imgURL + "\"" +
+                    "}";
+        }
     }
 }

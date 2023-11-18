@@ -6,4 +6,6 @@ import dy.whatsong.domain.music.entity.MusicRoom;
 public interface MusicMemberService {
 	void createdRoomDetails(MusicRoom musicRoom, Member member);
 	void deletedRoomDetails(MusicRoom musicRoom);
+
+	boolean memberIsRoomOwner(Long memberSeq,Long roomSeq);
 }

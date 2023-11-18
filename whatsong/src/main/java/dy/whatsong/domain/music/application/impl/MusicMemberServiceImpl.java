@@ -3,6 +3,7 @@ package dy.whatsong.domain.music.application.impl;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.music.application.service.MusicMemberService;
+import dy.whatsong.domain.music.application.service.check.MusicCheckService;
 import dy.whatsong.domain.music.entity.MusicRoom;
 import dy.whatsong.domain.music.entity.MusicRoomMember;
 import dy.whatsong.domain.music.repo.MusicMemberRepository;
@@ -23,6 +24,8 @@ public class MusicMemberServiceImpl implements MusicMemberService {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
+	private final MusicCheckService musicCheckService;
+
 	@Override
 	public void createdRoomDetails(MusicRoom musicRoom, Member member) {
 		musicMemberRepository.save(
@@ -39,4 +42,12 @@ public class MusicMemberServiceImpl implements MusicMemberService {
 		Optional<MusicRoomMember> findMRM = musicMemberRepository.findByMusicRoom(musicRoom);
 		musicMemberRepository.delete(findMRM.get());
 	}
+
+	@Override
+	public boolean memberIsRoomOwner(Long memberSeq, Long roomSeq) {
+		MusicRoom findMusicRoom = musicCheckService.getInfoMRBySeq(roomSeq);
+		Optional<MusicRoomMember> findMRM = musicMemberRepository.findByMusicRoom(findMusicRoom);
+		return findMRM.map(musicRoomMember -> musicRoomMember.getOwnerSeq().equals(memberSeq)).orElse(false);
+	}
+
 }

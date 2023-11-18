@@ -47,6 +47,10 @@ public class RoomWsServiceImpl implements RoomWsService {
     @Transactional
     public MRWS saveCurrentRoomState(final Reservation reservation){
         MusicRoom infoMRBySeq = musicCheckService.getInfoMRBySeq(reservation.getRoomSeq());
+        System.out.println("====================");
+        System.out.println(infoMRBySeq.getRoomCode());
+        System.out.println(reservation.getSelectVideo().getVideoId());
+        System.out.println("====================");
         return mrSseRepository.save(
                 MRWS.builder()
                         .videoId(reservation.getSelectVideo().getVideoId())

@@ -16,6 +16,8 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.util.List;
+
 @Configuration
 @RequiredArgsConstructor
 @EnableRedisRepositories
@@ -37,6 +39,8 @@ public class RedisConfig {
 	public RedisTemplate<?, ?> redisTemplate() {
 		RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
 		redisTemplate.setConnectionFactory(redisConnectionFactory());
+		redisTemplate.setKeySerializer(new StringRedisSerializer());
+		redisTemplate.setValueSerializer(redisSerializer());
 		return redisTemplate;
 	}
 
@@ -73,11 +77,11 @@ public class RedisConfig {
 	 * 어플리케이션에서 사용할 redisTemplate 설정
 	 */
 	@Bean("chatRedisTemplate")
-	public RedisTemplate<String, Object> chatRedisTemplate(RedisConnectionFactory connectionFactory) {
-		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+	public RedisTemplate<?, ?> chatRedisTemplate(RedisConnectionFactory connectionFactory) {
+		RedisTemplate<?, ?> redisTemplate = new RedisTemplate<>();
 		redisTemplate.setConnectionFactory(connectionFactory);
 		redisTemplate.setKeySerializer(new StringRedisSerializer());
-		redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
+		redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(Object.class));
 		return redisTemplate;
 	}
 }
