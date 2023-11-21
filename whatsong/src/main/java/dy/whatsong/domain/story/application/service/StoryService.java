@@ -38,6 +38,7 @@ public class StoryService {
         LocalDateTime postTime = LocalDateTime.now();
         System.out.println("POST TIME :" + postTime);
         Long memberSeq = storyPostReq.getMemberSeq();
+        System.out.println("memberSeq:" + memberSeq);
         Member memberInfoBySeq = memberCheckService.getInfoByMemberSeq(memberSeq);
         Story postedStory = storyRepository.save(
                 Story.builder()
