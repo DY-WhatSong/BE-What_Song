@@ -115,4 +115,12 @@ public class ReservationServiceImpl implements ReservationService {
         reservationRepository.deleteById(reservationId);
         return reservationList(roomSeq);
     }
+
+    @Override
+    public void reservationDelete(String reservationId, Recognize recognize) {
+        if (recognize.equals(Recognize.NONE)) {
+            throw new IllegalArgumentException("대기열에 있는 값은 지울 수 없습니다");
+        }
+        reservationRepository.deleteById(reservationId);
+    }
 }
