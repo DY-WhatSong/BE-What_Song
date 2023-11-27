@@ -9,7 +9,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket  = "whatsong-terraform-state"
+    bucket  = "whatsong-terraform"
     key     = "terraform/terraform.tfstate"
     region  = "ap-northeast-2"
     encrypt = true
