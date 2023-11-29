@@ -1,6 +1,7 @@
 package dy.whatsong.domain.member.api;
 
 import dy.whatsong.domain.member.application.service.MemberDetailService;
+import dy.whatsong.domain.member.dto.FollowCurrentDTO;
 import dy.whatsong.domain.member.dto.MemberRequestDTO;
 import dy.whatsong.global.annotation.EssentialController;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,11 @@ public class MemberDetailAPI {
     @DeleteMapping("/friends/apply")
     public ResponseEntity<?> applyUnfollowOnMEmber(@RequestBody MemberRequestDTO.FriendsApply friendsApply) {
         return memberDetailService.memberUnfollowRequest(friendsApply);
+    }
+
+    @GetMapping("/friends/count")
+    public ResponseEntity<?> getMemberFriendsCount(@RequestParam("ownerSeq") Long ownerSeq) {
+        FollowCurrentDTO followCurrentDTO = memberDetailService.followListAndCount(ownerSeq);
+        return new ResponseEntity<>(followCurrentDTO, HttpStatus.OK);
     }
 }

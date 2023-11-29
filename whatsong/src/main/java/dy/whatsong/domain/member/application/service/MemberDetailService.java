@@ -1,5 +1,6 @@
 package dy.whatsong.domain.member.application.service;
 
+import dy.whatsong.domain.member.dto.FollowCurrentDTO;
 import dy.whatsong.domain.member.dto.MemberRequestDTO;
 import dy.whatsong.domain.member.entity.FriendsState;
 import org.springframework.http.ResponseEntity;
@@ -16,4 +17,6 @@ public interface MemberDetailService {
 	List<FriendsState> getMemberFriendsList(Long ownerSeq);
 
 	ResponseEntity<?> memberUnfollowRequest(MemberRequestDTO.FriendsApply friendsApplyDTO);
+
+	FollowCurrentDTO followListAndCount(Long ownerSeq);
 }

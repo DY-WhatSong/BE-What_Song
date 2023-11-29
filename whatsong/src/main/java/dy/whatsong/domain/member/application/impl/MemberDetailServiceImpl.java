@@ -3,8 +3,8 @@ package dy.whatsong.domain.member.application.impl;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
-import dy.whatsong.domain.member.dto.FriendsSearchListDTO;
-import dy.whatsong.domain.member.dto.MemberRequestDTO;
+import dy.whatsong.domain.member.application.service.check.MemberCheckService;
+import dy.whatsong.domain.member.dto.*;
 import dy.whatsong.domain.member.entity.FriendsState;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.entity.QFriendsState;
@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @EssentialServiceLayer
@@ -29,6 +30,8 @@ public class MemberDetailServiceImpl implements MemberDetailService {
     private final JPAQueryFactory jpaQueryFactory;
 
     private final FriendsStateRepository friendsStateRepository;
+
+    private final MemberCheckService memberCheckService;
 
     @Override
     @Transactional
@@ -121,5 +124,34 @@ public class MemberDetailServiceImpl implements MemberDetailService {
         }
 
         return new ResponseEntity<>(o + "unfollowed" + t, HttpStatus.OK);
+    }
+
+    @Override
+    public FollowCurrentDTO followListAndCount(Long ownerSeq) {
+        QFriendsState qf = QFriendsState.friendsState;
+        List<FollowingListDTO> followingList = jpaQueryFactory.select(qf.targetSeq)
+                .from(qf)
+                .where(qf.ownerSeq.eq(ownerSeq))
+                .fetch()
+                .stream()
+                .map(memberCheckService::getInfoByMemberSeq)
+                .map(member -> new FollowingListDTO(member.getMemberSeq(), followingOrFollowListMemberInfo(member, ownerSeq)))
+                .collect(Collectors.toList());
+
+        List<FollowerListDTO> followerList = jpaQueryFactory.select(qf.ownerSeq)
+                .from(qf)
+                .where(qf.targetSeq.eq(ownerSeq))
+                .fetch()
+                .stream()
+                .map(memberCheckService::getInfoByMemberSeq)
+                .map(member -> new FollowerListDTO(member.getMemberSeq(), followingOrFollowListMemberInfo(member, ownerSeq)))
+                .collect(Collectors.toList());
+
+        return new FollowCurrentDTO(followingList, followerList, followingList.size(), followerList.size());
+    }
+
+    private FriendsStateMemberDTO followingOrFollowListMemberInfo(Member member, Long ownerSeq){
+        return new FriendsStateMemberDTO(member.getEmail(), member.getNickname(), member.getImgURL(),
+                            isOwnerAlreadyFriendsRequest(ownerSeq, member.getMemberSeq()));
     }
 }
