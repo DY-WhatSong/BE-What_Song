@@ -4,10 +4,13 @@ import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.dto.FollowCurrentDTO;
 import dy.whatsong.domain.member.dto.MemberRequestDTO;
 import dy.whatsong.global.annotation.EssentialController;
+import dy.whatsong.global.dto.page.PageReq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @EssentialController
 @RequiredArgsConstructor
@@ -35,8 +38,9 @@ public class MemberDetailAPI {
     }
 
     @GetMapping("/friends/count")
-    public ResponseEntity<?> getMemberFriendsCount(@RequestParam("ownerSeq") Long ownerSeq) {
-        FollowCurrentDTO followCurrentDTO = memberDetailService.followListAndCount(ownerSeq);
+    public ResponseEntity<?> getMemberFriendsCount(@RequestParam("ownerSeq") Long ownerSeq,
+                                                   @Valid PageReq pageReq) {
+        FollowCurrentDTO followCurrentDTO = memberDetailService.findByFollowList(ownerSeq, pageReq.page(), pageReq.size());
         return new ResponseEntity<>(followCurrentDTO, HttpStatus.OK);
     }
 }
