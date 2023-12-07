@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @EssentialServiceLayer
@@ -144,7 +145,7 @@ public class MemberDetailServiceImpl implements MemberDetailService {
         return new FollowCurrentDTO(new PageRes<>(followingListPage), new PageRes<>(followerListPage),findByFollowCount(ownerSeq));
     }
 
-    private <T> Page<T> getFollowListByQueryDslPaging(NumberExpression<Long> selection, BooleanExpression condition, BiFunction<Long, FriendsStateMemberDTO, T> constructor, Long ownerSeq, Pageable pageable) {
+    private <T> Page<T> getFollowListByQueryDslPaging(NumberExpression<Long> selection, BooleanExpression condition, Function<FriendsStateMemberDTO, T> constructor, Long ownerSeq, Pageable pageable) {
         List<T> content = jpaQueryFactory.select(selection)
                 .from(QFriendsState.friendsState)
                 .where(condition)
@@ -153,7 +154,7 @@ public class MemberDetailServiceImpl implements MemberDetailService {
                 .fetch()
                 .stream()
                 .map(memberCheckService::getInfoByMemberSeq)
-                .map(member -> constructor.apply(member.getMemberSeq(), followingOrFollowListMemberInfo(member, ownerSeq)))
+                .map(member -> constructor.apply(followingOrFollowListMemberInfo(member, ownerSeq)))
                 .collect(Collectors.toList());
 
         // 총 개수를 가져오기 위해 별도의 쿼리를 수행합니다.
@@ -165,7 +166,7 @@ public class MemberDetailServiceImpl implements MemberDetailService {
     }
 
     private FriendsStateMemberDTO followingOrFollowListMemberInfo(Member member, Long ownerSeq){
-        return new FriendsStateMemberDTO(member.getEmail(), member.getNickname(), member.getImgURL(),
+        return new FriendsStateMemberDTO(member.getMemberSeq() ,member.getEmail(), member.getNickname(), member.getImgURL(),
                             isOwnerAlreadyFriendsRequest(ownerSeq, member.getMemberSeq()));
     }
 
