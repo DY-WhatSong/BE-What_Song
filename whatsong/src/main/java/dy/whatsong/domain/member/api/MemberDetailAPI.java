@@ -47,7 +47,7 @@ public class MemberDetailAPI {
     @GetMapping("/friends/follower")
     public ResponseEntity<?> getMemberFriendsFollowerList(@RequestParam("ownerSeq") Long ownerSeq,
                                                           @Valid PageReq pageReq){
-        FollowCurrentDTO followCurrentDTO = memberDetailService.findByFollowingList(ownerSeq, pageReq.page(), pageReq.size());
+        FollowCurrentDTO followCurrentDTO = memberDetailService.findByFollowerList(ownerSeq, pageReq.page(), pageReq.size());
         return new ResponseEntity<>(followCurrentDTO, HttpStatus.OK);
     }
 }
