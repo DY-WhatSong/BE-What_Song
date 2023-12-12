@@ -37,10 +37,17 @@ public class MemberDetailAPI {
         return memberDetailService.memberUnfollowRequest(friendsApply);
     }
 
-    @GetMapping("/friends/count")
-    public ResponseEntity<?> getMemberFriendsCount(@RequestParam("ownerSeq") Long ownerSeq,
+    @GetMapping("/friends/following")
+    public ResponseEntity<?> getMemberFriendsFollowList(@RequestParam("ownerSeq") Long ownerSeq,
                                                    @Valid PageReq pageReq) {
-        FollowCurrentDTO followCurrentDTO = memberDetailService.findByFollowList(ownerSeq, pageReq.page(), pageReq.size());
+        FollowCurrentDTO followCurrentDTO = memberDetailService.findByFollowingList(ownerSeq, pageReq.page(), pageReq.size());
+        return new ResponseEntity<>(followCurrentDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/friends/follower")
+    public ResponseEntity<?> getMemberFriendsFollowerList(@RequestParam("ownerSeq") Long ownerSeq,
+                                                          @Valid PageReq pageReq){
+        FollowCurrentDTO followCurrentDTO = memberDetailService.findByFollowingList(ownerSeq, pageReq.page(), pageReq.size());
         return new ResponseEntity<>(followCurrentDTO, HttpStatus.OK);
     }
 }

@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -135,14 +134,23 @@ public class MemberDetailServiceImpl implements MemberDetailService {
     }
 
     @Override
-    public FollowCurrentDTO findByFollowList(Long ownerSeq, int page, int size) {
+    public FollowCurrentDTO findByFollowingList(Long ownerSeq, int page, int size) {
         QFriendsState qf = QFriendsState.friendsState;
         Pageable pageable = CustomPageable.of(page, size, Sort.unsorted());
 
-        Page<FollowingListDTO> followingListPage = getFollowListByQueryDslPaging(qf.targetSeq, qf.ownerSeq.eq(ownerSeq), FollowingListDTO::new, ownerSeq, pageable);
-        Page<FollowerListDTO> followerListPage = getFollowListByQueryDslPaging(qf.ownerSeq, qf.targetSeq.eq(ownerSeq), FollowerListDTO::new, ownerSeq, pageable);
+        Page<FollowListDTO> followingListPage = getFollowListByQueryDslPaging(qf.targetSeq, qf.ownerSeq.eq(ownerSeq), FollowListDTO::new, ownerSeq, pageable);
 
-        return new FollowCurrentDTO(new PageRes<>(followingListPage), new PageRes<>(followerListPage),findByFollowCount(ownerSeq));
+        return new FollowCurrentDTO(new PageRes<>(followingListPage), findByFollowCount(qf.ownerSeq.eq(ownerSeq)));
+    }
+
+    @Override
+    public FollowCurrentDTO findByFollowerList(Long ownerSeq, int page, int size) {
+        QFriendsState qf = QFriendsState.friendsState;
+        Pageable pageable = CustomPageable.of(page, size, Sort.unsorted());
+
+        Page<FollowListDTO> followerListPage = getFollowListByQueryDslPaging(qf.ownerSeq, qf.targetSeq.eq(ownerSeq), FollowListDTO::new, ownerSeq, pageable);
+
+        return new FollowCurrentDTO(new PageRes<>(followerListPage), findByFollowCount(qf.targetSeq.eq(ownerSeq)));
     }
 
     private <T> Page<T> getFollowListByQueryDslPaging(NumberExpression<Long> selection, BooleanExpression condition, Function<FriendsStateMemberDTO, T> constructor, Long ownerSeq, Pageable pageable) {
@@ -170,15 +178,12 @@ public class MemberDetailServiceImpl implements MemberDetailService {
                             isOwnerAlreadyFriendsRequest(ownerSeq, member.getMemberSeq()));
     }
 
-    private FollowCount findByFollowCount(Long ownerSeq){
+    private FollowCount findByFollowCount(BooleanExpression condition){
         QFriendsState qf = QFriendsState.friendsState;
-        int followingSize = jpaQueryFactory.selectFrom(qf)
-                .where(qf.ownerSeq.eq(ownerSeq))
-                .fetch().size();
-        int followerSize = jpaQueryFactory.selectFrom(qf)
-                .where(qf.targetSeq.eq(ownerSeq))
+        int size = jpaQueryFactory.selectFrom(qf)
+                .where(condition)
                 .fetch().size();
 
-        return new FollowCount(followingSize,followerSize);
+        return new FollowCount(size);
     }
 }

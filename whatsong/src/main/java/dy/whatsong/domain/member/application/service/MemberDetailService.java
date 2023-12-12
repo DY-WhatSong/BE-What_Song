@@ -18,5 +18,7 @@ public interface MemberDetailService {
 
 	ResponseEntity<?> memberUnfollowRequest(MemberRequestDTO.FriendsApply friendsApplyDTO);
 
-	FollowCurrentDTO findByFollowList(Long ownerSeq, int page, int size);
+	FollowCurrentDTO findByFollowingList(Long ownerSeq, int page, int size);
+
+	FollowCurrentDTO findByFollowerList(Long ownerSeq, int page, int size);
 }
