@@ -11,13 +11,15 @@ public record PageRes<T>(PageInfo pageInfo, List<T> pageData) {
                         page.getNumber() + 1,
                         page.getSize(),
                         page.getTotalPages(),
-                        page.getTotalElements()
+                        page.getTotalElements(),
+                        page.isFirst(),
+                        page.isLast()
                 ),
                 page.getContent()
         );
     }
 
-    public record PageInfo(int page, int size, int totalPage, long totalSize) {
+    public record PageInfo(int page, int size, int totalPage, long totalSize, boolean isFirst, boolean isEnd) {
     }
 
 
