@@ -19,7 +19,7 @@ public record PageRes<T>(PageInfo pageInfo, List<T> pageData) {
         );
     }
 
-    public record PageInfo(int page, int size, int totalPage, long totalSize, boolean isFirst, boolean isEnd) {
+    public record PageInfo(int page, int size, int totalPage, long totalSize, boolean isFirst, boolean isLast) {
     }
 
 
