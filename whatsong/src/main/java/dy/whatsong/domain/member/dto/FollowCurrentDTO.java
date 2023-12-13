@@ -1,9 +1,10 @@
 package dy.whatsong.domain.member.dto;
 
+import dy.whatsong.global.dto.page.PageRes;
 import lombok.Getter;
 
 import java.util.List;
 
 
-public record FollowCurrentDTO(List<FollowingListDTO> followingListDTOs, List<FollowerListDTO> followerListDTOs, Integer followingCount, Integer followerCount) {
+public record FollowCurrentDTO(PageRes<?> followListDTO,FollowCount followCount) {
 }

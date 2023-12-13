@@ -1,6 +1,7 @@
 package dy.whatsong.domain.member.application.impl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import dy.whatsong.domain.member.application.service.MemberDetailService;
 import dy.whatsong.domain.member.application.service.check.MemberCheckService;
@@ -11,15 +12,21 @@ import dy.whatsong.domain.member.entity.QFriendsState;
 import dy.whatsong.domain.member.entity.QMember;
 import dy.whatsong.domain.member.repo.FriendsStateRepository;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
+import dy.whatsong.global.dto.page.CustomPageable;
+import dy.whatsong.global.dto.page.PageRes;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @EssentialServiceLayer
@@ -127,31 +134,56 @@ public class MemberDetailServiceImpl implements MemberDetailService {
     }
 
     @Override
-    public FollowCurrentDTO followListAndCount(Long ownerSeq) {
+    public FollowCurrentDTO findByFollowingList(Long ownerSeq, int page, int size) {
         QFriendsState qf = QFriendsState.friendsState;
-        List<FollowingListDTO> followingList = jpaQueryFactory.select(qf.targetSeq)
-                .from(qf)
-                .where(qf.ownerSeq.eq(ownerSeq))
+        Pageable pageable = CustomPageable.of(page, size, Sort.unsorted());
+
+        Page<FollowListDTO> followingListPage = getFollowListByQueryDslPaging(qf.targetSeq, qf.ownerSeq.eq(ownerSeq), FollowListDTO::new, ownerSeq, pageable);
+
+        return new FollowCurrentDTO(new PageRes<>(followingListPage), findByFollowCount(qf.ownerSeq.eq(ownerSeq)));
+    }
+
+    @Override
+    public FollowCurrentDTO findByFollowerList(Long ownerSeq, int page, int size) {
+        QFriendsState qf = QFriendsState.friendsState;
+        Pageable pageable = CustomPageable.of(page, size, Sort.unsorted());
+
+        Page<FollowListDTO> followerListPage = getFollowListByQueryDslPaging(qf.ownerSeq, qf.targetSeq.eq(ownerSeq), FollowListDTO::new, ownerSeq, pageable);
+
+        return new FollowCurrentDTO(new PageRes<>(followerListPage), findByFollowCount(qf.targetSeq.eq(ownerSeq)));
+    }
+
+    private <T> Page<T> getFollowListByQueryDslPaging(NumberExpression<Long> selection, BooleanExpression condition, Function<FriendsStateMemberDTO, T> constructor, Long ownerSeq, Pageable pageable) {
+        List<T> content = jpaQueryFactory.select(selection)
+                .from(QFriendsState.friendsState)
+                .where(condition)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch()
                 .stream()
                 .map(memberCheckService::getInfoByMemberSeq)
-                .map(member -> new FollowingListDTO(member.getMemberSeq(), followingOrFollowListMemberInfo(member, ownerSeq)))
+                .map(member -> constructor.apply(followingOrFollowListMemberInfo(member, ownerSeq)))
                 .collect(Collectors.toList());
 
-        List<FollowerListDTO> followerList = jpaQueryFactory.select(qf.ownerSeq)
-                .from(qf)
-                .where(qf.targetSeq.eq(ownerSeq))
-                .fetch()
-                .stream()
-                .map(memberCheckService::getInfoByMemberSeq)
-                .map(member -> new FollowerListDTO(member.getMemberSeq(), followingOrFollowListMemberInfo(member, ownerSeq)))
-                .collect(Collectors.toList());
+        // 총 개수를 가져오기 위해 별도의 쿼리를 수행합니다.
+        long total = jpaQueryFactory.selectFrom(QFriendsState.friendsState)
+                .where(condition)
+                .fetchCount();
 
-        return new FollowCurrentDTO(followingList, followerList, followingList.size(), followerList.size());
+        return new PageImpl<>(content, pageable, total);
     }
 
     private FriendsStateMemberDTO followingOrFollowListMemberInfo(Member member, Long ownerSeq){
-        return new FriendsStateMemberDTO(member.getEmail(), member.getNickname(), member.getImgURL(),
+        return new FriendsStateMemberDTO(member.getMemberSeq() ,member.getEmail(), member.getNickname(), member.getImgURL(),
                             isOwnerAlreadyFriendsRequest(ownerSeq, member.getMemberSeq()));
+    }
+
+    private FollowCount findByFollowCount(BooleanExpression condition){
+        QFriendsState qf = QFriendsState.friendsState;
+        int size = jpaQueryFactory.selectFrom(qf)
+                .where(condition)
+                .fetch().size();
+
+        return new FollowCount(size);
     }
 }
