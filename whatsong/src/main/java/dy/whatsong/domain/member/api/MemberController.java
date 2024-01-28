@@ -2,7 +2,6 @@ package dy.whatsong.domain.member.api;
 
 import dy.whatsong.domain.member.dto.MemberDto;
 import dy.whatsong.domain.member.dto.TokenInfo;
-import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.service.MemberService;
 import dy.whatsong.domain.member.service.TokenService;
 import io.swagger.annotations.ApiOperation;
@@ -10,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -32,6 +33,8 @@ public class MemberController {
                 .oauthId(request.getAttribute("oauthId").toString())
                 .email(request.getAttribute("email").toString())
                 .build();
+
+        log.info("token:{}", decodedTokenInfo);
         MemberDto.MemberResponseDto member = memberService.getMember(decodedTokenInfo.getOauthId(), decodedTokenInfo.getEmail());
 
         return ResponseEntity.ok().body(member);
