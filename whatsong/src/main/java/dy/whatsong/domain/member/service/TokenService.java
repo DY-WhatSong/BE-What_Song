@@ -62,6 +62,7 @@ public class TokenService {
 
     /**
      * 인가 코드를 통해서 access_token 발급받는 메서드
+     *
      * @param authorizedCode
      * @return OAuthToken
      */
@@ -96,6 +97,7 @@ public class TokenService {
 
     /**
      * 카카오 서버에 접근해서 사용자의 정보를 받아오는 메서드
+     *
      * @param accessToken
      * @return KakaoProfile
      */
@@ -156,7 +158,11 @@ public class TokenService {
 
         String refreshToken = request.getHeader(jwtProperties.getREFRESH_TOKEN_HEADER());
 
+        log.info("refreshToken=" + refreshToken);
+
         List<String> tokenList = reissueRefreshToken(refreshToken);
+
+        System.out.println("tokenList=" + tokenList);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("authorization", "Bearer " + tokenList.get(0));
@@ -167,6 +173,7 @@ public class TokenService {
 
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
+
     /**
      * 토큰을 포함한 응답값 리턴 함수
      */
@@ -178,10 +185,11 @@ public class TokenService {
 
     /**
      * refresh token 을 받아 access token 과 refresh token 재발급
+     *
      * @param refreshToken
      * @return access token과 refresh token List
      */
-    public List<String> reissueRefreshToken(String refreshToken){
+    public List<String> reissueRefreshToken(String refreshToken) {
 
         List<String> tokenList = new ArrayList<>();
 
@@ -198,13 +206,14 @@ public class TokenService {
 
     /**
      * 토큰 정보를 통해서 고유한 유저 식별 값을 가져오는 메서드
+     *
      * @param token 토큰
-     * @return 유저정보({})
+     * @return 유저정보({ })
      */
     public String getOauthIdAndSocialType(String token) {
         String oauthId = this.getDecodedJWT(token).getClaim("oauthId").asString();
         String socialType = this.getDecodedJWT(token).getClaim("socialType").asString();
-        if(StringUtils.hasText(oauthId) && StringUtils.hasText(socialType)) {
+        if (StringUtils.hasText(oauthId) && StringUtils.hasText(socialType)) {
             return oauthId + ":" + socialType;
         }
         return null;
@@ -212,11 +221,12 @@ public class TokenService {
 
     /**
      * 토큰 정보를 검증하는 메서드
+     *
      * @param token 토큰
      * @return 토큰 검증 여부
      */
     public boolean validateToken(String token) {
-        if(StringUtils.hasText(getDecodedJWT(token).getClaim("oauthId").asString())) {
+        if (StringUtils.hasText(getDecodedJWT(token).getClaim("oauthId").asString())) {
             return true;
         }
         return false;
@@ -224,6 +234,7 @@ public class TokenService {
 
     /**
      * JWT토큰 생성하는 함수
+     *
      * @param member 사용자
      * @return 발급한 JWT 토큰
      */
@@ -240,13 +251,14 @@ public class TokenService {
 
     /**
      * refresh 토큰을 생성하는 함수
+     *
      * @param member 사용자
      * @return 발급한 refresh token
      */
     private String createRefreshToken(Member member) {
         return JWT.create()
                 .withSubject(member.getEmail())
-                .withExpiresAt(new Date(System.currentTimeMillis()+ jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
+                .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperties.getREFRESH_TOKEN_EXPIRED_TIME()))
                 .withClaim("oauthId", member.getOauthId())
                 .withClaim("socialType", "kakao")
                 .withClaim("email", member.getEmail())
@@ -320,13 +332,13 @@ public class TokenService {
                 .build();
     }
 
-    public String getUsernameByToken(String accessToken){
+    public String getUsernameByToken(String accessToken) {
         DecodedJWT decodedJWT = getDecodedJWT(getEliminateBearer(accessToken));
-        System.out.println("decodedJWT:"+decodedJWT.toString());
+        System.out.println("decodedJWT:" + decodedJWT.toString());
         return decodedJWT.getSubject();
     }
 
-    public String getEliminateBearer(String token){
+    public String getEliminateBearer(String token) {
         return token.replaceAll("Bearer ", "");
     }
 }
