@@ -2,7 +2,6 @@ package dy.whatsong.domain.member.api;
 
 import dy.whatsong.domain.member.application.service.check.MemberCheckService;
 import dy.whatsong.domain.member.dto.KakaoProfile;
-import dy.whatsong.domain.member.dto.MemberRequestDTO;
 import dy.whatsong.domain.member.dto.OAuthToken;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.service.MemberService;
@@ -35,6 +34,7 @@ public class TokenController {
     @GetMapping(value = "/kakao/callback")
     public ResponseEntity kakaoLogin(@RequestParam String code) {
         // authorizedCode: 카카오 서버로부터 받은 인가 코드
+        log.info("KAKAO/callback");
 
         // 1. 넘어온 인가 코드를 통해 access_token 발급
         OAuthToken oauthToken = tokenService.getAccessToken(code);
@@ -47,8 +47,7 @@ public class TokenController {
         Member member = memberService.getMember(usersInfo.getId());
 //        Member member = memberService.existsByEmail(usersInfo.getKakao_account().getEmail());
 
-        log.info("member : {}", member);
-        if(member != null) {
+        if (member != null) {
             // 3.1. 회원 정보 DB 에 존재하면? 토큰받기
             return tokenService.getTokensResponse(member);
         } else {
@@ -59,14 +58,15 @@ public class TokenController {
 
     @GetMapping(value = "/token/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request) {
+        log.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         return tokenService.getReissusedTokensResponse(request);
     }
 
     @GetMapping("/member/info/refresh")
-    public ResponseEntity<?> getMemberInfoByRefreshToken(@RequestHeader(name = "refreshToken") String refreshToken){
+    public ResponseEntity<?> getMemberInfoByRefreshToken(@RequestHeader(name = "refreshToken") String refreshToken) {
         return new ResponseEntity(
                 memberCheckService.getInfoByMemberRefreshToken(refreshToken).toDTO(),
                 HttpStatus.OK
-        ) ;
+        );
     }
 }
