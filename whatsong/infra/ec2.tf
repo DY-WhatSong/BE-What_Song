@@ -2,9 +2,28 @@ resource "aws_instance" "default" {
   ami                    = "ami-086cae3329a3f7d75"
   instance_type          = "t2.micro"
   subnet_id              = aws_subnet.public[0].id
-  key_name               = var.ec2_key_name
+  key_name               = aws_key_pair.deployer.key_name
   vpc_security_group_ids = [aws_security_group.ec2.id]
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
+}
+
+resource "tls_private_key" "default" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "deployer" {
+  key_name   = var.ec2_key_name
+  public_key = tls_private_key.default.public_key_openssh
+}
+
+resource "local_file" "private_key" {
+  content  = tls_private_key.default.private_key_pem
+  filename = "${path.module}/whatsong.pem"
+
+  provisioner "local-exec" {
+    command = "chmod 400 ${path.module}/whatsong.pem"
+  }
 }
 
 resource "aws_iam_instance_profile" "ec2" {
