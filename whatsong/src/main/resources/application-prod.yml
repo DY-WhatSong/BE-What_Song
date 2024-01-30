@@ -8,9 +8,9 @@ spring:
   
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ENC(UccpGByvTKh5WMIwtIWCPpKhlkETYUwySd5r8ZzZC2O2YHLwSdaiBVNyGG77j1biOnpY7ALB6OHJBP6wKqWxmNjYyTB6BwTpcGGq6PNmh4UdyBIiHVVep5EJVjfdWPny)
-    username: ENC(rLpNCDEZfWnRZBkmOlV5fSCzTAtB0aVC)
-    password: ENC(AM7RFJtbcjQC5TvNmTaNd0tNwF7Z1cV3tcWkYSOvTutrzB5vqmfuEw==)
+    url: ENC(zFG6GJcYTTZ2IKl2cv/+sbLF2PBc5u9ugCfrGsRZ1MRkZxcLsb4oKCoo6eORZ/gdlk3lAZJXq9SXuqxM2dIU5YFwc37Hrjhna1Q7zYhmuWbkFXm4iTcduae/KfGgt/3h)
+    username: ENC(FU4sLp0cpczGXqBP2/UfhQupodZ3hTGf)
+    password: ENC(cbttnt+0rFJyWeHZDSxpZmsxmFuGsCQMPxtplnQoB+VW06gl9g7iDg==)
 
   ######################################################################
   # JPA Settings
