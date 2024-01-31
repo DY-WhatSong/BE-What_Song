@@ -36,4 +36,3 @@ server:
 jasypt:
   encryptor:
     bean: jasyptStringEncryptor
-    password: 5678
