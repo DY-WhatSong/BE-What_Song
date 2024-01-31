@@ -1,10 +1,9 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/whatsong
-    maximum-pool-size: '4'
-    username: root
-    password: root1234
+    url: ENC(zFG6GJcYTTZ2IKl2cv/+sbLF2PBc5u9ugCfrGsRZ1MRkZxcLsb4oKCoo6eORZ/gdlk3lAZJXq9SXuqxM2dIU5YFwc37Hrjhna1Q7zYhmuWbkFXm4iTcduae/KfGgt/3h)
+    username: ENC(FU4sLp0cpczGXqBP2/UfhQupodZ3hTGf)
+    password: ENC(cbttnt+0rFJyWeHZDSxpZmsxmFuGsCQMPxtplnQoB+VW06gl9g7iDg==)
   jpa:
     hibernate:
       ddl-auto: update
