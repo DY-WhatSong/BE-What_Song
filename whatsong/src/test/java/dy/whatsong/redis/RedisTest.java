@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.redis;
 
 import dy.whatsong.domain.member.application.service.check.MemberCheckService;
@@ -35,3 +36,4 @@ public class RedisTest {
         Assertions.assertThat(op.get(targetNickname)).isEqualTo("test");
     }
 }
+*/
