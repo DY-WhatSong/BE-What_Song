@@ -1,4 +1,12 @@
 spring:
+  web:
+    cors:
+      allowed-origins:
+        - http://localhost:3000
+        - https://whatsong.vercel.app
+      allowed-methods: GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD
+      allowed-headers: "*"
+      allow-credentials: true
   profiles:
     active:
       - prod
