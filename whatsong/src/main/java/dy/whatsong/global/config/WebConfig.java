@@ -1,44 +1,25 @@
 package dy.whatsong.global.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+@EnableConfigurationProperties(WebConfigProperties.class)
 @Configuration
-@EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 
-    private final String ipAddress = "localhost";
-    private final String frontEndPort = "3000";
+    @Autowired
+    WebConfigProperties webConfigProperties;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://" + this.ipAddress + ":" + this.frontEndPort, "whatsong.me:8082", "whatsong.me:80", "52.79.221.247:8082", "52.79.221.247:80", "https://whatsong.vercel.app/**", "http:localhost:8080", "*", "/**")
-                .allowCredentials(false)
-                .allowedHeaders("Access-Control-Allow-Origin", "*")
-                .exposedHeaders("Access-Control-Allow-Origin", "*")
-                .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE");
+                .allowedOrigins(webConfigProperties.cors().allowedOrigins().toArray(String[]::new))
+                .allowedMethods(webConfigProperties.cors().allowedMethods().toArray(String[]::new))
+                .allowedHeaders(webConfigProperties.cors().allowedHeaders().toArray(String[]::new))
+                .allowCredentials(webConfigProperties.cors().allowCredentials())
+                .maxAge(3600);
     }
-
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addRedirectViewController("/docApi/v2/api-docs", "/v2/api-docs");
-        registry.addRedirectViewController("/docApi/swagger-resources/configuration/ui", "/swagger-resources/configuration/ui");
-        registry.addRedirectViewController("/docApi/swagger-resources/configuration/security", "/swagger-resources/configuration/security");
-        registry.addRedirectViewController("/docApi/swagger-resources", "/swagger-resources");
-    }
-
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-
-        registry.addResourceHandler("/swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
-
-        registry
-                .addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
-
-        WebMvcConfigurer.super.addResourceHandlers(registry);
-    }
-
 }
