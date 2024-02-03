@@ -1,10 +1,12 @@
 package dy.whatsong.global.filter.jwt;
 
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Setter
+@Getter
 public class ExceptionResponse {
 
     private int code;

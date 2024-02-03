@@ -1,4 +1,4 @@
-package dy.whatsong.global.handler.exception;
+package dy.whatsong.global.exception;
 
 public class ErrorResponse {
     private int errorCode;
