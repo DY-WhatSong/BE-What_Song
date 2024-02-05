@@ -17,6 +17,9 @@ public class OauthService {
     @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
     private String tokenURI;
 
+    @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}")
+    private String userInfoURI;
+
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
 
@@ -47,9 +50,26 @@ public class OauthService {
         );
 
         OauthCodeRes oauthCodeRes = responseEntity.getBody();
-
+        getUserInfoByAccessToken(oauthCodeRes.access_token());
 
     }
 
+    private void getUserInfoByAccessToken(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
 
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("Authorization", "Bearer " + accessToken);
+        headers.set("charset", "utf-8");
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange(
+                userInfoURI,
+                HttpMethod.GET,
+                requestEntity,
+                String.class
+        );
+
+        System.out.println(responseEntity.getBody());
+    }
 }
