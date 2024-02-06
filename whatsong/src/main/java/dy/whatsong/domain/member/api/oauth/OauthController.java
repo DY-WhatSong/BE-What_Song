@@ -1,15 +1,13 @@
 package dy.whatsong.domain.member.api.oauth;
 
 import dy.whatsong.domain.member.service.oauth.OauthService;
-import dy.whatsong.domain.member.service.oauth.dto.OauthCodeReq;
-import dy.whatsong.domain.member.service.oauth.dto.OauthCodeRes;
-import dy.whatsong.domain.member.service.oauth.dto.OauthSingUpReq;
+import dy.whatsong.domain.member.service.oauth.dto.req.OauthCodeReq;
+import dy.whatsong.domain.member.service.oauth.dto.req.OauthSingUpReq;
+import dy.whatsong.domain.member.service.oauth.dto.res.MemberDetailRes;
+import dy.whatsong.domain.member.service.oauth.dto.res.OauthCodeRes;
 import dy.whatsong.global.dto.ResponseEnvelope;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,9 +24,16 @@ public class OauthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEnvelope<Long> signUpByToken(@RequestBody OauthSingUpReq oauthSingUpReq) {
-        Long memberId = oauthService.singUp(oauthSingUpReq.accessToken(), oauthSingUpReq.refreshToken(), oauthSingUpReq.innerNickName());
+    public ResponseEnvelope<String> signUpByToken(@RequestBody OauthSingUpReq oauthSingUpReq) {
+        String oauthId = oauthService.singUp(oauthSingUpReq.accessToken(), oauthSingUpReq.refreshToken(), oauthSingUpReq.innerNickName());
 
-        return ResponseEnvelope.of(memberId);
+        return ResponseEnvelope.of(oauthId);
+    }
+
+    @GetMapping("/me")
+    public ResponseEnvelope<MemberDetailRes> getMe(@RequestHeader("Authorization") String accessToken) {
+        MemberDetailRes memberDetailRes = oauthService.getMe(accessToken);
+
+        return ResponseEnvelope.of(memberDetailRes);
     }
 }

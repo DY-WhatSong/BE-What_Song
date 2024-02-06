@@ -2,10 +2,12 @@ package dy.whatsong.domain.member.service.oauth;
 
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
-import dy.whatsong.domain.member.service.oauth.dto.KakaoUserRes;
-import dy.whatsong.domain.member.service.oauth.dto.OauthCodeRes;
 import dy.whatsong.domain.member.service.oauth.dto.OauthProperties;
-import dy.whatsong.domain.member.service.oauth.dto.OauthTokenValidRes;
+import dy.whatsong.domain.member.service.oauth.dto.res.KakaoUserRes;
+import dy.whatsong.domain.member.service.oauth.dto.res.MemberDetailRes;
+import dy.whatsong.domain.member.service.oauth.dto.res.OauthCodeRes;
+import dy.whatsong.domain.member.service.oauth.dto.res.OauthTokenValidRes;
+import dy.whatsong.global.exception.InvalidRequestAPIException;
 import dy.whatsong.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -92,7 +94,7 @@ public class OauthService {
         return responseEntity.getBody();
     }
 
-    public Long singUp(String accessToken, String refreshToken, String innerNickName) {
+    public String singUp(String accessToken, String refreshToken, String innerNickName) {
         String accessToken1 = eliminateBearerPrefix(accessToken);
         System.out.println("!=" + accessToken1);
         KakaoUserRes kakaoUserRes = getUserInfo(accessToken1);
@@ -106,10 +108,29 @@ public class OauthService {
 
         Member saveMember = memberRepository.save(member);
 
-        return saveMember.getMemberSeq();
+        return saveMember.getOauthId();
     }
 
     public boolean validationForToken(String accessToken) {
+        ResponseEntity<OauthTokenValidRes> responseEntity = getUserInfoByAccessToken(accessToken);
+
+        OauthTokenValidRes response = responseEntity.getBody();
+        if (response.expires_in() <= 10) {
+            return false;
+        }
+        return true;
+    }
+
+    public MemberDetailRes getMe(String accessToken) {
+        ResponseEntity<OauthTokenValidRes> responseEntity = getUserInfoByAccessToken(accessToken);
+
+        OauthTokenValidRes response = responseEntity.getBody();
+        Member member = memberRepository.findByOauthId(response.id().toString()).orElseThrow(InvalidRequestAPIException::new);
+
+        return new MemberDetailRes(member);
+    }
+
+    private ResponseEntity<OauthTokenValidRes> getUserInfoByAccessToken(String accessToken) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", accessToken);
 
@@ -126,11 +147,7 @@ public class OauthService {
             throw new UnauthorizedException();
         }
 
-        OauthTokenValidRes response = responseEntity.getBody();
-        if (response.expires_in() <= 10) {
-            return false;
-        }
-        return true;
+        return responseEntity;
     }
 
     public void tokenReissue(String refreshToken) {

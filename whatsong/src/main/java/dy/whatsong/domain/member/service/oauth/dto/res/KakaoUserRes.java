@@ -1,4 +1,4 @@
-package dy.whatsong.domain.member.service.oauth.dto;
+package dy.whatsong.domain.member.service.oauth.dto.res;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
