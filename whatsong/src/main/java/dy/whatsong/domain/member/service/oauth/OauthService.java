@@ -15,6 +15,11 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Optional;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -45,11 +50,21 @@ public class OauthService {
                 requestEntity,
                 OauthCodeRes.class
         );
+
         OauthCodeRes oauthCodeRes = responseEntity.getBody();
+
+        assert oauthCodeRes != null;
         KakaoUserRes kakaoUserRes = getUserInfo(oauthCodeRes.access_token());
-        if (memberRepository.findByOauthId(kakaoUserRes.getId()).isPresent()) {
+
+        if (responseEntity.getStatusCode() == UNAUTHORIZED || responseEntity.getStatusCode() == BAD_REQUEST) {
+            throw new UnauthorizedException();
+        }
+
+        Optional<Member> findMember = memberRepository.findByOauthId(kakaoUserRes.getId());
+        if (findMember.isPresent()) {
             oauthCodeRes = new OauthCodeRes(oauthCodeRes, kakaoUserRes.getId());
         }
+
         return oauthCodeRes;
     }
 
@@ -69,11 +84,19 @@ public class OauthService {
                 KakaoUserRes.class
         );
 
+        if (responseEntity.getStatusCode() == UNAUTHORIZED) {
+            throw new UnauthorizedException();
+        }
+
+        System.out.println(responseEntity);
         return responseEntity.getBody();
     }
 
     public Long singUp(String accessToken, String refreshToken, String innerNickName) {
-        KakaoUserRes kakaoUserRes = getUserInfo(accessToken);
+        String accessToken1 = eliminateBearerPrefix(accessToken);
+        System.out.println("!=" + accessToken1);
+        KakaoUserRes kakaoUserRes = getUserInfo(accessToken1);
+
         Member member = new Member(kakaoUserRes.getKakaoAccount().getEmail(),
                 kakaoUserRes.getProperties().getNickname(),
                 innerNickName,
@@ -99,7 +122,7 @@ public class OauthService {
                 OauthTokenValidRes.class
         );
 
-        if (responseEntity.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+        if (responseEntity.getStatusCode() == UNAUTHORIZED) {
             throw new UnauthorizedException();
         }
 
@@ -110,7 +133,49 @@ public class OauthService {
         return true;
     }
 
-    public void tokenReissue() {
+    public void tokenReissue(String refreshToken) {
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+        parameters.add("grant_type", "authorization_code");
+        parameters.add("client_id", oauthProperties.getKakaoClientId());
+        parameters.add("refresh_token", refreshToken);
 
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("charset", "utf-8");
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, headers);
+
+        ResponseEntity<OauthCodeRes> responseEntity = restTemplate.exchange(
+                oauthProperties.getReissueURI(),
+                HttpMethod.POST,
+                requestEntity,
+                OauthCodeRes.class
+        );
+
+        System.out.println(responseEntity);
+    }
+
+    public void logout(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", accessToken);
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(null, headers);
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange(
+                oauthProperties.getLogoutURI(),
+                HttpMethod.POST,
+                requestEntity,
+                String.class
+        );
+
+        System.out.println(responseEntity);
+    }
+
+    private String eliminateBearerPrefix(String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            return token.substring("Bearer ".length());
+        }
+        return token;
     }
 }

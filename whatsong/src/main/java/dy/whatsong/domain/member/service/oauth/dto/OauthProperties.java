@@ -21,4 +21,10 @@ public class OauthProperties {
 
     @Value("https://kapi.kakao.com/v1/user/access_token_info")
     private String tokenValidURI;
+
+    @Value("https://kauth.kakao.com/oauth/token")
+    private String reissueURI;
+
+    @Value("https://kapi.kakao.com/v1/user/logout")
+    private String logoutURI;
 }
