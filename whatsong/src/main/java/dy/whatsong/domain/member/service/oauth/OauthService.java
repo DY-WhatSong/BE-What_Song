@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +23,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @Service
 @RequiredArgsConstructor
 @Log4j2
+@Transactional
 public class OauthService {
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -184,14 +186,17 @@ public class OauthService {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(null, headers);
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange(
+        ResponseEntity<LogoutRes> responseEntity = restTemplate.exchange(
                 oauthProperties.getLogoutURI(),
                 HttpMethod.POST,
                 requestEntity,
-                String.class
+                LogoutRes.class
         );
 
-        System.out.println(responseEntity);
+        LogoutRes logoutRes = responseEntity.getBody();
+
+        Member member = memberRepository.findByOauthId(logoutRes.id().toString()).orElseThrow(InvalidRequestAPIException::new);
+        member.updateRefreshToken(null);
     }
 
     private String eliminateBearerPrefix(String token) {

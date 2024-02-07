@@ -44,4 +44,9 @@ public class OauthController {
 
         return ResponseEnvelope.of(reissueRes);
     }
+
+    @PostMapping("/logout")
+    public void logout(@RequestHeader("Authorization") String accessToken) {
+        oauthService.logout(accessToken);
+    }
 }
