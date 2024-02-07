@@ -9,7 +9,7 @@ import dy.whatsong.domain.reservation.entity.Reservation;
 import dy.whatsong.domain.reservation.repo.ReservationRepository;
 import dy.whatsong.domain.streaming.application.service.RoomWsService;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
-import dy.whatsong.global.handler.exception.InvalidRequestAPIException;
+import dy.whatsong.global.exception.InvalidRequestAPIException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -84,7 +84,7 @@ public class ReservationServiceImpl implements ReservationService {
         System.out.println("뮤직승인!");
         Optional<Reservation> findOptionReservation = reservationRepository.findById(approveDTO.getReservationId());
         if (findOptionReservation.isEmpty()) {
-            throw new InvalidRequestAPIException("Invalid Request", 400);
+            throw new InvalidRequestAPIException();
         }
         Reservation reSaveReserv = reSaveReservationEntity(
                 findOptionReservation.get()
