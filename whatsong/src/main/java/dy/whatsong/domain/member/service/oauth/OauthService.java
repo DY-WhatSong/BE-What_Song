@@ -170,9 +170,9 @@ public class OauthService {
         ReissueRes reissueRes = responseEntity.getBody();
 
         assert reissueRes != null;
-        if (reissueRes.refreshToken().isPresent()) {
+        if (reissueRes.refresh_token().isPresent()) {
             Member member = memberRepository.findByRefreshToken(refreshToken).orElseThrow(InvalidRequestAPIException::new);
-            member.updateRefreshToken(reissueRes.refreshToken().get());
+            member.updateRefreshToken(reissueRes.refresh_token().get());
         }
 
         return reissueRes;
