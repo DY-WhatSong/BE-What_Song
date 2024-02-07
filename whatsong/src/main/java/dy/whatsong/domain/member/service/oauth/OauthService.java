@@ -3,10 +3,7 @@ package dy.whatsong.domain.member.service.oauth;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.domain.member.service.oauth.dto.OauthProperties;
-import dy.whatsong.domain.member.service.oauth.dto.res.KakaoUserRes;
-import dy.whatsong.domain.member.service.oauth.dto.res.MemberDetailRes;
-import dy.whatsong.domain.member.service.oauth.dto.res.OauthCodeRes;
-import dy.whatsong.domain.member.service.oauth.dto.res.OauthTokenValidRes;
+import dy.whatsong.domain.member.service.oauth.dto.res.*;
 import dy.whatsong.global.exception.InvalidRequestAPIException;
 import dy.whatsong.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
@@ -150,9 +147,9 @@ public class OauthService {
         return responseEntity;
     }
 
-    public void tokenReissue(String refreshToken) {
+    public ReissueRes tokenReissue(String refreshToken) {
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
-        parameters.add("grant_type", "authorization_code");
+        parameters.add("grant_type", "refresh_token");
         parameters.add("client_id", oauthProperties.getKakaoClientId());
         parameters.add("refresh_token", refreshToken);
 
@@ -163,14 +160,22 @@ public class OauthService {
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(parameters, headers);
 
-        ResponseEntity<OauthCodeRes> responseEntity = restTemplate.exchange(
+        ResponseEntity<ReissueRes> responseEntity = restTemplate.exchange(
                 oauthProperties.getReissueURI(),
                 HttpMethod.POST,
                 requestEntity,
-                OauthCodeRes.class
+                ReissueRes.class
         );
 
-        System.out.println(responseEntity);
+        ReissueRes reissueRes = responseEntity.getBody();
+
+        assert reissueRes != null;
+        if (reissueRes.refreshToken().isPresent()) {
+            Member member = memberRepository.findByRefreshToken(refreshToken).orElseThrow(InvalidRequestAPIException::new);
+            member.updateRefreshToken(reissueRes.refreshToken().get());
+        }
+
+        return reissueRes;
     }
 
     public void logout(String accessToken) {

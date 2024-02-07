@@ -5,6 +5,7 @@ import dy.whatsong.domain.member.service.oauth.dto.req.OauthCodeReq;
 import dy.whatsong.domain.member.service.oauth.dto.req.OauthSingUpReq;
 import dy.whatsong.domain.member.service.oauth.dto.res.MemberDetailRes;
 import dy.whatsong.domain.member.service.oauth.dto.res.OauthCodeRes;
+import dy.whatsong.domain.member.service.oauth.dto.res.ReissueRes;
 import dy.whatsong.global.dto.ResponseEnvelope;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -35,5 +36,12 @@ public class OauthController {
         MemberDetailRes memberDetailRes = oauthService.getMe(accessToken);
 
         return ResponseEnvelope.of(memberDetailRes);
+    }
+
+    @PostMapping("/reissue")
+    public ResponseEnvelope<ReissueRes> reissueToken(@RequestHeader("Authorization_Refresh") String refreshToken) {
+        ReissueRes reissueRes = oauthService.tokenReissue(refreshToken);
+
+        return ResponseEnvelope.of(reissueRes);
     }
 }
