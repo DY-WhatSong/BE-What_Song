@@ -151,7 +151,7 @@ public class OauthService {
         MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
         parameters.add("grant_type", "refresh_token");
         parameters.add("client_id", oauthProperties.getKakaoClientId());
-        parameters.add("refresh_token", refreshToken);
+        parameters.add("refresh_token", eliminateBearerPrefix(refreshToken));
 
         HttpHeaders headers = new HttpHeaders();
 
