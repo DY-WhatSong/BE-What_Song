@@ -1,6 +1,5 @@
 package dy.whatsong.domain.member.service.oauth;
 
-import dy.whatsong.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -25,12 +24,15 @@ public class OauthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("Request-uri:" + request.getRequestURI());
+        
         if (!isIgnoreUrl(request.getRequestURI())) {
             String accessToken = request.getHeader("Authorization");
             if (!oauthService.validationForToken(accessToken)) {
-                throw new UnauthorizedException();
+                oauthService.error(response);
+                return;
             }
         }
+
 
         filterChain.doFilter(request, response);
     }

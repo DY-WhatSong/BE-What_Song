@@ -3,6 +3,7 @@ package dy.whatsong.domain.member.api.oauth;
 import dy.whatsong.domain.member.service.oauth.OauthService;
 import dy.whatsong.domain.member.service.oauth.dto.req.OauthCodeReq;
 import dy.whatsong.domain.member.service.oauth.dto.req.OauthSingUpReq;
+import dy.whatsong.domain.member.service.oauth.dto.req.ReissueReq;
 import dy.whatsong.domain.member.service.oauth.dto.res.MemberDetailRes;
 import dy.whatsong.domain.member.service.oauth.dto.res.OauthCodeRes;
 import dy.whatsong.domain.member.service.oauth.dto.res.ReissueRes;
@@ -39,8 +40,8 @@ public class OauthController {
     }
 
     @PostMapping("/reissue")
-    public ResponseEnvelope<ReissueRes> reissueToken(@RequestHeader("Authorization_Refresh") String refreshToken) {
-        ReissueRes reissueRes = oauthService.tokenReissue(refreshToken);
+    public ResponseEnvelope<ReissueRes> reissueToken(@RequestBody ReissueReq refreshToken) {
+        ReissueRes reissueRes = oauthService.tokenReissue(refreshToken.Authorization_Refresh());
 
         return ResponseEnvelope.of(reissueRes);
     }

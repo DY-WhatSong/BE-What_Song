@@ -4,6 +4,7 @@ import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.repository.MemberRepository;
 import dy.whatsong.domain.member.service.oauth.dto.OauthProperties;
 import dy.whatsong.domain.member.service.oauth.dto.res.*;
+import dy.whatsong.global.dto.ResponseEnvelope;
 import dy.whatsong.global.exception.InvalidRequestAPIException;
 import dy.whatsong.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -204,5 +207,16 @@ public class OauthService {
             return token.substring("Bearer ".length());
         }
         return token;
+    }
+
+    public void error(HttpServletResponse response) throws IOException {
+        ResponseEnvelope<?> envelope = ResponseEnvelope.of(
+                "401",
+                null,
+                "인증되지 않은 사용자입니다."
+        );
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.getWriter().write(String.valueOf(envelope));
     }
 }
