@@ -10,6 +10,10 @@ import dy.whatsong.global.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -27,7 +31,7 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @RequiredArgsConstructor
 @Log4j2
 @Transactional
-public class OauthService {
+public class OauthService implements UserDetailsService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final OauthProperties oauthProperties;
@@ -218,5 +222,17 @@ public class OauthService {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.getWriter().write(String.valueOf(envelope));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("해당 이메일이 존재하지 않습니다."));
+
+        return User.builder()
+                .username(member.getEmail())
+                .password(member.getOauthId())
+                .roles("ROLE_USER")
+                .build();
     }
 }

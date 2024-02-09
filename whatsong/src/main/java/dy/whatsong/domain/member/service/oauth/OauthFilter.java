@@ -24,7 +24,7 @@ public class OauthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("Request-uri:" + request.getRequestURI());
-        
+
         if (!isIgnoreUrl(request.getRequestURI())) {
             String accessToken = request.getHeader("Authorization");
             if (!oauthService.validationForToken(accessToken)) {
@@ -33,6 +33,7 @@ public class OauthFilter extends OncePerRequestFilter {
             }
         }
 
+        response.setStatus(response.SC_OK);
 
         filterChain.doFilter(request, response);
     }
