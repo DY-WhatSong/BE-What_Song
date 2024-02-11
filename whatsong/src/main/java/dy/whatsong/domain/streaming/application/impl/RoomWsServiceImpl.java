@@ -8,11 +8,12 @@ import dy.whatsong.domain.streaming.entity.room.MRWS;
 import dy.whatsong.domain.streaming.entity.room.Status;
 import dy.whatsong.domain.streaming.repo.MRSseRepository;
 import dy.whatsong.global.annotation.EssentialServiceLayer;
-import dy.whatsong.global.handler.exception.InvalidRequestAPIException;
+import dy.whatsong.global.exception.InvalidRequestAPIException;
 import lombok.RequiredArgsConstructor;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Optional;
 
 @EssentialServiceLayer
 @RequiredArgsConstructor
@@ -30,14 +31,14 @@ public class RoomWsServiceImpl implements RoomWsService {
 
     @Override
     public MRWS getMRSseByRoomCode(String roomCode) {
-        System.out.println("RC="+roomCode);
+        System.out.println("RC=" + roomCode);
         Optional<MRWS> byId = mrSseRepository.findById(roomCode);
         if (byId.isEmpty()) System.out.println("!!!!");
-        return mrSseRepository.findById(roomCode).orElseThrow(()->new InvalidRequestAPIException("Invalid Request",400));
+        return mrSseRepository.findById(roomCode).orElseThrow(InvalidRequestAPIException::new);
     }
 
-    private LinkedList<MRWS> changeIterableToArrayList(Iterable<MRWS> targetIterable){
-        LinkedList<MRWS> currentReservList=new LinkedList<>();
+    private LinkedList<MRWS> changeIterableToArrayList(Iterable<MRWS> targetIterable) {
+        LinkedList<MRWS> currentReservList = new LinkedList<>();
         for (MRWS mrSse : targetIterable) {
             currentReservList.add(mrSse);
         }
@@ -45,7 +46,7 @@ public class RoomWsServiceImpl implements RoomWsService {
     }
 
     @Transactional
-    public MRWS saveCurrentRoomState(final Reservation reservation){
+    public MRWS saveCurrentRoomState(final Reservation reservation) {
         MusicRoom infoMRBySeq = musicCheckService.getInfoMRBySeq(reservation.getRoomSeq());
         System.out.println("====================");
         System.out.println(infoMRBySeq.getRoomCode());
@@ -54,7 +55,7 @@ public class RoomWsServiceImpl implements RoomWsService {
         return mrSseRepository.save(
                 MRWS.builder()
                         .videoId(reservation.getSelectVideo().getVideoId())
-                        .roomCode(infoMRBySeq.getRoomCode()+reservation.getSelectVideo().getVideoId())
+                        .roomCode(infoMRBySeq.getRoomCode() + reservation.getSelectVideo().getVideoId())
                         .status(Status.PAUSE)
                         .timestamp("0")
                         .build()
