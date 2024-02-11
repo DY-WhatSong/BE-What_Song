@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -36,6 +37,8 @@ public class OauthService implements UserDetailsService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final OauthProperties oauthProperties;
     private final MemberRepository memberRepository;
+    private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
 
     public OauthCodeRes getTokenInfoByResourceServer(String code) {
 
@@ -231,8 +234,8 @@ public class OauthService implements UserDetailsService {
 
         return User.builder()
                 .username(member.getEmail())
-                .password(member.getOauthId())
-                .roles("ROLE_USER")
+                .password(passwordEncoder.encode(member.getOauthId()))
+                .roles("USER")
                 .build();
     }
 }

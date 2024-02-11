@@ -1,7 +1,6 @@
 package dy.whatsong.global.filter.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -34,9 +33,10 @@ public class CustomOauthFilter extends AbstractAuthenticationProcessingFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         System.out.println("!!!!!!=" + request.getRequestURI());
+        /*
         if (request.getContentType() == null || !request.getContentType().equals(CONTENT_TYPE)) {
             throw new AuthenticationServiceException("Authentication Content-Type not supported: " + request.getContentType());
-        }
+        }*/
 
         String messageBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
         System.out.println(messageBody);
@@ -46,7 +46,11 @@ public class CustomOauthFilter extends AbstractAuthenticationProcessingFilter {
         String password = usernamePasswordMap.get(PASSWORD_KEY);
 
 */
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("email", "password");//principal 과 credentials 전달
+        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("newjin46@gmail.com", "3304914763");//principal 과 credentials 전달
+
+        if (request.getRequestURI().equals(DEFAULT_LOGIN_REQUEST_URL)) {
+            return this.getAuthenticationManager().authenticate(authRequest);
+        }
 
         return this.getAuthenticationManager().authenticate(authRequest);
     }

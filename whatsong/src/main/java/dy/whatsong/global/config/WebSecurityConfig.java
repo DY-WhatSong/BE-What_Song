@@ -16,7 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -50,13 +50,14 @@ public class WebSecurityConfig {
                         "/user/kakao/callback",
                         "/healthcheck",
                         "/user/login",
-                        "/oauth/**"
+                        "/oauth/**",
+                        "/oauth/callback"
                 )
                 .permitAll()
                 .antMatchers("/api/v1/**").authenticated()
                 .antMatchers("/chat/**").permitAll()// chat으로 시작하는 리소스에 대한 접근 권한 설정
                 .anyRequest().authenticated();
-        http.addFilterAfter(customOauthFilter(), LogoutFilter.class);
+        http.addFilterAfter(customOauthFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(oauthAuthenticationFilter(), CustomOauthFilter.class);
 
 //                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
