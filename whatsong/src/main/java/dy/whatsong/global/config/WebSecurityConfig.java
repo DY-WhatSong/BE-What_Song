@@ -39,8 +39,8 @@ public class WebSecurityConfig {
 //                .addFilter(corsFilter);
                 .sessionManagement()    // jwt 토큰을 사용하게 되면 세션을 사용하지 않는다고 서버에 명시적으로 선언해 주어야 합니다.
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-        http.authorizeRequests()
+        http.authorizeRequests().antMatchers("/oauth/**", "/healthcheck").permitAll();
+       /* http.authorizeRequests()
                 .antMatchers("/oauth/**",
                         "/test",
                         "/test/**",
@@ -53,9 +53,10 @@ public class WebSecurityConfig {
                         "/oauth/**",
                         "/oauth/callback"
                 )
-                .permitAll()
+                .permitAll()*/
+        http.authorizeRequests()
                 .antMatchers("/api/v1/**").authenticated()
-                .antMatchers("/chat/**").permitAll()// chat으로 시작하는 리소스에 대한 접근 권한 설정
+//                .antMatchers("/chat/**").permitAll()// chat으로 시작하는 리소스에 대한 접근 권한 설정
                 .anyRequest().authenticated();
         http.addFilterAfter(customOauthFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(oauthAuthenticationFilter(), CustomOauthFilter.class);

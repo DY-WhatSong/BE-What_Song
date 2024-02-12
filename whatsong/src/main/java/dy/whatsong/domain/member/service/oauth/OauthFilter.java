@@ -19,7 +19,7 @@ public class OauthFilter extends OncePerRequestFilter {
 
     private final OauthService oauthService;
 
-    private final List<String> ignoreValidUrl = List.of("/oauth/callback", "/oauth/signup", "/oauth/reissue");
+    private final List<String> ignoreValidUrl = List.of("/oauth/callback", "/oauth/signup", "/oauth/reissue", "/healthcheck");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
