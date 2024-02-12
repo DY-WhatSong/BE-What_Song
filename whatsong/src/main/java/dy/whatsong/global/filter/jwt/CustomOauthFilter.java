@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.global.filter.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,19 +34,23 @@ public class CustomOauthFilter extends AbstractAuthenticationProcessingFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         System.out.println("!!!!!!=" + request.getRequestURI());
-        /*
+        */
+/*
         if (request.getContentType() == null || !request.getContentType().equals(CONTENT_TYPE)) {
             throw new AuthenticationServiceException("Authentication Content-Type not supported: " + request.getContentType());
-        }*/
+        }*//*
+
 
         String messageBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
         System.out.println(messageBody);
-        /*Map<String, String> usernamePasswordMap = objectMapper.readValue(messageBody, Map.class);
+        */
+/*Map<String, String> usernamePasswordMap = objectMapper.readValue(messageBody, Map.class);
 
         String email = usernamePasswordMap.get();
         String password = usernamePasswordMap.get(PASSWORD_KEY);
 
-*/
+*//*
+
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("newjin46@gmail.com", "3304914763");//principal 과 credentials 전달
 
         if (request.getRequestURI().equals(DEFAULT_LOGIN_REQUEST_URL)) {
@@ -55,3 +60,4 @@ public class CustomOauthFilter extends AbstractAuthenticationProcessingFilter {
         return this.getAuthenticationManager().authenticate(authRequest);
     }
 }
+*/
