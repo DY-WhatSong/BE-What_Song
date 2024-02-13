@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.domain.member.api;
 
 import dy.whatsong.domain.member.dto.MemberDto;
@@ -41,3 +42,4 @@ public class MemberController {
     }
 
 }
+*/

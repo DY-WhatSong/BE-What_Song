@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.domain.member.api;
 
 import dy.whatsong.domain.member.application.service.check.MemberCheckService;
@@ -5,7 +6,6 @@ import dy.whatsong.domain.member.dto.KakaoProfile;
 import dy.whatsong.domain.member.dto.OAuthToken;
 import dy.whatsong.domain.member.entity.Member;
 import dy.whatsong.domain.member.service.MemberService;
-import dy.whatsong.domain.member.service.TokenService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,3 +70,4 @@ public class TokenController {
         );
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.domain.member.api;
 
 import com.nimbusds.openid.connect.sdk.claims.UserInfo;
@@ -54,3 +55,4 @@ public class LoginController {
                 .build();
     }
 }
+*/

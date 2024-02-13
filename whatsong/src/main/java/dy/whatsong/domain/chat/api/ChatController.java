@@ -1,3 +1,4 @@
+/*
 package dy.whatsong.domain.chat.api;
 
 import dy.whatsong.domain.chat.model.ChatMessage;
@@ -19,9 +20,11 @@ public class ChatController {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
 
-    /**
-     * websocket "/app/chat/message"로 들어오는 메시징을 처리한다.
-     */
+    */
+/**
+ * websocket "/app/chat/message"로 들어오는 메시징을 처리한다.
+ *//*
+
     @MessageMapping("/chat/message")
     public void message(ChatMessage message, @Header("authorization") String token) {
         log.info("message : {}, token : {}", message, token);
@@ -36,3 +39,4 @@ public class ChatController {
         }
     }
 }
+*/

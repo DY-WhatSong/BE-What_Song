@@ -19,7 +19,7 @@ public class OauthFilter extends OncePerRequestFilter {
 
     private final OauthService oauthService;
 
-    private final List<String> ignoreValidUrl = List.of("/oauth/callback", "/oauth/signup", "/oauth/reissue", "/healthcheck");
+    private final List<String> ignoreValidUrl = List.of("/oauth/callback", "/oauth/signup", "/oauth/reissue", "/healthcheck", "/ws-stomp/info", "/app", "/topic", "/stream", "/ws-stomp");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -27,13 +27,13 @@ public class OauthFilter extends OncePerRequestFilter {
 
         if (!isIgnoreUrl(request.getRequestURI())) {
             String accessToken = request.getHeader("Authorization");
-            if (!oauthService.validationForToken(accessToken)) {
+            /*if (!oauthService.validationForToken(accessToken)) {
                 oauthService.error(response);
                 return;
-            }
+            }*/
         }
 
-        response.setStatus(response.SC_OK);
+//        response.setStatus(response.SC_OK);
 
         filterChain.doFilter(request, response);
     }

@@ -1,9 +1,9 @@
+/*
 package dy.whatsong.domain.chat.api;
 
 import dy.whatsong.domain.chat.model.ChatRoom;
 import dy.whatsong.domain.chat.model.LoginInfo;
 import dy.whatsong.domain.chat.repo.ChatRoomRepository;
-import dy.whatsong.domain.member.service.TokenService;
 import dy.whatsong.global.constant.Properties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,7 +20,6 @@ public class ChatRoomController {
 
     private final Properties.JwtProperties jwtProperties;
     private final ChatRoomRepository chatRoomRepository;
-    private final TokenService tokenService;
 
     @GetMapping("/room")
     public String rooms() {
@@ -63,3 +62,4 @@ public class ChatRoomController {
                 .build();
     }
 }
+*/

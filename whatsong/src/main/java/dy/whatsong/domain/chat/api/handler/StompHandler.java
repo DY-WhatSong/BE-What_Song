@@ -4,7 +4,7 @@ import dy.whatsong.domain.chat.repo.ChatRoomRepository;
 import dy.whatsong.domain.chat.service.ChatService;
 import dy.whatsong.domain.member.application.service.cache.MemberCacheService;
 import dy.whatsong.domain.member.dto.MemberRequestCacheDTO;
-import dy.whatsong.domain.member.service.TokenService;
+import dy.whatsong.domain.member.service.oauth.OauthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
@@ -24,10 +24,10 @@ import java.util.regex.Pattern;
 @Component
 public class StompHandler implements ChannelInterceptor {
 
-    private final TokenService tokenService;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
     private final MemberCacheService memberCacheService;
+    private final OauthService oauthService;
 
     // websocket을 통해 들어온 요청이 처리 되기전 실행된다.
     @Override
@@ -41,7 +41,6 @@ public class StompHandler implements ChannelInterceptor {
             System.out.println("Connect");
             log.info("CONNECT {}", jwtToken);
             // Header의 jwt token 검증
-            tokenService.validateToken(eliminateInBearerToken(jwtToken));
         } else if (StompCommand.SUBSCRIBE == commandType) { // 채팅룸 구독요청
             // header정보에서 구독 destination정보를 얻고, roomId를 추출한다.
             String chatRoomSequence = chatService.getChatRoomSequence(Optional.ofNullable((String) message.getHeaders().get("simpDestination")).orElse("InvalidChatRoomSequence"));
@@ -74,33 +73,34 @@ public class StompHandler implements ChannelInterceptor {
             // 퇴장한 클라이언트의 chatRoomSequence 맵핑 정보를 삭제한다.
             chatRoomRepository.removeUserEnterInfo(sessionId);
             log.info("DISCONNECTED {}, {}", sessionId, chatRoomSequence);
-        }else if (StompCommand.SEND==commandType){
-            System.out.println("url:"+ destinationUrl);
-            if (destinationUrl.contains("enter")){
-                memberCacheService.putMemberInCacheIfEmpty(processMemberCache(destinationUrl,jwtToken));
-            }else if (destinationUrl.contains("leave")){
-                memberCacheService.leaveMemberInCache(processMemberCache(destinationUrl,jwtToken));
+        } else if (StompCommand.SEND == commandType) {
+            System.out.println("url:" + destinationUrl);
+            if (destinationUrl.contains("enter")) {
+                memberCacheService.putMemberInCacheIfEmpty(processMemberCache(destinationUrl, jwtToken));
+            } else if (destinationUrl.contains("leave")) {
+                memberCacheService.leaveMemberInCache(processMemberCache(destinationUrl, jwtToken));
             }
         }
         return message;
     }
-    public String getUsernameByTokenDecode(String accessToken){
-        return tokenService.getUsernameByToken(accessToken);
+
+    public String getUsernameByTokenDecode(String accessToken) {
+        return oauthService.getMe(accessToken).email();
     }
 
-    public String eliminateInBearerToken(String accessToken){
-        return accessToken.replaceAll("Bearer ","");
+    public String eliminateInBearerToken(String accessToken) {
+        return accessToken.replaceAll("Bearer ", "");
     }
 
-    public String getRoomCodeInDestUrl(String destinationUrl){
+    public String getRoomCodeInDestUrl(String destinationUrl) {
         Matcher matcher = Pattern.compile("/app/([a-fA-F0-9-]+)/").matcher(destinationUrl);
         return matcher.find() ? matcher.group(1) : null;
     }
 
     public MemberRequestCacheDTO.BasicInfo processMemberCache(String destinationUrl, String jwtToken) {
         return MemberRequestCacheDTO.BasicInfo.builder()
-                        .roomCode(getRoomCodeInDestUrl(destinationUrl))
-                        .username(getUsernameByTokenDecode(jwtToken))
-                        .build();
+                .roomCode(getRoomCodeInDestUrl(destinationUrl))
+                .username(getUsernameByTokenDecode(jwtToken))
+                .build();
     }
 }
