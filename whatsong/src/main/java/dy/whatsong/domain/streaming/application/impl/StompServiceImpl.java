@@ -19,7 +19,7 @@ public class StompServiceImpl implements StompService {
 
     @Override
     public List<Reservation> musicSkipInPlaylist(List<Reservation> reservationList, Long roomSeq) {
-        if (reservationList.size() <= 1) {
+        if (reservationList.size() < 1) {
             return new ArrayList<>();
         }
         Reservation reservation = reservationList.get(0);
