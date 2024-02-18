@@ -47,6 +47,7 @@ public class RoomSocketAPI {
     public void memberEnterTheMusicRoom(@DestinationVariable String roomCode) {
         System.out.println("User ROOM ENTER");
         RoomMember roomOfMemberList = memberCacheService.getRoomOfMemberList(roomCode);
+        System.out.println("ROOM MEMBER :" + roomOfMemberList);
         template.convertAndSend("/stream/" + roomCode + "/room/enter", roomOfMemberList);
     }
 
@@ -69,10 +70,11 @@ public class RoomSocketAPI {
     public void currentRoomStateInfo(@DestinationVariable String roomCode, @RequestBody MRWSRequest.playerCurrentState playerCurrentState) {
         List<Reservation> reservationList = reservationService.approveReservationList(playerCurrentState.getRoomSeq());
         System.out.println("제일중요=" + reservationList);
+        System.out.println("Controller Status :" + playerCurrentState.getController());
         if (playerCurrentState.getController() == null) {
             template.convertAndSend("/stream/" + roomCode + "/playlist/current/info", reservationList);
         } else {
-            List<Reservation> retuReservationList = stompService.musicSkipInPlaylist(reservationList);
+            List<Reservation> retuReservationList = stompService.musicSkipInPlaylist(reservationList, playerCurrentState.getRoomSeq());
             template.convertAndSend("/stream/" + roomCode + "/playlist/current/info", retuReservationList);
         }
     }
