@@ -76,6 +76,7 @@ public class StompHandler implements ChannelInterceptor {
         } else if (StompCommand.SEND == commandType) {
             System.out.println("url:" + destinationUrl);
             if (destinationUrl.contains("enter")) {
+                log.info("JWT TOKEN IN STOMP HANDLER :" + jwtToken);
                 memberCacheService.putMemberInCacheIfEmpty(processMemberCache(destinationUrl, jwtToken));
             } else if (destinationUrl.contains("leave")) {
                 memberCacheService.leaveMemberInCache(processMemberCache(destinationUrl, jwtToken));

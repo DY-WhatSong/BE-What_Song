@@ -27,10 +27,10 @@ public class OauthFilter extends OncePerRequestFilter {
 
         if (!isIgnoreUrl(request.getRequestURI())) {
             String accessToken = request.getHeader("Authorization");
-            /*if (!oauthService.validationForToken(accessToken)) {
+            if (!oauthService.validationForToken(accessToken)) {
                 oauthService.error(response);
                 return;
-            }*/
+            }
         }
 
 //        response.setStatus(response.SC_OK);
