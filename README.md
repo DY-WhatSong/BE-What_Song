@@ -1,8 +1,6 @@
 # BE-What-s_Song
 What's Song(왓송) 서비스 백엔드 레포지토리
 
-# BE-Mogakco
-
 ## 프로젝트 아키텍쳐
 
 ![image](https://github.com/DY-WhatSong/BE-What_Song/assets/39437170/7b4ba815-c0b7-4ecd-92e3-8dfc8401af1b)
